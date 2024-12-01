@@ -1,6 +1,5 @@
 package component:nana;
 
-/// An example world for the component to target.
-world example {
-    export hello-world: func() -> string;
+world command {
+  export wasi:cli/run@0.2.2;
 }

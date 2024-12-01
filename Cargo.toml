@@ -20,3 +20,11 @@ lto = true
 package = "component:nana"
 
 [package.metadata.component.dependencies]
+
+[package.metadata.component.target.dependencies]
+"wasi:cli" = { path = "wit/wasi/cli" }
+"wasi:io" = { path = "wit/wasi/io" }
+"wasi:clocks" = { path = "wit/wasi/clocks" }
+"wasi:filesystem" = { path = "wit/wasi/filesystem" }
+"wasi:sockets" = { path = "wit/wasi/sockets" }
+"wasi:random" = { path = "wit/wasi/random" }

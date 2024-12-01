@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+# Will build a component that does not import any wasi
+cargo component build \
+  --release \
+  --target wasm32-unknown-unknown

@@ -1,14 +1,15 @@
 #[allow(warnings)]
 mod bindings;
 
-use bindings::Guest;
+use bindings::exports::wasi::cli::run::Guest as Command;
 
 struct Component;
 
-impl Guest for Component {
+impl Command for Component {
     /// Say hello!
-    fn hello_world() -> String {
-        "Hello, World!".to_string()
+    fn run() -> Result<(), ()> {
+        println!("Hello world");
+        Ok(())
     }
 }
 

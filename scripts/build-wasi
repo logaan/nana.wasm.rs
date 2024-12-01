@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+cargo component build \
+  --release \
+  --target wasm32-wasip1

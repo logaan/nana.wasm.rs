@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+wasmtime run target/wasm32-wasip1/release/nana.wasm
