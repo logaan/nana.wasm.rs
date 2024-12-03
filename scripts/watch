@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+fswatch \
+  -o \
+  `find src ! -name "bindings.rs" -type f` \
+  scripts wit Cargo.lock Cargo.toml \
+  | xargs -n1 -I{} ./scripts/test

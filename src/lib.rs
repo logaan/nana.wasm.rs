@@ -20,25 +20,31 @@ fn titlecase_word(input: &str) -> IResult<&str, String> {
     })(input)
 }
 
-fn parse_uppercase() {
-    assert_eq!(uppercase_char("Foo"), Ok(("oo", 'F')));
-    assert_eq!(titlecase_word("Foo"), Ok(("", "Foo".to_string())));
-    assert_eq!(titlecase_word("Foo Bar"), Ok((" Bar", "Foo".to_string())));
-    assert_eq!(
-        titlecase_word("foo Bar"),
-        Err(nom::Err::Error(nom::error::Error {
-            input: "foo Bar",
-            code: nom::error::ErrorKind::Satisfy
-        }))
-    );
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_uppercase() {
+        assert_eq!(uppercase_char("F"), Ok(("", 'F')));
+        assert_eq!(uppercase_char("Foo"), Ok(("oo", 'F')));
+        assert_eq!(titlecase_word("Foo"), Ok(("", "Foo".to_string())));
+        assert_eq!(titlecase_word("Foo Bar"), Ok((" Bar", "Foo".to_string())));
+        assert_eq!(
+            titlecase_word("foo Bar"),
+            Err(nom::Err::Error(nom::error::Error {
+                input: "foo Bar",
+                code: nom::error::ErrorKind::Satisfy
+            }))
+        );
+    }
 }
 
 struct Component;
 
 impl Command for Component {
     fn run() -> Result<(), ()> {
-        parse_uppercase();
-        println!("Tests passed");
+        println!("Hello world");
         Ok(())
     }
 }
