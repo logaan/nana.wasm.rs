@@ -1,7 +1,10 @@
 use std::fmt::Debug;
 
 use super::general::*;
-use nom::{branch::alt, combinator::map, multi::many0, IResult};
+use nom::{
+    branch::alt, character::complete::multispace0, combinator::map, multi::many0,
+    sequence::delimited, IResult,
+};
 
 #[derive(PartialEq, Debug)]
 pub enum Expression {
@@ -22,5 +25,9 @@ pub fn value_name(input: &str) -> IResult<&str, Expression> {
 }
 
 pub fn program(input: &str) -> IResult<&str, Vec<Expression>> {
-    many0(alt((macro_name, value_name)))(input)
+    many0(delimited(
+        multispace0,
+        alt((macro_name, value_name)),
+        multispace0,
+    ))(input)
 }
