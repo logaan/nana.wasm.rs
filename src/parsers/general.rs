@@ -18,7 +18,7 @@ pub fn lowercase_char(input: &str) -> IResult<&str, char> {
 }
 
 fn nana_name_char(input: &str) -> IResult<&str, char> {
-    alt((satisfy(|c| c.is_alphanumeric()), one_of(":/@-.")))(input)
+    alt((satisfy(|c| c.is_alphanumeric()), one_of(":/@-.<>")))(input)
 }
 
 pub fn nana_name0(input: &str) -> IResult<&str, String> {
