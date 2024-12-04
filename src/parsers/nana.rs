@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use super::general::*;
 use nom::{
     branch::alt,
-    character::complete::{char, digit1, multispace0},
+    character::complete::{char, digit1, multispace0, none_of},
     multi::many0,
     sequence::{delimited, tuple},
     IResult, Parser,
@@ -16,6 +16,7 @@ pub enum Expression {
     FunctionCall(String, Vec<Expression>),
     List(Vec<Expression>),
     Number(u8),
+    String(String),
     Hole,
 }
 
@@ -46,12 +47,27 @@ pub fn number(input: &str) -> IResult<&str, Expression> {
         .parse(input)
 }
 
+pub fn string(input: &str) -> IResult<&str, Expression> {
+    delimited(char('"'), many0(none_of("\"")), char('"'))
+        .map(|chars| chars.iter().collect())
+        .map(Expression::String)
+        .parse(input)
+}
+
 pub fn hole(input: &str) -> IResult<&str, Expression> {
     char('_').map(|_| Expression::Hole).parse(input)
 }
 
 pub fn expression(input: &str) -> IResult<&str, Expression> {
-    let expressions = alt((macro_name, function_call, value_name, hole, number, list));
+    let expressions = alt((
+        macro_name,
+        function_call,
+        value_name,
+        hole,
+        number,
+        string,
+        list,
+    ));
     delimited(multispace0, expressions, multispace0).parse(input)
 }
 
