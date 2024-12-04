@@ -12,11 +12,20 @@ fn test_macro_name() {
         ))
     );
     assert_eq!(
-        macro_name("HelloWorld"),
+        macro_name("Hello World"),
+        Ok((
+            " World",
+            MacroName {
+                name: "Hello".to_string()
+            }
+        ))
+    );
+    assert_eq!(
+        macro_name("Greetings::English/Hello-World"),
         Ok((
             "",
             MacroName {
-                name: "HelloWorld".to_string()
+                name: "Greetings::English/Hello-World".to_string()
             }
         ))
     );
@@ -36,11 +45,11 @@ fn test_value_name() {
         ))
     );
     assert_eq!(
-        value_name("helloWorld"),
+        value_name("greetings::english/hello-world"),
         Ok((
             "",
             ValueName {
-                name: "helloWorld".to_string()
+                name: "greetings::english/hello-world".to_string()
             }
         ))
     );
