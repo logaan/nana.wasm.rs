@@ -1,32 +1,27 @@
+use std::sync::Arc;
+
 use super::nana::*;
 
 #[test]
 fn test_macro_name() {
     assert_eq!(
         macro_name("Hello"),
-        Ok((
-            "",
-            MacroName {
-                name: "Hello".to_string()
-            }
-        ))
+        Ok(("", Arc::new(Expression::MacroName("Hello".to_string()))))
     );
     assert_eq!(
         macro_name("Hello World"),
         Ok((
             " World",
-            MacroName {
-                name: "Hello".to_string()
-            }
+            Arc::new(Expression::MacroName("Hello".to_string()))
         ))
     );
     assert_eq!(
         macro_name("Greetings::English/Hello-World"),
         Ok((
             "",
-            MacroName {
-                name: "Greetings::English/Hello-World".to_string()
-            }
+            Arc::new(Expression::MacroName(
+                "Greetings::English/Hello-World".to_string()
+            ))
         ))
     );
     assert!(macro_name("hello").is_err());
@@ -37,20 +32,15 @@ fn test_macro_name() {
 fn test_value_name() {
     assert_eq!(
         value_name("hello"),
-        Ok((
-            "",
-            ValueName {
-                name: "hello".to_string()
-            }
-        ))
+        Ok(("", Arc::new(Expression::ValueName("hello".to_string()))))
     );
     assert_eq!(
         value_name("greetings::english/hello-world"),
         Ok((
             "",
-            ValueName {
-                name: "greetings::english/hello-world".to_string()
-            }
+            Arc::new(Expression::ValueName(
+                "greetings::english/hello-world".to_string()
+            ))
         ))
     );
     assert!(value_name("Hello").is_err());
