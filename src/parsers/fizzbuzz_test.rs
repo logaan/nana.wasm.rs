@@ -1,4 +1,6 @@
-use super::parsers::nana::*;
+use super::nana::*;
+
+use Expression::*;
 
 pub static FIZZBUZZ: &str = r#"
 Package nana:examples@0.0.1
@@ -28,8 +30,6 @@ Func print-fizzbuzz [max u8] _
       stdout.write(line)
  
 "#;
-
-use Expression::*;
 
 fn expected() -> Vec<Expression> {
     vec![

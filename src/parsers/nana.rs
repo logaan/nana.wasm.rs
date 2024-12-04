@@ -11,6 +11,7 @@ use nom::{
 
 #[derive(PartialEq, Debug)]
 pub enum Expression {
+    Macro(String, Vec<String>, Vec<Expression>),
     MacroName(String),
     ValueName(String),
     FunctionCall(String, Vec<Expression>),

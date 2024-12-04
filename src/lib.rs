@@ -3,7 +3,6 @@
 #[allow(warnings)]
 mod bindings;
 
-mod fizzbuzz_test;
 use bindings::exports::wasi::cli::run::Guest as Command;
 
 mod parsers;
