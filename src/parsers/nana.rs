@@ -3,9 +3,9 @@ use std::fmt::Debug;
 use super::general::*;
 use nom::{
     branch::alt,
-    character::complete::{char, multispace0},
+    character::complete::{char, digit1, multispace0},
     multi::many0,
-    sequence::delimited,
+    sequence::{delimited, tuple},
     IResult, Parser,
 };
 
@@ -13,7 +13,9 @@ use nom::{
 pub enum Expression {
     MacroName(String),
     ValueName(String),
+    FunctionCall(String, Vec<Expression>),
     List(Vec<Expression>),
+    Number(u8),
     Hole,
 }
 
@@ -25,9 +27,22 @@ pub fn value_name(input: &str) -> IResult<&str, Expression> {
     lower_start_word.map(Expression::ValueName).parse(input)
 }
 
+pub fn function_call(input: &str) -> IResult<&str, Expression> {
+    tuple((lower_start_word, char('('), many0(expression), char(')')))
+        .map(|(name, _, args, _)| Expression::FunctionCall(name, args))
+        .parse(input)
+}
+
 pub fn list(input: &str) -> IResult<&str, Expression> {
     delimited(char('['), many0(expression), char(']'))
         .map(Expression::List)
+        .parse(input)
+}
+
+pub fn number(input: &str) -> IResult<&str, Expression> {
+    digit1
+        .map(|s: &str| s.parse().unwrap())
+        .map(Expression::Number)
         .parse(input)
 }
 
@@ -36,7 +51,7 @@ pub fn hole(input: &str) -> IResult<&str, Expression> {
 }
 
 pub fn expression(input: &str) -> IResult<&str, Expression> {
-    let expressions = alt((macro_name, value_name, hole, list));
+    let expressions = alt((macro_name, function_call, value_name, hole, number, list));
     delimited(multispace0, expressions, multispace0).parse(input)
 }
 
