@@ -2,6 +2,8 @@
 
 set -e
 
+clear
+
 cargo test
 
 ./scripts/build-wasi
