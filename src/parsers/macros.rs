@@ -9,16 +9,17 @@ pub fn build_macros(
         [] => panic!("Empty expression list"),
         [MacroName(name), rest @ ..] => match environment.get(name) {
             Some(Macro(name, params, _)) => {
-                // TODO: Rewrite this in a functional way with reduce
-                let mut args = Vec::new();
-                let mut new_rest = rest.to_vec();
-
-                for _ in 0..params.len() {
-                    let (arg, remainder) = build_macros(new_rest, environment.clone());
-                    args.push(arg);
-                    new_rest = remainder
-                }
-                (MacroCall(name.clone(), args.to_vec()), new_rest.to_vec())
+                let (args, new_rest) = (0..params.len()).fold(
+                    (Vec::new(), rest.to_vec()),
+                    |(mut args, curr_rest), _| {
+                        let (arg, remainder) = build_macros(curr_rest, environment.clone());
+                        // TODO: Switch to persistent data structures to avoid mutating.
+                        // https://github.com/orium/rpds seems best maintained
+                        args.push(arg);
+                        (args, remainder)
+                    },
+                );
+                (MacroCall(name.clone(), args), new_rest)
             }
             Some(_) => panic!("A macro name should only ever point to a macro in the environment"),
             None => panic!("Macro was referenced but has not defined"),
