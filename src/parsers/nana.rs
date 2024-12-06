@@ -9,12 +9,22 @@ use nom::{
     IResult, Parser,
 };
 
-#[derive(PartialEq, Debug)]
+// I would kind of like to make the destinction between lexical expressions and
+// like... runtime expressions. Macros and functions aren't lexical, they're
+// created by macro calls. Some for builtins. I'm not sur what the benefit of
+// making the distinction is though.
+//
+// I guess in a function like `build_macros` we could take
+// Vec<LexicalExpression> and return Vec<RuntimeExpression>. That way we
+// wouldn't need to handle cases for a whole bunch of expression types that
+// can't be returned by the parser. That might be the only benefit though.
+#[derive(PartialEq, Debug, Clone)]
 pub enum Expression {
     Macro(String, Vec<String>, Vec<Expression>),
     MacroName(String),
     ValueName(String),
     FunctionCall(String, Vec<Expression>),
+    MacroCall(String, Vec<Expression>),
     List(Vec<Expression>),
     Number(u8),
     String(String),

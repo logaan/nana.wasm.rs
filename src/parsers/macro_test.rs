@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-use super::fizzbuzz_test::FIZZBUZZ;
 use super::macros::build_macros;
 use super::nana::program;
 
 use super::nana::Expression;
+use super::nana::Expression::MacroCall;
 
 pub fn create_macro_map() -> HashMap<String, Expression> {
     let mut macros = HashMap::new();
@@ -85,12 +85,37 @@ pub fn create_macro_map() -> HashMap<String, Expression> {
     macros
 }
 
-fn expected() -> Vec<Expression> {
-    vec![Expression::Hole]
+#[test]
+fn parses_basic_macro() {
+    let result =
+        program("Package \"foo\"").and_then(|(_, es)| Ok(build_macros(es, create_macro_map())));
+    assert_eq!(
+        Ok((
+            MacroCall(
+                "Package".to_string(),
+                vec![Expression::String("foo".to_string())],
+            ),
+            vec![],
+        )),
+        result
+    );
 }
 
 #[test]
-fn parses_macros() {
-    let result = program(FIZZBUZZ).and_then(|(_, es)| Ok(build_macros(es, create_macro_map())));
-    assert_eq!(Ok(expected()), result);
+fn parses_nested_macros() {
+    let result = program("Package Package \"foo\"")
+        .and_then(|(_, es)| Ok(build_macros(es, create_macro_map())));
+    assert_eq!(
+        Ok((
+            MacroCall(
+                "Package".to_string(),
+                vec![MacroCall(
+                    "Package".to_string(),
+                    vec![Expression::String("foo".to_string())],
+                )],
+            ),
+            vec![],
+        )),
+        result
+    );
 }
