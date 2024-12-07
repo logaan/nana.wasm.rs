@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use im::vector;
+
 use super::macros::build_macros;
 use super::nana::program;
 
@@ -10,33 +12,37 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
 
     macros.insert(
         String::from("Package"),
-        RuntimeExpression::Macro("Package".to_string(), vec!["name".to_string()], vec![]),
+        RuntimeExpression::Macro(
+            "Package".to_string(),
+            vector!["name".to_string()],
+            vector![],
+        ),
     );
 
     macros.insert(
         String::from("World"),
         RuntimeExpression::Macro(
             "World".to_string(),
-            vec!["name".to_string(), "body".to_string()],
-            vec![],
+            vector!["name".to_string(), "body".to_string()],
+            vector![],
         ),
     );
 
     macros.insert(
         String::from("Import"),
-        RuntimeExpression::Macro("Import".to_string(), vec!["name".to_string()], vec![]),
+        RuntimeExpression::Macro("Import".to_string(), vector!["name".to_string()], vector![]),
     );
 
     macros.insert(
         String::from("Export"),
         RuntimeExpression::Macro(
             "Export".to_string(),
-            vec![
+            vector![
                 "name".to_string(),
                 "args".to_string(),
                 "return_type".to_string(),
             ],
-            vec![],
+            vector![],
         ),
     );
 
@@ -44,13 +50,13 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
         String::from("Func"),
         RuntimeExpression::Macro(
             "Func".to_string(),
-            vec![
+            vector![
                 "name".to_string(),
                 "args".to_string(),
                 "return_type".to_string(),
                 "body".to_string(),
             ],
-            vec![],
+            vector![],
         ),
     );
 
@@ -58,8 +64,8 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
         String::from("Match"),
         RuntimeExpression::Macro(
             "Match".to_string(),
-            vec!["condition".to_string(), "branches".to_string()],
-            vec![],
+            vector!["condition".to_string(), "branches".to_string()],
+            vector![],
         ),
     );
 
@@ -67,8 +73,8 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
         String::from("Let"),
         RuntimeExpression::Macro(
             "Let".to_string(),
-            vec!["bindings".to_string(), "body".to_string()],
-            vec![],
+            vector!["bindings".to_string(), "body".to_string()],
+            vector![],
         ),
     );
 
@@ -76,8 +82,8 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
         String::from("For"),
         RuntimeExpression::Macro(
             "For".to_string(),
-            vec!["binding".to_string(), "body".to_string()],
-            vec![],
+            vector!["binding".to_string(), "body".to_string()],
+            vector![],
         ),
     );
 
@@ -86,15 +92,15 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
 
 #[test]
 fn parses_basic_macro() {
-    let result =
-        program("Package \"foo\"").and_then(|(_, es)| Ok(build_macros(es, create_macro_map())));
+    let result = program("Package \"foo\"")
+        .and_then(|(_, es)| Ok(build_macros(es.into(), create_macro_map())));
     assert_eq!(
         Ok((
             MacroCall(
                 "Package".to_string(),
-                vec![RuntimeExpression::String("foo".to_string())],
+                vector![RuntimeExpression::String("foo".to_string())],
             ),
-            vec![],
+            vector![],
         )),
         result
     );
@@ -103,17 +109,17 @@ fn parses_basic_macro() {
 #[test]
 fn parses_nested_macros() {
     let result = program("Package Package \"foo\"")
-        .and_then(|(_, es)| Ok(build_macros(es, create_macro_map())));
+        .and_then(|(_, es)| Ok(build_macros(es.into(), create_macro_map())));
     assert_eq!(
         Ok((
             MacroCall(
                 "Package".to_string(),
-                vec![MacroCall(
+                vector![MacroCall(
                     "Package".to_string(),
-                    vec![RuntimeExpression::String("foo".to_string())],
+                    vector![RuntimeExpression::String("foo".to_string())],
                 )],
             ),
-            vec![],
+            vector![],
         )),
         result
     );
@@ -123,21 +129,21 @@ fn parses_nested_macros() {
 fn parses_macros_in_lists() {
     assert_eq!(
         Ok((
-            RuntimeExpression::List(vec![
+            RuntimeExpression::List(vector![
                 RuntimeExpression::Number(1),
                 MacroCall(
                     "Package".to_string(),
-                    vec![MacroCall(
+                    vector![MacroCall(
                         "Package".to_string(),
-                        vec![RuntimeExpression::String("two".to_string())],
+                        vector![RuntimeExpression::String("two".to_string())],
                     )],
                 ),
                 RuntimeExpression::Number(3)
             ]),
-            vec![],
+            vector![],
         )),
         program("[1 Package Package \"two\" 3]")
-            .and_then(|(_, es)| Ok(build_macros(es, create_macro_map())))
+            .and_then(|(_, es)| Ok(build_macros(es.into(), create_macro_map())))
     )
 }
 
@@ -147,21 +153,21 @@ fn parses_macros_in_args_to_functions() {
         Ok((
             RuntimeExpression::FunctionCall(
                 "println".to_string(),
-                vec![
+                vector![
                     RuntimeExpression::Number(1),
                     MacroCall(
                         "Package".to_string(),
-                        vec![MacroCall(
+                        vector![MacroCall(
                             "Package".to_string(),
-                            vec![RuntimeExpression::String("two".to_string())],
+                            vector![RuntimeExpression::String("two".to_string())],
                         )],
                     ),
                     RuntimeExpression::Number(3)
                 ]
             ),
-            vec![],
+            vector![],
         )),
         program("println(1 Package Package \"two\" 3)")
-            .and_then(|(_, es)| Ok(build_macros(es, create_macro_map())))
+            .and_then(|(_, es)| Ok(build_macros(es.into(), create_macro_map())))
     )
 }
