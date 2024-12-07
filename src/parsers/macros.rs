@@ -33,7 +33,7 @@ pub fn build_macros(
                         (args, remainder)
                     });
                 (
-                    RuntimeExpression::MacroCall(name.clone(), final_args),
+                    RuntimeExpression::MacroCall(name.to_string(), final_args),
                     new_rest,
                 )
             }
@@ -78,8 +78,7 @@ fn build_many_macros(
     } else {
         let (new_outgoing_expr, new_incoming_exprs) =
             build_macros(incoming_exprs, environment.clone());
-        let mut new_outgoing_exprs = outgoing_exprs.clone();
-        new_outgoing_exprs.push_back(new_outgoing_expr);
+        let new_outgoing_exprs = outgoing_exprs + Vector::unit(new_outgoing_expr);
         build_many_macros(new_incoming_exprs, new_outgoing_exprs, environment)
     }
 }
