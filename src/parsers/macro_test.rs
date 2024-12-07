@@ -141,3 +141,28 @@ fn parses_macros_in_lists() {
             .and_then(|(_, es)| Ok(build_macros(es, create_macro_map())))
     )
 }
+
+#[test]
+fn parses_macros_in_args_to_functions() {
+    assert_eq!(
+        Ok((
+            Expression::FunctionCall(
+                "println".to_string(),
+                vec![
+                    Expression::Number(1),
+                    MacroCall(
+                        "Package".to_string(),
+                        vec![MacroCall(
+                            "Package".to_string(),
+                            vec![Expression::String("two".to_string())],
+                        )],
+                    ),
+                    Expression::Number(3)
+                ]
+            ),
+            vec![],
+        )),
+        program("println(1 Package Package \"two\" 3)")
+            .and_then(|(_, es)| Ok(build_macros(es, create_macro_map())))
+    )
+}

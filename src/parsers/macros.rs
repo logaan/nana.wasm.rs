@@ -32,6 +32,13 @@ pub fn build_macros(
             )),
             rest.to_vec(),
         ),
+        [Expression::FunctionCall(name, expressions), rest @ ..] => (
+            Expression::FunctionCall(
+                name.to_string(),
+                build_many_macros(expressions.clone(), vec![], environment.clone()),
+            ),
+            rest.to_vec(),
+        ),
         // Any lexical expression that includes expressions needs to be handled
         // here. That's function calls, and lists for now. The expressions in a
         // macro object aren't lexical so won't have macro names for us to
