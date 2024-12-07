@@ -119,3 +119,25 @@ fn parses_nested_macros() {
         result
     );
 }
+
+#[test]
+fn parses_macros_in_lists() {
+    assert_eq!(
+        Ok((
+            Expression::List(vec![
+                Expression::Number(1),
+                MacroCall(
+                    "Package".to_string(),
+                    vec![MacroCall(
+                        "Package".to_string(),
+                        vec![Expression::String("two".to_string())],
+                    )],
+                ),
+                Expression::Number(3)
+            ]),
+            vec![],
+        )),
+        program("[1 Package Package \"two\" 3]")
+            .and_then(|(_, es)| Ok(build_macros(es, create_macro_map())))
+    )
+}
