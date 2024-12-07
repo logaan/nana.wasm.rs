@@ -14,7 +14,7 @@ pub enum RuntimeExpression {
 }
 
 pub fn build_macros(
-    expressions: Vector<LexicalExpression>,
+    expressions: &Vector<LexicalExpression>,
     environment: &HashMap<String, RuntimeExpression>,
 ) -> (RuntimeExpression, Vector<LexicalExpression>) {
     let rest = expressions.skip(1);
@@ -25,7 +25,7 @@ pub fn build_macros(
             Some(RuntimeExpression::Macro(name, params, _)) => {
                 let (final_args, new_rest) =
                     (0..params.len()).fold((Vector::new(), rest), |(args, curr_rest), _| {
-                        let (arg, remainder) = build_macros(curr_rest, &environment);
+                        let (arg, remainder) = build_macros(&curr_rest, &environment);
                         let new_args = args + Vector::unit(arg);
                         (new_args, remainder)
                     });
@@ -38,11 +38,7 @@ pub fn build_macros(
             None => panic!("Macro was referenced but has not defined"),
         },
         Some(LexicalExpression::List(expressions)) => (
-            RuntimeExpression::List(build_many_macros(
-                expressions.into(),
-                vector![],
-                &environment,
-            )),
+            RuntimeExpression::List(build_many_macros(expressions, vector![], &environment)),
             rest,
         ),
         Some(LexicalExpression::FunctionCall(name, expressions)) => (
@@ -66,7 +62,7 @@ pub fn build_macros(
 // TODO: This isn't gaurenteed to receive TCO. Should switch to an iterative
 // implementation.
 fn build_many_macros(
-    incoming_exprs: Vector<LexicalExpression>,
+    incoming_exprs: &Vector<LexicalExpression>,
     outgoing_exprs: Vector<RuntimeExpression>,
     environment: &HashMap<String, RuntimeExpression>,
 ) -> Vector<RuntimeExpression> {
@@ -75,6 +71,6 @@ fn build_many_macros(
     } else {
         let (new_outgoing_expr, new_incoming_exprs) = build_macros(incoming_exprs, &environment);
         let new_outgoing_exprs = outgoing_exprs + Vector::unit(new_outgoing_expr);
-        build_many_macros(new_incoming_exprs, new_outgoing_exprs, environment)
+        build_many_macros(&new_incoming_exprs, new_outgoing_exprs, environment)
     }
 }

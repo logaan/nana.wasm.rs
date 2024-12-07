@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 
 use super::general::*;
+use im::Vector;
 use nom::{
     branch::alt,
     character::complete::{char, digit1, multispace0, none_of},
@@ -13,8 +14,8 @@ use nom::{
 pub enum LexicalExpression {
     MacroName(String),
     ValueName(String),
-    FunctionCall(String, Vec<LexicalExpression>),
-    List(Vec<LexicalExpression>),
+    FunctionCall(String, Vector<LexicalExpression>),
+    List(Vector<LexicalExpression>),
     Number(u8),
     String(String),
     Hole,
@@ -34,13 +35,13 @@ pub fn value_name(input: &str) -> IResult<&str, LexicalExpression> {
 
 pub fn function_call(input: &str) -> IResult<&str, LexicalExpression> {
     tuple((lower_start_word, char('('), many0(expression), char(')')))
-        .map(|(name, _, args, _)| LexicalExpression::FunctionCall(name, args))
+        .map(|(name, _, args, _)| LexicalExpression::FunctionCall(name, args.into()))
         .parse(input)
 }
 
 pub fn list(input: &str) -> IResult<&str, LexicalExpression> {
     delimited(char('['), many0(expression), char(']'))
-        .map(LexicalExpression::List)
+        .map(|v| LexicalExpression::List(v.into()))
         .parse(input)
 }
 
@@ -75,6 +76,6 @@ pub fn expression(input: &str) -> IResult<&str, LexicalExpression> {
     delimited(multispace0, expressions, multispace0).parse(input)
 }
 
-pub fn program(input: &str) -> IResult<&str, Vec<LexicalExpression>> {
-    many0(expression).parse(input)
+pub fn program(input: &str) -> IResult<&str, Vector<LexicalExpression>> {
+    many0(expression).map(|v| v.into()).parse(input)
 }

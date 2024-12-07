@@ -1,5 +1,6 @@
 use super::nana::*;
 
+use im::{vector, Vector};
 use LexicalExpression::*;
 
 pub static FIZZBUZZ: &str = r#"
@@ -31,20 +32,20 @@ Func print-fizzbuzz [max u8] _
  
 "#;
 
-fn expected() -> Vec<LexicalExpression> {
-    vec![
+fn expected() -> Vector<LexicalExpression> {
+    vector![
         MacroName("Package".to_string()),
         ValueName("nana:examples@0.0.1".to_string()),
         MacroName("World".to_string()),
         ValueName("fizzbuzz".to_string()),
-        List(vec![
+        List(vector![
             MacroName("Import".to_string()),
             ValueName("wasi:cli/stdout".to_string()),
             MacroName("Import".to_string()),
             ValueName("wasi:streams/output-stream".to_string()),
             MacroName("Export".to_string()),
             ValueName("print-fizzbuzz".to_string()),
-            List(vec![
+            List(vector![
                 ValueName("max".to_string()),
                 ValueName("u8".to_string()),
             ]),
@@ -52,74 +53,74 @@ fn expected() -> Vec<LexicalExpression> {
         ]),
         MacroName("Func".to_string()),
         ValueName("num-to-txt".to_string()),
-        List(vec![
+        List(vector![
             ValueName("num".to_string()),
             ValueName("u8".to_string()),
         ]),
         ValueName("string".to_string()),
         MacroName("Match".to_string()),
-        List(vec![
+        List(vector![
             FunctionCall(
                 "mod".to_string(),
-                vec![ValueName("num".to_string()), Number(3)],
+                vector![ValueName("num".to_string()), Number(3)],
             ),
             FunctionCall(
                 "mod".to_string(),
-                vec![ValueName("num".to_string()), Number(5)],
+                vector![ValueName("num".to_string()), Number(5)],
             ),
         ]),
-        List(vec![
-            List(vec![Number(0), Number(0)]),
+        List(vector![
+            List(vector![Number(0), Number(0)]),
             String("Fizzbuzz".to_string()),
-            List(vec![Number(0), Hole]),
+            List(vector![Number(0), Hole]),
             String("Fizz".to_string()),
-            List(vec![Hole, Number(0)]),
+            List(vector![Hole, Number(0)]),
             String("Buzz".to_string()),
-            List(vec![Hole, Hole]),
+            List(vector![Hole, Hole]),
             ValueName("n".to_string()),
         ]),
         MacroName("Func".to_string()),
         ValueName("list-to-txt".to_string()),
-        List(vec![
+        List(vector![
             ValueName("list".to_string()),
             ValueName("list<u8>".to_string()),
         ]),
         ValueName("list<string>".to_string()),
         FunctionCall(
             "map".to_string(),
-            vec![
+            vector![
                 ValueName("num-to-text".to_string()),
                 ValueName("list".to_string()),
             ],
         ),
         MacroName("Func".to_string()),
         ValueName("print-fizzbuzz".to_string()),
-        List(vec![
+        List(vector![
             ValueName("max".to_string()),
             ValueName("u8".to_string()),
         ]),
         Hole,
         MacroName("Let".to_string()),
-        List(vec![
+        List(vector![
             ValueName("lines".to_string()),
             FunctionCall(
                 "list-to-text".to_string(),
-                vec![FunctionCall(
+                vector![FunctionCall(
                     "range".to_string(),
-                    vec![Number(1), Number(100)],
+                    vector![Number(1), Number(100)],
                 )],
             ),
             ValueName("stdout".to_string()),
-            FunctionCall("stdout/get-stdout".to_string(), vec![]),
+            FunctionCall("stdout/get-stdout".to_string(), vector![]),
         ]),
         MacroName("For".to_string()),
-        List(vec![
+        List(vector![
             ValueName("line".to_string()),
             ValueName("lines".to_string()),
         ]),
         FunctionCall(
             "stdout.write".to_string(),
-            vec![ValueName("line".to_string())],
+            vector![ValueName("line".to_string())],
         ),
     ]
 }

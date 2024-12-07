@@ -75,8 +75,8 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
 
 #[test]
 fn parses_basic_macro() {
-    let result = program("Package \"foo\"")
-        .and_then(|(_, es)| Ok(build_macros(es.into(), &create_macro_map())));
+    let result =
+        program("Package \"foo\"").and_then(|(_, es)| Ok(build_macros(&es, &create_macro_map())));
     assert_eq!(
         Ok((
             MacroCall(
@@ -92,7 +92,7 @@ fn parses_basic_macro() {
 #[test]
 fn parses_nested_macros() {
     let result = program("Package Package \"foo\"")
-        .and_then(|(_, es)| Ok(build_macros(es.into(), &create_macro_map())));
+        .and_then(|(_, es)| Ok(build_macros(&es, &create_macro_map())));
     assert_eq!(
         Ok((
             MacroCall(
@@ -126,7 +126,7 @@ fn parses_macros_in_lists() {
             vector![],
         )),
         program("[1 Package Package \"two\" 3]")
-            .and_then(|(_, es)| Ok(build_macros(es.into(), &create_macro_map())))
+            .and_then(|(_, es)| Ok(build_macros(&es, &create_macro_map())))
     )
 }
 
@@ -151,6 +151,6 @@ fn parses_macros_in_args_to_functions() {
             vector![],
         )),
         program("println(1 Package Package \"two\" 3)")
-            .and_then(|(_, es)| Ok(build_macros(es.into(), &create_macro_map())))
+            .and_then(|(_, es)| Ok(build_macros(&es, &create_macro_map())))
     )
 }
