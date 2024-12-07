@@ -1,6 +1,6 @@
 use super::nana::*;
 
-use Expression::*;
+use LexicalExpression::*;
 
 pub static FIZZBUZZ: &str = r#"
 Package nana:examples@0.0.1
@@ -31,7 +31,7 @@ Func print-fizzbuzz [max u8] _
  
 "#;
 
-fn expected() -> Vec<Expression> {
+fn expected() -> Vec<LexicalExpression> {
     vec![
         MacroName("Package".to_string()),
         ValueName("nana:examples@0.0.1".to_string()),

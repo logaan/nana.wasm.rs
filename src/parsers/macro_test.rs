@@ -3,20 +3,19 @@ use std::collections::HashMap;
 use super::macros::build_macros;
 use super::nana::program;
 
-use super::nana::Expression;
-use super::nana::Expression::MacroCall;
+use super::macros::RuntimeExpression::{self, MacroCall};
 
-pub fn create_macro_map() -> HashMap<String, Expression> {
+pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
     let mut macros = HashMap::new();
 
     macros.insert(
         String::from("Package"),
-        Expression::Macro("Package".to_string(), vec!["name".to_string()], vec![]),
+        RuntimeExpression::Macro("Package".to_string(), vec!["name".to_string()], vec![]),
     );
 
     macros.insert(
         String::from("World"),
-        Expression::Macro(
+        RuntimeExpression::Macro(
             "World".to_string(),
             vec!["name".to_string(), "body".to_string()],
             vec![],
@@ -25,12 +24,12 @@ pub fn create_macro_map() -> HashMap<String, Expression> {
 
     macros.insert(
         String::from("Import"),
-        Expression::Macro("Import".to_string(), vec!["name".to_string()], vec![]),
+        RuntimeExpression::Macro("Import".to_string(), vec!["name".to_string()], vec![]),
     );
 
     macros.insert(
         String::from("Export"),
-        Expression::Macro(
+        RuntimeExpression::Macro(
             "Export".to_string(),
             vec![
                 "name".to_string(),
@@ -43,7 +42,7 @@ pub fn create_macro_map() -> HashMap<String, Expression> {
 
     macros.insert(
         String::from("Func"),
-        Expression::Macro(
+        RuntimeExpression::Macro(
             "Func".to_string(),
             vec![
                 "name".to_string(),
@@ -57,7 +56,7 @@ pub fn create_macro_map() -> HashMap<String, Expression> {
 
     macros.insert(
         String::from("Match"),
-        Expression::Macro(
+        RuntimeExpression::Macro(
             "Match".to_string(),
             vec!["condition".to_string(), "branches".to_string()],
             vec![],
@@ -66,7 +65,7 @@ pub fn create_macro_map() -> HashMap<String, Expression> {
 
     macros.insert(
         String::from("Let"),
-        Expression::Macro(
+        RuntimeExpression::Macro(
             "Let".to_string(),
             vec!["bindings".to_string(), "body".to_string()],
             vec![],
@@ -75,7 +74,7 @@ pub fn create_macro_map() -> HashMap<String, Expression> {
 
     macros.insert(
         String::from("For"),
-        Expression::Macro(
+        RuntimeExpression::Macro(
             "For".to_string(),
             vec!["binding".to_string(), "body".to_string()],
             vec![],
@@ -93,7 +92,7 @@ fn parses_basic_macro() {
         Ok((
             MacroCall(
                 "Package".to_string(),
-                vec![Expression::String("foo".to_string())],
+                vec![RuntimeExpression::String("foo".to_string())],
             ),
             vec![],
         )),
@@ -111,7 +110,7 @@ fn parses_nested_macros() {
                 "Package".to_string(),
                 vec![MacroCall(
                     "Package".to_string(),
-                    vec![Expression::String("foo".to_string())],
+                    vec![RuntimeExpression::String("foo".to_string())],
                 )],
             ),
             vec![],
@@ -124,16 +123,16 @@ fn parses_nested_macros() {
 fn parses_macros_in_lists() {
     assert_eq!(
         Ok((
-            Expression::List(vec![
-                Expression::Number(1),
+            RuntimeExpression::List(vec![
+                RuntimeExpression::Number(1),
                 MacroCall(
                     "Package".to_string(),
                     vec![MacroCall(
                         "Package".to_string(),
-                        vec![Expression::String("two".to_string())],
+                        vec![RuntimeExpression::String("two".to_string())],
                     )],
                 ),
-                Expression::Number(3)
+                RuntimeExpression::Number(3)
             ]),
             vec![],
         )),
@@ -146,18 +145,18 @@ fn parses_macros_in_lists() {
 fn parses_macros_in_args_to_functions() {
     assert_eq!(
         Ok((
-            Expression::FunctionCall(
+            RuntimeExpression::FunctionCall(
                 "println".to_string(),
                 vec![
-                    Expression::Number(1),
+                    RuntimeExpression::Number(1),
                     MacroCall(
                         "Package".to_string(),
                         vec![MacroCall(
                             "Package".to_string(),
-                            vec![Expression::String("two".to_string())],
+                            vec![RuntimeExpression::String("two".to_string())],
                         )],
                     ),
-                    Expression::Number(3)
+                    RuntimeExpression::Number(3)
                 ]
             ),
             vec![],
