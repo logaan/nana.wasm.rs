@@ -38,13 +38,13 @@ pub fn build_macros(
             None => panic!("Macro was referenced but has not defined"),
         },
         Some(LexicalExpression::List(expressions)) => (
-            RuntimeExpression::List(build_many_macros(expressions, vector![], &environment)),
+            RuntimeExpression::List(build_many_macros(expressions, &environment)),
             rest,
         ),
         Some(LexicalExpression::FunctionCall(name, expressions)) => (
             RuntimeExpression::FunctionCall(
                 name.to_string(),
-                build_many_macros(expressions.into(), vector![], &environment),
+                build_many_macros(expressions.into(), &environment),
             ),
             rest,
         ),
@@ -59,18 +59,18 @@ pub fn build_macros(
     }
 }
 
-// TODO: This isn't gaurenteed to receive TCO. Should switch to an iterative
-// implementation.
 fn build_many_macros(
     incoming_exprs: &Vector<LexicalExpression>,
-    outgoing_exprs: Vector<RuntimeExpression>,
     environment: &HashMap<String, RuntimeExpression>,
 ) -> Vector<RuntimeExpression> {
-    if incoming_exprs.is_empty() {
-        outgoing_exprs
-    } else {
-        let (new_outgoing_expr, new_incoming_exprs) = build_macros(incoming_exprs, &environment);
-        let new_outgoing_exprs = outgoing_exprs + Vector::unit(new_outgoing_expr);
-        build_many_macros(&new_incoming_exprs, new_outgoing_exprs, environment)
+    let mut remaining_exprs = incoming_exprs.clone();
+    let mut outgoing_exprs: Vector<RuntimeExpression> = vector![];
+
+    while !remaining_exprs.is_empty() {
+        let (built_expression, new_remaining_exprs) = build_macros(&remaining_exprs, &environment);
+        outgoing_exprs.push_back(built_expression);
+        remaining_exprs = new_remaining_exprs;
     }
+
+    outgoing_exprs
 }
