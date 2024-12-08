@@ -5,22 +5,21 @@ pub enum Process<T> {
     Complete(T),
 }
 
+use Process::{Complete, Running};
+
 impl<T> Process<T> {
-    pub fn step(self) -> Process<T> {
+    pub fn step(&self) -> Process<T> {
         match self {
-            Process::Complete(_) => panic!("Process is already complete"),
-            Process::Running(f) => f(),
+            Complete(_) => panic!("Process is already complete"),
+            Running(f) => f(),
         }
     }
 
-    pub fn is_complete(self) -> bool {
-        match self {
-            Process::Complete(_) => true,
-            Process::Running(_) => false,
-        }
+    pub fn is_complete(&self) -> bool {
+        matches!(self, Complete(_))
     }
 
-    pub fn is_running(self) -> bool {
+    pub fn is_running(&self) -> bool {
         !self.is_complete()
     }
 }
@@ -29,7 +28,7 @@ impl<T> Process<T> {
 mod tests {
     use im::vector;
 
-    use crate::parsers::macros::RuntimeExpression;
+    use crate::parsers::macros::RuntimeExpression::{List, Number};
 
     use super::Process::{Complete, Running};
     use super::*;
@@ -42,22 +41,17 @@ mod tests {
                 let b = 2;
                 Running(Arc::new(move || {
                     let c = 3;
-                    Complete(RuntimeExpression::List(vector![
-                        RuntimeExpression::Number(a),
-                        RuntimeExpression::Number(b),
-                        RuntimeExpression::Number(c)
-                    ]))
+                    Complete(List(vector![Number(a), Number(b), Number(c)]))
                 }))
             }))
         }));
 
-        let expected = RuntimeExpression::List(vector![
-            RuntimeExpression::Number(1),
-            RuntimeExpression::Number(2),
-            RuntimeExpression::Number(3)
-        ]);
-
         let actual = process.step().step().step();
+
+        assert!(actual.is_complete());
+        assert!(!actual.is_running());
+
+        let expected = List(vector![Number(1), Number(2), Number(3)]);
 
         match actual {
             Complete(result) => assert_eq!(expected, result),
