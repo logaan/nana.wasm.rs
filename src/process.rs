@@ -59,6 +59,26 @@ impl<T: Clone> Process<T> {
 
         complete_processes
     }
+
+    pub fn run_in_sequence(
+        processes: Vector<Process<T>>,
+        results: Vector<T>,
+    ) -> Process<Vector<T>> {
+        let mut processes = processes;
+        let mut results = results;
+
+        if processes.is_empty() {
+            Complete(results)
+        } else {
+            let active_process = processes.pop_front().unwrap();
+            if active_process.is_complete() {
+                results.push_back(active_process.result().unwrap());
+            } else {
+                processes.push_front(active_process.step());
+            }
+            Self::run_in_sequence(processes, results)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -70,13 +90,10 @@ mod tests {
     use super::Process::{Complete, Running};
     use super::*;
 
-    fn make_process() -> Process<RuntimeExpression> {
-        Running(Arc::new(|| {
-            let a = 1;
+    fn make_process(a: u8, b: u8, c: u8) -> Process<RuntimeExpression> {
+        Running(Arc::new(move || {
             Running(Arc::new(move || {
-                let b = 2;
                 Running(Arc::new(move || {
-                    let c = 3;
                     Complete(List(vector![Number(a), Number(b), Number(c)]))
                 }))
             }))
@@ -85,7 +102,7 @@ mod tests {
 
     #[test]
     fn test_process_by_steps() {
-        let actual = make_process().step().step().step();
+        let actual = make_process(1, 2, 3).step().step().step();
 
         assert!(actual.is_complete());
         assert!(!actual.is_running());
@@ -97,7 +114,7 @@ mod tests {
 
     #[test]
     fn test_process_to_completion() {
-        let actual = make_process().run_until_complete();
+        let actual = make_process(1, 2, 3).run_until_complete();
 
         let expected = List(vector![Number(1), Number(2), Number(3)]);
         assert_eq!(expected, actual);
@@ -105,12 +122,54 @@ mod tests {
 
     #[test]
     fn test_processes_to_completion() {
-        let actual = Process::round_robin(vector![make_process(), make_process(), make_process(),]);
+        let actual = Process::round_robin(vector![
+            make_process(1, 2, 3),
+            make_process(4, 5, 6),
+            make_process(7, 8, 9),
+        ]);
 
         let expected = vector![
             List(vector![Number(1), Number(2), Number(3)]),
+            List(vector![Number(4), Number(5), Number(6)]),
+            List(vector![Number(7), Number(8), Number(9)]),
+        ];
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_complete_sequence() {
+        let input = vector![
+            Complete(Number(1)),
+            Complete(Number(2)),
+            Complete(Number(3))
+        ];
+
+        let process = Process::run_in_sequence(input, vector![]);
+
+        let actual = process.run_until_complete();
+
+        let expected = vector![Number(1), Number(2), Number(3)];
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_running_sequence() {
+        let input = vector![
+            make_process(1, 2, 3),
+            make_process(4, 5, 6),
+            make_process(7, 8, 9),
+        ];
+
+        let process = Process::run_in_sequence(input, vector![]);
+
+        let actual = process.run_until_complete();
+
+        let expected = vector![
             List(vector![Number(1), Number(2), Number(3)]),
-            List(vector![Number(1), Number(2), Number(3)]),
+            List(vector![Number(4), Number(5), Number(6)]),
+            List(vector![Number(7), Number(8), Number(9)]),
         ];
 
         assert_eq!(expected, actual);

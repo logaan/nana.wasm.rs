@@ -4,9 +4,7 @@ set -e
 
 clear
 
-cargo test \
-  -- \
-  --show-output
+cargo test
 
 ./scripts/build-wasi
 ./scripts/run
