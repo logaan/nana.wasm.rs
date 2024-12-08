@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+find src \
+  -type f \
+  -not -name "bindings.rs" \
+  -not -name "*_test.rs" \
+  | xargs cloc \
+  --by-file
