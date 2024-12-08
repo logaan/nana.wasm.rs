@@ -5,6 +5,7 @@ pub enum Process<T> {
     Complete(T),
 }
 
+use im::Vector;
 use Process::{Complete, Running};
 
 impl<T> Process<T> {
@@ -12,6 +13,13 @@ impl<T> Process<T> {
         match self {
             Complete(_) => panic!("Process is already complete"),
             Running(f) => f(),
+        }
+    }
+
+    pub fn result(self) -> Result<T, String> {
+        match self {
+            Complete(result) => Ok(result),
+            Running(_) => Err("Process still running".to_string()),
         }
     }
 
@@ -29,10 +37,11 @@ impl<T> Process<T> {
             active_process = active_process.step();
         }
 
-        match active_process {
-            Complete(result) => result,
-            Running(_) => panic!("We just checked that it's not running"),
-        }
+        active_process.result().unwrap()
+    }
+
+    pub fn round_robin(_processes: Vector<Process<T>>) -> Vector<T> {
+        todo!()
     }
 }
 
@@ -67,10 +76,7 @@ mod tests {
 
         let expected = List(vector![Number(1), Number(2), Number(3)]);
 
-        match actual {
-            Complete(result) => assert_eq!(expected, result),
-            _ => assert!(false, "The process was not complete"),
-        }
+        assert_eq!(expected, actual.result().unwrap());
     }
 
     #[test]
