@@ -22,20 +22,31 @@ impl<T> Process<T> {
     pub fn is_running(&self) -> bool {
         !self.is_complete()
     }
+
+    pub fn run_until_complete(self) -> T {
+        let mut active_process = self;
+        while active_process.is_running() {
+            active_process = active_process.step();
+        }
+
+        match active_process {
+            Complete(result) => result,
+            Running(_) => panic!("We just checked that it's not running"),
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use im::vector;
 
-    use crate::parsers::macros::RuntimeExpression::{List, Number};
+    use crate::parsers::macros::RuntimeExpression::{self, List, Number};
 
     use super::Process::{Complete, Running};
     use super::*;
 
-    #[test]
-    fn test_step_running_process() {
-        let process = Running(Arc::new(|| {
+    fn make_process() -> Process<RuntimeExpression> {
+        Running(Arc::new(|| {
             let a = 1;
             Running(Arc::new(move || {
                 let b = 2;
@@ -44,9 +55,12 @@ mod tests {
                     Complete(List(vector![Number(a), Number(b), Number(c)]))
                 }))
             }))
-        }));
+        }))
+    }
 
-        let actual = process.step().step().step();
+    #[test]
+    fn test_process_by_steps() {
+        let actual = make_process().step().step().step();
 
         assert!(actual.is_complete());
         assert!(!actual.is_running());
@@ -57,5 +71,13 @@ mod tests {
             Complete(result) => assert_eq!(expected, result),
             _ => assert!(false, "The process was not complete"),
         }
+    }
+
+    #[test]
+    fn test_process_to_completion() {
+        let actual = make_process().run_until_complete();
+
+        let expected = List(vector![Number(1), Number(2), Number(3)]);
+        assert_eq!(expected, actual);
     }
 }
