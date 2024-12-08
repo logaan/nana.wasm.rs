@@ -1,14 +1,17 @@
 use std::sync::Arc;
 
-pub enum Process<T> {
+#[derive(Clone)]
+pub enum Process<T: Clone> {
+    // TODO: If the fn returned a list of processes then running processes could
+    // kick off new processes and they could be added into the round robin pool.
     Running(Arc<dyn Fn() -> Process<T>>),
     Complete(T),
 }
 
-use im::Vector;
+use im::{vector, Vector};
 use Process::{Complete, Running};
 
-impl<T> Process<T> {
+impl<T: Clone> Process<T> {
     pub fn step(&self) -> Process<T> {
         match self {
             Complete(_) => panic!("Process is already complete"),
@@ -40,8 +43,21 @@ impl<T> Process<T> {
         active_process.result().unwrap()
     }
 
-    pub fn round_robin(_processes: Vector<Process<T>>) -> Vector<T> {
-        todo!()
+    pub fn round_robin(processes: Vector<Process<T>>) -> Vector<T> {
+        let mut active_processes = processes;
+        let mut complete_processes: Vector<T> = vector![];
+
+        while !active_processes.is_empty() {
+            let new_process = active_processes.pop_front().unwrap().step();
+
+            if new_process.is_complete() {
+                complete_processes.push_back(new_process.result().unwrap());
+            } else {
+                active_processes.push_back(new_process);
+            }
+        }
+
+        complete_processes
     }
 }
 
@@ -84,6 +100,19 @@ mod tests {
         let actual = make_process().run_until_complete();
 
         let expected = List(vector![Number(1), Number(2), Number(3)]);
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_processes_to_completion() {
+        let actual = Process::round_robin(vector![make_process(), make_process(), make_process(),]);
+
+        let expected = vector![
+            List(vector![Number(1), Number(2), Number(3)]),
+            List(vector![Number(1), Number(2), Number(3)]),
+            List(vector![Number(1), Number(2), Number(3)]),
+        ];
+
         assert_eq!(expected, actual);
     }
 }
