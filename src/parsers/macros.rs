@@ -20,7 +20,7 @@ pub fn build_macros(
     let rest = expressions.skip(1);
 
     match expressions.head() {
-        None => panic!("Empty expression list"),
+        None => panic!("We can't build macros from an empty expression list"),
         Some(LexicalExpression::MacroName(name)) => match environment.get(name) {
             Some(RuntimeExpression::Macro(name, params, _)) => {
                 let (final_args, new_rest) =
