@@ -11,6 +11,8 @@ pub enum Process<T: Clone> {
 use im::{vector, Vector};
 use Process::{Complete, Running};
 
+use crate::parsers::macros::RuntimeExpression;
+
 impl<T: Clone> Process<T> {
     pub fn step(&self) -> Process<T> {
         match self {
@@ -59,25 +61,29 @@ impl<T: Clone> Process<T> {
 
         complete_processes
     }
+}
 
-    pub fn run_in_sequence(
-        processes: Vector<Process<T>>,
-        results: Vector<T>,
-    ) -> Process<Vector<T>> {
+pub fn run_in_sequence(
+    processes: Vector<Process<RuntimeExpression>>,
+    results: Vector<RuntimeExpression>,
+) -> Process<Vector<RuntimeExpression>> {
+    if processes.is_empty() {
+        Complete(results)
+    } else {
         let mut processes = processes;
         let mut results = results;
 
-        if processes.is_empty() {
-            Complete(results)
+        let active_process = processes.pop_front().unwrap();
+
+        if active_process.is_complete() {
+            results.push_back(active_process.result().unwrap());
         } else {
-            let active_process = processes.pop_front().unwrap();
-            if active_process.is_complete() {
-                results.push_back(active_process.result().unwrap());
-            } else {
-                processes.push_front(active_process.step());
-            }
-            Self::run_in_sequence(processes, results)
+            processes.push_front(active_process.step());
         }
+
+        Running(Arc::new(move || {
+            run_in_sequence(processes.clone(), results.clone())
+        }))
     }
 }
 
@@ -145,7 +151,7 @@ mod tests {
             Complete(Number(3))
         ];
 
-        let process = Process::run_in_sequence(input, vector![]);
+        let process = run_in_sequence(input, vector![]);
 
         let actual = process.run_until_complete();
 
@@ -162,7 +168,7 @@ mod tests {
             make_process(7, 8, 9),
         ];
 
-        let process = Process::run_in_sequence(input, vector![]);
+        let process = run_in_sequence(input, vector![]);
 
         let actual = process.run_until_complete();
 
