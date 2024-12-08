@@ -4,6 +4,8 @@
 mod bindings;
 mod eval;
 mod process;
+#[cfg(test)]
+mod process_test;
 
 use bindings::exports::wasi::cli::run::Guest as Command;
 
