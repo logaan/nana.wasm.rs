@@ -2,6 +2,8 @@
 
 #[allow(warnings)]
 mod bindings;
+mod eval;
+mod process;
 
 use bindings::exports::wasi::cli::run::Guest as Command;
 
