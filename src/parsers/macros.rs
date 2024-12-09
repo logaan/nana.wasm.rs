@@ -4,6 +4,11 @@ use im::{vector, HashMap, Vector};
 #[derive(PartialEq, Debug, Clone)]
 pub enum RuntimeExpression {
     Macro(String, Vector<String>, Vector<RuntimeExpression>),
+    Function(
+        HashMap<String, RuntimeExpression>,
+        Vector<String>,
+        Vector<RuntimeExpression>,
+    ),
     ValueName(String),
     FunctionCall(String, Vector<RuntimeExpression>),
     MacroCall(String, Vector<RuntimeExpression>),

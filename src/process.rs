@@ -11,7 +11,7 @@ impl<T: Clone + 'static, F: Fn() -> Process<T> + 'static> Stepable<T> for F {
     }
 }
 
-struct AndThen<A: Clone, B: Clone>(Process<A>, fn(A) -> Process<B>);
+struct AndThen<A: Clone, B: Clone>(Process<A>, Arc<dyn Fn(A) -> Process<B>>);
 
 impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
     fn step(&self) -> Process<B> {
@@ -21,7 +21,7 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
         if new_process.is_complete() {
             (and_then)(new_process.result().unwrap())
         } else {
-            Running(Arc::new(AndThen(new_process, *and_then)))
+            Running(Arc::new(AndThen(new_process, and_then.clone())))
         }
     }
 }
@@ -114,7 +114,10 @@ impl<T: Clone + 'static> Process<T> {
         }
     }
 
-    pub fn and_then<B: Clone + 'static>(self, and_then: fn(T) -> Process<B>) -> Process<B> {
+    pub fn and_then<B: Clone + 'static>(
+        self,
+        and_then: Arc<dyn Fn(T) -> Process<B>>,
+    ) -> Process<B> {
         Running(Arc::new(AndThen(self, and_then)))
     }
 }
