@@ -14,6 +14,9 @@ use nom::{
 pub enum LexicalExpression {
     MacroName(String),
     ValueName(String),
+    // TODO: FunctionCalls should take a LexicalExpression as their first
+    // argument so that we can do things like get(someMap,
+    // "someFuncName")(someArg).
     FunctionCall(String, Vector<LexicalExpression>),
     List(Vector<LexicalExpression>),
     Number(u8),

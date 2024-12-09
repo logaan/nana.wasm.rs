@@ -89,3 +89,9 @@ fn test_running_sequence() {
 
     assert_eq!(expected, actual);
 }
+
+#[test]
+fn test_and_then() {
+    let process = Running(Arc::new(|| Complete(1))).and_then(|n| Complete((n, 2)));
+    assert_eq!((1, 2), process.run_until_complete());
+}

@@ -11,6 +11,21 @@ impl<T: Clone + 'static, F: Fn() -> Process<T> + 'static> Stepable<T> for F {
     }
 }
 
+struct AndThen<A: Clone, B: Clone>(Process<A>, fn(A) -> Process<B>);
+
+impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
+    fn step(&self) -> Process<B> {
+        let AndThen(process, and_then) = self;
+        let new_process = process.step();
+
+        if new_process.is_complete() {
+            (and_then)(new_process.result().unwrap())
+        } else {
+            Running(Arc::new(AndThen(new_process, *and_then)))
+        }
+    }
+}
+
 #[derive(Clone)]
 pub enum Process<T: Clone> {
     // TODO: If the fn returned a list of processes then running processes could
@@ -93,5 +108,9 @@ impl<T: Clone + 'static> Process<T> {
                 Process::run_in_sequence(processes.clone(), results.clone())
             }))
         }
+    }
+
+    pub fn and_then<B: Clone + 'static>(self, and_then: fn(T) -> Process<B>) -> Process<B> {
+        Running(Arc::new(AndThen(self, and_then)))
     }
 }
