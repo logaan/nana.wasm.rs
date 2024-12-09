@@ -60,7 +60,7 @@ fn test_complete_sequence() {
         Complete(Number(3))
     ];
 
-    let process = Process::run_in_sequence(input, vector![]);
+    let process = Process::run_in_sequence(input);
 
     let actual = process.run_until_complete();
 
@@ -77,7 +77,7 @@ fn test_running_sequence() {
         make_process(7, 8, 9),
     ];
 
-    let process = Process::run_in_sequence(input, vector![]);
+    let process = Process::run_in_sequence(input);
 
     let actual = process.run_until_complete();
 

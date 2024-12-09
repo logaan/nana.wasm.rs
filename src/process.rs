@@ -86,7 +86,11 @@ impl<T: Clone + 'static> Process<T> {
         complete_processes
     }
 
-    pub fn run_in_sequence(
+    pub fn run_in_sequence(processes: Vector<Process<T>>) -> Process<Vector<T>> {
+        Process::run_in_sequence_with_results(processes, vector![])
+    }
+
+    fn run_in_sequence_with_results(
         processes: Vector<Process<T>>,
         results: Vector<T>,
     ) -> Process<Vector<T>> {
@@ -105,7 +109,7 @@ impl<T: Clone + 'static> Process<T> {
             }
 
             Running(Arc::new(move || {
-                Process::run_in_sequence(processes.clone(), results.clone())
+                Process::run_in_sequence_with_results(processes.clone(), results.clone())
             }))
         }
     }

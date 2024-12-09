@@ -13,16 +13,17 @@ fn eval(
     match expression {
         FunctionCall(_name, _args) => todo!(),
         MacroCall(_name, _args) => todo!(),
-        // TODO: We can use run_in_sequence to evaluate everything in the list.
-        // But that'll just complete with Process<Vector<RuntimeExpression>>.
-        // What we need is a Process<RuntimeExpression>, we need to be able to
-        // grab the final results and wrap them in a List.
-        //
-        // I think there's two ways of doing that. Either we have a wrapper
-        // process that runs an inner process until completion and then does the
-        // transform. Or we add a `then` field to Running and update `step` so
-        // that it calls then rather than Complete.
-        List(_expressions) => todo!(),
+
+        List(expressions) => {
+            let eval_processes = expressions
+                .iter()
+                .cloned()
+                .map(|e| eval(e, environment))
+                .collect::<im::Vector<_>>();
+
+            Process::run_in_sequence(eval_processes)
+                .and_then(|evaluated_expressions| Complete(List(evaluated_expressions)))
+        }
 
         ValueName(name) => match environment.get(&name) {
             // TODO: Give this clone some thought
