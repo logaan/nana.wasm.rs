@@ -6,7 +6,7 @@ use crate::parsers::macros::RuntimeExpression::{
 
 use crate::process::Process::{self, Complete};
 
-fn eval(
+pub fn eval(
     expression: RuntimeExpression,
     environment: &HashMap<String, RuntimeExpression>,
 ) -> Process<RuntimeExpression> {

@@ -3,6 +3,8 @@
 #[allow(warnings)]
 mod bindings;
 mod eval;
+#[cfg(test)]
+mod eval_test;
 mod process;
 #[cfg(test)]
 mod process_test;
