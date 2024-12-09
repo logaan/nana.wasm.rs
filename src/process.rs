@@ -16,12 +16,17 @@ struct AndThen<A: Clone, B: Clone>(Process<A>, Arc<dyn Fn(A) -> Process<B>>);
 impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
     fn step(&self) -> Process<B> {
         let AndThen(process, and_then) = self;
-        let new_process = process.step();
-
-        if new_process.is_complete() {
-            (and_then)(new_process.result().unwrap())
+        if process.is_complete() {
+            // TODO: Can this clone be avoided?
+            (and_then)(process.clone().result().unwrap())
         } else {
-            Running(Arc::new(AndThen(new_process, and_then.clone())))
+            let new_process = process.step();
+
+            if new_process.is_complete() {
+                (and_then)(new_process.result().unwrap())
+            } else {
+                Running(Arc::new(AndThen(new_process, and_then.clone())))
+            }
         }
     }
 }
@@ -74,6 +79,8 @@ impl<T: Clone + 'static> Process<T> {
         let mut complete_processes: Vector<T> = vector![];
 
         while !active_processes.is_empty() {
+            // TODO: Need to handle the case where the process was already
+            // Complete (ie: don't call step)
             let new_process = active_processes.pop_front().unwrap().step();
 
             if new_process.is_complete() {
