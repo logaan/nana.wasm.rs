@@ -1,21 +1,32 @@
 use std::sync::Arc;
 
+pub trait Stepable<T: Clone> {
+    fn step(&self) -> Process<T>;
+}
+
+// Functions that return Processes count as Stepable by just calling themselves
+impl<T: Clone + 'static, F: Fn() -> Process<T> + 'static> Stepable<T> for F {
+    fn step(&self) -> Process<T> {
+        self()
+    }
+}
+
 #[derive(Clone)]
-pub enum FnProcess<T: Clone> {
+pub enum Process<T: Clone> {
     // TODO: If the fn returned a list of processes then running processes could
     // kick off new processes and they could be added into the round robin pool.
-    Running(Arc<dyn Fn() -> FnProcess<T>>),
+    Running(Arc<dyn Stepable<T>>),
     Complete(T),
 }
 
 use im::{vector, Vector};
-use FnProcess::{Complete, Running};
+use Process::{Complete, Running};
 
-impl<T: Clone + 'static> FnProcess<T> {
-    pub fn step(&self) -> FnProcess<T> {
+impl<T: Clone + 'static> Process<T> {
+    pub fn step(&self) -> Process<T> {
         match self {
             Complete(_) => panic!("Process is already complete"),
-            Running(f) => f(),
+            Running(f) => f.step(),
         }
     }
 
@@ -43,7 +54,7 @@ impl<T: Clone + 'static> FnProcess<T> {
         active_process.result().unwrap()
     }
 
-    pub fn round_robin(processes: Vector<FnProcess<T>>) -> Vector<T> {
+    pub fn round_robin(processes: Vector<Process<T>>) -> Vector<T> {
         let mut active_processes = processes;
         let mut complete_processes: Vector<T> = vector![];
 
@@ -61,9 +72,9 @@ impl<T: Clone + 'static> FnProcess<T> {
     }
 
     pub fn run_in_sequence(
-        processes: Vector<FnProcess<T>>,
+        processes: Vector<Process<T>>,
         results: Vector<T>,
-    ) -> FnProcess<Vector<T>> {
+    ) -> Process<Vector<T>> {
         if processes.is_empty() {
             Complete(results)
         } else {
@@ -79,7 +90,7 @@ impl<T: Clone + 'static> FnProcess<T> {
             }
 
             Running(Arc::new(move || {
-                FnProcess::run_in_sequence(processes.clone(), results.clone())
+                Process::run_in_sequence(processes.clone(), results.clone())
             }))
         }
     }

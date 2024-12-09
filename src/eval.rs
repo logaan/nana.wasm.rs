@@ -4,12 +4,12 @@ use crate::parsers::macros::RuntimeExpression::{
     self, FunctionCall, Hole, List, Macro, MacroCall, Number, ValueName,
 };
 
-use crate::process::FnProcess::{self, Complete};
+use crate::process::Process::{self, Complete};
 
 fn eval(
     expression: RuntimeExpression,
     environment: &HashMap<String, RuntimeExpression>,
-) -> FnProcess<RuntimeExpression> {
+) -> Process<RuntimeExpression> {
     match expression {
         FunctionCall(_name, _args) => todo!(),
         MacroCall(_name, _args) => todo!(),
