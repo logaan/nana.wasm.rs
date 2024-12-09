@@ -3,21 +3,41 @@
 #[allow(warnings)]
 mod bindings;
 mod eval;
+mod parsers;
+mod process;
+
 #[cfg(test)]
 mod eval_test;
-mod process;
 #[cfg(test)]
 mod process_test;
 
+use crate::eval::eval;
+use crate::parsers::macros::RuntimeExpression::{self, BuiltinFunction};
 use bindings::exports::wasi::cli::run::Guest as Command;
-
-mod parsers;
+use im::{hashmap, HashMap};
+use parsers::macros::build_macros;
+use parsers::nana::program;
+use process::Process;
 
 struct Component;
 
+fn execute(code: String, env: HashMap<String, RuntimeExpression>) -> RuntimeExpression {
+    program(&code)
+        .and_then(|(_, es)| Ok(build_macros(&es, &env)))
+        .and_then(|(ast, _)| Ok(eval(ast, env)))
+        .unwrap()
+        .run_until_complete()
+}
+
 impl Command for Component {
     fn run() -> Result<(), ()> {
-        println!("Hello world");
+        let environment = hashmap! {
+            String::from("greet") => BuiltinFunction(|_args| {
+                Process::Complete(RuntimeExpression::String(String::from("Hello, World.")))
+            }),
+        };
+        let result = execute(String::from("greet()"), environment);
+        println!("{:?}", result);
         Ok(())
     }
 }
