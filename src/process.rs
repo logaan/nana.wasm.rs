@@ -1,20 +1,18 @@
 use std::sync::Arc;
 
 #[derive(Clone)]
-pub enum Process<T: Clone> {
+pub enum FnProcess<T: Clone> {
     // TODO: If the fn returned a list of processes then running processes could
     // kick off new processes and they could be added into the round robin pool.
-    Running(Arc<dyn Fn() -> Process<T>>),
+    Running(Arc<dyn Fn() -> FnProcess<T>>),
     Complete(T),
 }
 
 use im::{vector, Vector};
-use Process::{Complete, Running};
+use FnProcess::{Complete, Running};
 
-use crate::parsers::macros::RuntimeExpression;
-
-impl<T: Clone> Process<T> {
-    pub fn step(&self) -> Process<T> {
+impl<T: Clone + 'static> FnProcess<T> {
+    pub fn step(&self) -> FnProcess<T> {
         match self {
             Complete(_) => panic!("Process is already complete"),
             Running(f) => f(),
@@ -45,7 +43,7 @@ impl<T: Clone> Process<T> {
         active_process.result().unwrap()
     }
 
-    pub fn round_robin(processes: Vector<Process<T>>) -> Vector<T> {
+    pub fn round_robin(processes: Vector<FnProcess<T>>) -> Vector<T> {
         let mut active_processes = processes;
         let mut complete_processes: Vector<T> = vector![];
 
@@ -61,28 +59,28 @@ impl<T: Clone> Process<T> {
 
         complete_processes
     }
-}
 
-pub fn run_in_sequence(
-    processes: Vector<Process<RuntimeExpression>>,
-    results: Vector<RuntimeExpression>,
-) -> Process<Vector<RuntimeExpression>> {
-    if processes.is_empty() {
-        Complete(results)
-    } else {
-        let mut processes = processes;
-        let mut results = results;
-
-        let active_process = processes.pop_front().unwrap();
-
-        if active_process.is_complete() {
-            results.push_back(active_process.result().unwrap());
+    pub fn run_in_sequence(
+        processes: Vector<FnProcess<T>>,
+        results: Vector<T>,
+    ) -> FnProcess<Vector<T>> {
+        if processes.is_empty() {
+            Complete(results)
         } else {
-            processes.push_front(active_process.step());
-        }
+            let mut processes = processes;
+            let mut results = results;
 
-        Running(Arc::new(move || {
-            run_in_sequence(processes.clone(), results.clone())
-        }))
+            let active_process = processes.pop_front().unwrap();
+
+            if active_process.is_complete() {
+                results.push_back(active_process.result().unwrap());
+            } else {
+                processes.push_front(active_process.step());
+            }
+
+            Running(Arc::new(move || {
+                FnProcess::run_in_sequence(processes.clone(), results.clone())
+            }))
+        }
     }
 }

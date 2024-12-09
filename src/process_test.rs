@@ -2,10 +2,10 @@ use im::vector;
 use std::sync::Arc;
 
 use crate::parsers::macros::RuntimeExpression::{self, List, Number};
-use crate::process::Process::{Complete, Running};
+use crate::process::FnProcess::{Complete, Running};
 use crate::process::*;
 
-fn make_process(a: u8, b: u8, c: u8) -> Process<RuntimeExpression> {
+fn make_process(a: u8, b: u8, c: u8) -> FnProcess<RuntimeExpression> {
     Running(Arc::new(move || {
         Running(Arc::new(move || {
             Running(Arc::new(move || {
@@ -37,7 +37,7 @@ fn test_process_to_completion() {
 
 #[test]
 fn test_processes_to_completion() {
-    let actual = Process::round_robin(vector![
+    let actual = FnProcess::round_robin(vector![
         make_process(1, 2, 3),
         make_process(4, 5, 6),
         make_process(7, 8, 9),
@@ -60,7 +60,7 @@ fn test_complete_sequence() {
         Complete(Number(3))
     ];
 
-    let process = run_in_sequence(input, vector![]);
+    let process = FnProcess::run_in_sequence(input, vector![]);
 
     let actual = process.run_until_complete();
 
@@ -77,7 +77,7 @@ fn test_running_sequence() {
         make_process(7, 8, 9),
     ];
 
-    let process = run_in_sequence(input, vector![]);
+    let process = FnProcess::run_in_sequence(input, vector![]);
 
     let actual = process.run_until_complete();
 
