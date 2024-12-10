@@ -8,6 +8,7 @@ mod eval;
 mod expressions;
 mod parsers;
 mod process;
+mod standard_library;
 
 #[cfg(test)]
 mod eval_test;

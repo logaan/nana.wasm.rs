@@ -1,6 +1,8 @@
 use crate::process::Process;
 use im::{HashMap, Vector};
 
+pub type Environment = HashMap<String, RuntimeExpression>;
+
 #[derive(PartialEq, Debug, Clone)]
 pub enum LexicalExpression {
     FunctionCall(String, Vector<LexicalExpression>),
