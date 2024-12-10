@@ -23,6 +23,19 @@ pub fn build_macros(
                     new_rest,
                 )
             }
+            // TODO: Copy paste job. Move to a fn
+            Some(RuntimeExpression::BuiltinMacro(params, _)) => {
+                let (final_args, new_rest) =
+                    (0..params.len()).fold((Vector::new(), rest), |(args, curr_rest), _| {
+                        let (arg, remainder) = build_macros(&curr_rest, &environment);
+                        let new_args = args + Vector::unit(arg);
+                        (new_args, remainder)
+                    });
+                (
+                    RuntimeExpression::MacroCall(name.to_string(), final_args),
+                    new_rest,
+                )
+            }
             Some(_) => panic!("A macro name should only ever point to a macro in the environment"),
             None => panic!("Macro was referenced but has not defined"),
         },

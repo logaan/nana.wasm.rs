@@ -2,6 +2,7 @@
 
 #[allow(warnings)]
 mod bindings;
+mod helpers;
 
 mod eval;
 mod expressions;

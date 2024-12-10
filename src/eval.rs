@@ -3,7 +3,8 @@ use std::sync::Arc;
 use im::{HashMap, Vector};
 
 use crate::expressions::RuntimeExpression::{
-    self, BuiltinFunction, Function, FunctionCall, Hole, List, Macro, MacroCall, Number, ValueName,
+    self, BuiltinFunction, BuiltinMacro, Function, FunctionCall, Hole, List, Macro, MacroCall,
+    Number, ValueName,
 };
 
 use crate::process::Process::{self, Complete};
@@ -36,6 +37,7 @@ pub fn apply(
                 |results: Vector<RuntimeExpression>| Complete(results.last().unwrap().clone()),
             ))
         }
+        BuiltinMacro(_params, body) => (body)(args),
         _ => panic!("Not a function"),
     }
 }
@@ -49,8 +51,6 @@ pub fn eval(
             let maybe_function = environment.get(&name);
             match maybe_function {
                 Some(function) => {
-                    // TODO: I clone this environment three times. There has got
-                    // to be a better way.
                     let environment = environment.clone();
                     let eval_processes = args
                         .iter()
@@ -71,7 +71,14 @@ pub fn eval(
             }
         }
 
-        MacroCall(_name, _args) => todo!(),
+        MacroCall(name, args) => {
+            let maybe_macro = environment.get(&name);
+            match maybe_macro {
+                Some(a_macro) => apply(a_macro.clone(), args)
+                    .and_then(Arc::new(move |re| eval(re, environment.clone()))),
+                _ => panic!("No macro of that name found"),
+            }
+        }
 
         List(expressions) => {
             let eval_processes = expressions
@@ -96,6 +103,7 @@ pub fn eval(
 
         BuiltinFunction(..) => todo!("When would you actually eval a function?"),
         Function(..) => todo!("Nope"),
+        BuiltinMacro(..) => todo!("Do we eval macros?"),
         Macro(..) => todo!("Do we eval macros?"),
         Hole => todo!("I can't imagine what holes evaluate to"),
     }
