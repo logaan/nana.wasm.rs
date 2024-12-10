@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use im::{HashMap, Vector};
 
+use crate::expressions::Environment;
 use crate::expressions::RuntimeExpression::{
     self, BuiltinFunction, BuiltinMacro, Function, FunctionCall, Hole, List, Macro, MacroCall,
     Number, ValueName,
@@ -64,10 +65,7 @@ pub fn apply(
     }
 }
 
-pub fn eval(
-    expression: RuntimeExpression,
-    environment: HashMap<String, RuntimeExpression>,
-) -> Process<RuntimeExpression> {
+pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<RuntimeExpression> {
     match expression {
         FunctionCall(name, args) => {
             let maybe_function = environment.get(&name);

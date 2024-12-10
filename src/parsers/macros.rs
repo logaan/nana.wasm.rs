@@ -1,10 +1,12 @@
+use crate::expressions::Environment;
 use crate::expressions::LexicalExpression;
 use crate::expressions::RuntimeExpression;
-use im::{vector, HashMap, Vector};
+use im::vector;
+use im::Vector;
 
 pub fn build_macros(
     expressions: &Vector<LexicalExpression>,
-    environment: &HashMap<String, RuntimeExpression>,
+    environment: &Environment,
 ) -> (RuntimeExpression, Vector<LexicalExpression>) {
     let rest = expressions.skip(1);
 
@@ -63,7 +65,7 @@ pub fn build_macros(
 
 fn build_many_macros(
     incoming_exprs: &Vector<LexicalExpression>,
-    environment: &HashMap<String, RuntimeExpression>,
+    environment: &Environment,
 ) -> Vector<RuntimeExpression> {
     let mut remaining_exprs = incoming_exprs.clone();
     let mut outgoing_exprs: Vector<RuntimeExpression> = vector![];

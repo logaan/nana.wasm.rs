@@ -1,16 +1,19 @@
-use im::{hashmap, vector, HashMap};
+use im::{hashmap, vector};
 
 use crate::{
     eval::eval,
-    expressions::RuntimeExpression::{
-        self, BuiltinFunction, BuiltinMacro, Function, FunctionCall, List, Macro, MacroCall,
-        Number, ValueName,
+    expressions::{
+        Environment,
+        RuntimeExpression::{
+            self, BuiltinFunction, BuiltinMacro, Function, FunctionCall, List, Macro, MacroCall,
+            Number, ValueName,
+        },
     },
     process::Process,
     s,
 };
 
-pub fn environment() -> HashMap<String, RuntimeExpression> {
+pub fn environment() -> Environment {
     hashmap! {
         s!("life") => Number(42),
         s!("Package") => Macro(
@@ -32,7 +35,7 @@ pub fn environment() -> HashMap<String, RuntimeExpression> {
     }
 }
 
-pub fn environment_with_fn() -> HashMap<String, RuntimeExpression> {
+pub fn environment_with_fn() -> Environment {
     hashmap! {
         s!("life") => Number(2),
         s!("list-nums") => Function(

@@ -19,14 +19,15 @@ use crate::eval::eval;
 
 use crate::expressions::RuntimeExpression::{self, BuiltinFunction};
 use bindings::exports::wasi::cli::run::Guest as Command;
-use im::{hashmap, HashMap};
+use expressions::Environment;
+use im::hashmap;
 use parsers::macros::build_macros;
 use parsers::nana::program;
 use process::Process;
 
 struct Component;
 
-fn execute(code: String, env: HashMap<String, RuntimeExpression>) -> RuntimeExpression {
+fn execute(code: String, env: Environment) -> RuntimeExpression {
     program(&code)
         .and_then(|(_, es)| Ok(build_macros(&es, &env)))
         .and_then(|(ast, _)| Ok(eval(ast, env)))

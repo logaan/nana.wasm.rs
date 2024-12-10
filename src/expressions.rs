@@ -17,11 +17,7 @@ pub enum LexicalExpression {
 #[derive(PartialEq, Debug, Clone)]
 pub enum RuntimeExpression {
     BuiltinFunction(fn(Vector<RuntimeExpression>) -> Process<RuntimeExpression>),
-    Function(
-        Vector<String>,
-        HashMap<String, RuntimeExpression>,
-        Vector<RuntimeExpression>,
-    ),
+    Function(Vector<String>, Environment, Vector<RuntimeExpression>),
     FunctionCall(String, Vector<RuntimeExpression>),
     Hole,
     List(Vector<RuntimeExpression>),
@@ -29,11 +25,7 @@ pub enum RuntimeExpression {
         Vector<String>,
         fn(Vector<RuntimeExpression>) -> Process<RuntimeExpression>,
     ),
-    Macro(
-        Vector<String>,
-        HashMap<String, RuntimeExpression>,
-        Vector<RuntimeExpression>,
-    ),
+    Macro(Vector<String>, Environment, Vector<RuntimeExpression>),
     MacroCall(String, Vector<RuntimeExpression>),
     Number(u8),
     String(String),
