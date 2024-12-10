@@ -36,10 +36,14 @@ impl Command for Component {
                 Process::Complete(RuntimeExpression::String(String::from("Hello, World.")))
             }),
         };
-        let result = execute(String::from("greet()"), environment);
+        let result = execute(PROGRAM_CODE.to_owned(), environment);
         println!("{:?}", result);
         Ok(())
     }
 }
 
 bindings::export!(Component with_types_in bindings);
+
+pub static PROGRAM_CODE: &str = r#"
+greet()
+"#;
