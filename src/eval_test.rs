@@ -24,6 +24,7 @@ pub fn environment() -> HashMap<String, RuntimeExpression> {
 
 pub fn environment_with_fn() -> HashMap<String, RuntimeExpression> {
     hashmap! {
+        String::from("life") => Number(2),
         String::from("list-nums") => Function(
             vector![String::from("n")],
             environment(),
@@ -75,7 +76,10 @@ fn test_builtin_function_call() {
 
 #[test]
 fn test_user_defined_function_call() {
-    let expression = FunctionCall(String::from("list-nums"), vector![Number(2)]);
+    let expression = FunctionCall(
+        String::from("list-nums"),
+        vector![ValueName(String::from("life"))],
+    );
     let actual = eval(expression, environment_with_fn()).run_until_complete();
     let expected = List(vector![Number(1), Number(2), Number(3), Number(42)]);
     assert_eq!(expected, actual)
