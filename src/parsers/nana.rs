@@ -1,6 +1,5 @@
-use std::fmt::Debug;
-
 use super::general::*;
+use crate::expressions::LexicalExpression;
 use im::Vector;
 use nom::{
     branch::alt,
@@ -9,20 +8,6 @@ use nom::{
     sequence::{delimited, tuple},
     IResult, Parser,
 };
-
-#[derive(PartialEq, Debug, Clone)]
-pub enum LexicalExpression {
-    MacroName(String),
-    ValueName(String),
-    // TODO: FunctionCalls should take a LexicalExpression as their first
-    // argument so that we can do things like get(someMap,
-    // "someFuncName")(someArg).
-    FunctionCall(String, Vector<LexicalExpression>),
-    List(Vector<LexicalExpression>),
-    Number(u8),
-    String(String),
-    Hole,
-}
 
 pub fn macro_name(input: &str) -> IResult<&str, LexicalExpression> {
     titlecase_word

@@ -1,7 +1,7 @@
 use super::nana::*;
 
+use crate::expressions::LexicalExpression::{self, *};
 use im::{vector, Vector};
-use LexicalExpression::*;
 
 pub static FIZZBUZZ: &str = r#"
 Package nana:examples@0.0.1

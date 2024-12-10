@@ -1,20 +1,6 @@
-use crate::process::Process;
-
-use super::nana::LexicalExpression;
+use crate::expressions::LexicalExpression;
+use crate::expressions::RuntimeExpression;
 use im::{vector, HashMap, Vector};
-
-#[derive(PartialEq, Debug, Clone)]
-pub enum RuntimeExpression {
-    Macro(String, Vector<String>, Vector<RuntimeExpression>),
-    BuiltinFunction(fn(Vector<RuntimeExpression>) -> Process<RuntimeExpression>),
-    ValueName(String),
-    FunctionCall(String, Vector<RuntimeExpression>),
-    MacroCall(String, Vector<RuntimeExpression>),
-    List(Vector<RuntimeExpression>),
-    Number(u8),
-    String(String),
-    Hole,
-}
 
 pub fn build_macros(
     expressions: &Vector<LexicalExpression>,

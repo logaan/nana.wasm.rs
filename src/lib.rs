@@ -2,7 +2,9 @@
 
 #[allow(warnings)]
 mod bindings;
+
 mod eval;
+mod expressions;
 mod parsers;
 mod process;
 
@@ -12,7 +14,8 @@ mod eval_test;
 mod process_test;
 
 use crate::eval::eval;
-use crate::parsers::macros::RuntimeExpression::{self, BuiltinFunction};
+
+use crate::expressions::RuntimeExpression::{self, BuiltinFunction};
 use bindings::exports::wasi::cli::run::Guest as Command;
 use im::{hashmap, HashMap};
 use parsers::macros::build_macros;

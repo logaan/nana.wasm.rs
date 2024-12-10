@@ -6,7 +6,7 @@ use im::vector;
 use super::macros::build_macros;
 use super::nana::program;
 
-use super::macros::RuntimeExpression::{self, MacroCall};
+use crate::expressions::RuntimeExpression::{self, MacroCall};
 
 pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
     hashmap! {
