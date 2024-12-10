@@ -23,7 +23,7 @@ pub enum RuntimeExpression {
     FunctionCall(String, Vector<RuntimeExpression>),
     Hole,
     List(Vector<RuntimeExpression>),
-    Macro(String, Vector<String>, Vector<RuntimeExpression>),
+    Macro(Vector<String>, Vector<RuntimeExpression>),
     MacroCall(String, Vector<RuntimeExpression>),
     Number(u8),
     String(String),

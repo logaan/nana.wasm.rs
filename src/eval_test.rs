@@ -12,7 +12,6 @@ pub fn environment() -> HashMap<String, RuntimeExpression> {
     hashmap! {
         String::from("life") => Number(42),
         String::from("Package") => Macro(
-            "Package".to_string(),
             vector!["name".to_string()],
             vector![],
         ),
