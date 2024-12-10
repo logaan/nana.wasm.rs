@@ -3,7 +3,7 @@ use std::sync::Arc;
 use im::{HashMap, Vector};
 
 use crate::expressions::RuntimeExpression::{
-    self, BuiltinFunction, FunctionCall, Hole, List, Macro, MacroCall, Number, ValueName,
+    self, BuiltinFunction, Function, FunctionCall, Hole, List, Macro, MacroCall, Number, ValueName,
 };
 
 use crate::process::Process::{self, Complete};
@@ -14,6 +14,28 @@ pub fn apply(
 ) -> Process<RuntimeExpression> {
     match function {
         BuiltinFunction(body) => (body)(args),
+        Function(params, environment, body) => {
+            let new_env = environment.union(
+                params
+                    .iter()
+                    .cloned()
+                    .zip(args.iter().cloned())
+                    .collect::<HashMap<_, _>>(),
+            );
+
+            let eval_body = body
+                .iter()
+                .cloned()
+                .map(move |e| {
+                    let new_env = new_env.clone();
+                    Process::Running(Arc::new(move || eval(e.clone(), new_env.clone())))
+                })
+                .collect::<im::Vector<_>>();
+
+            Process::run_in_sequence(eval_body).and_then(Arc::new(
+                |results: Vector<RuntimeExpression>| Complete(results.last().unwrap().clone()),
+            ))
+        }
         _ => panic!("Not a function"),
     }
 }
@@ -73,6 +95,7 @@ pub fn eval(
         RuntimeExpression::String(_) => Complete(expression),
 
         BuiltinFunction(..) => todo!("When would you actually eval a function?"),
+        Function(..) => todo!("Nope"),
         Macro(..) => todo!("Do we eval macros?"),
         Hole => todo!("I can't imagine what holes evaluate to"),
     }

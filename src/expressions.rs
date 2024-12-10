@@ -1,29 +1,31 @@
 use crate::process::Process;
-use im::Vector;
+use im::{HashMap, Vector};
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum LexicalExpression {
-    MacroName(String),
-    ValueName(String),
-    // TODO: FunctionCalls should take a LexicalExpression as their first
-    // argument so that we can do things like get(someMap,
-    // "someFuncName")(someArg).
     FunctionCall(String, Vector<LexicalExpression>),
+    Hole,
     List(Vector<LexicalExpression>),
+    MacroName(String),
     Number(u8),
     String(String),
-    Hole,
+    ValueName(String),
 }
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum RuntimeExpression {
-    Macro(String, Vector<String>, Vector<RuntimeExpression>),
     BuiltinFunction(fn(Vector<RuntimeExpression>) -> Process<RuntimeExpression>),
-    ValueName(String),
+    Function(
+        Vector<String>,
+        HashMap<String, RuntimeExpression>,
+        Vector<RuntimeExpression>,
+    ),
     FunctionCall(String, Vector<RuntimeExpression>),
-    MacroCall(String, Vector<RuntimeExpression>),
+    Hole,
     List(Vector<RuntimeExpression>),
+    Macro(String, Vector<String>, Vector<RuntimeExpression>),
+    MacroCall(String, Vector<RuntimeExpression>),
     Number(u8),
     String(String),
-    Hole,
+    ValueName(String),
 }
