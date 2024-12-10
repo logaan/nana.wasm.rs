@@ -27,7 +27,11 @@ pub enum RuntimeExpression {
         Vector<String>,
         fn(Vector<RuntimeExpression>) -> Process<RuntimeExpression>,
     ),
-    Macro(Vector<String>, Vector<RuntimeExpression>),
+    Macro(
+        Vector<String>,
+        HashMap<String, RuntimeExpression>,
+        Vector<RuntimeExpression>,
+    ),
     MacroCall(String, Vector<RuntimeExpression>),
     Number(u8),
     String(String),

@@ -1,15 +1,10 @@
-use std::thread::AccessError;
-
 use im::{hashmap, vector, HashMap};
 
 use crate::{
     eval::eval,
-    expressions::{
-        self,
-        RuntimeExpression::{
-            self, BuiltinFunction, BuiltinMacro, Function, FunctionCall, List, Macro, MacroCall,
-            Number, ValueName,
-        },
+    expressions::RuntimeExpression::{
+        self, BuiltinFunction, BuiltinMacro, Function, FunctionCall, List, Macro, MacroCall,
+        Number, ValueName,
     },
     process::Process,
     s,
@@ -20,6 +15,7 @@ pub fn environment() -> HashMap<String, RuntimeExpression> {
         s!("life") => Number(42),
         s!("Package") => Macro(
             vector![s!("name")],
+            hashmap!{},
             vector![],
         ),
         s!("foo") => BuiltinFunction(|_args| {
@@ -29,7 +25,10 @@ pub fn environment() -> HashMap<String, RuntimeExpression> {
             let first = args.head().unwrap().clone();
             let last = args.last().unwrap().clone();
             Process::Complete(List(vector![last, first]))
-        })
+        }),
+        s!("ignore") => Macro(vector![s!("expression")], hashmap!{}, vector![
+            Number(42)
+        ])
     }
 }
 
@@ -94,5 +93,13 @@ fn test_builtin_macro_call() {
     let expression = MacroCall(s!("swap"), vector![Number(1), Number(2)]);
     let actual = eval(expression, environment()).run_until_complete();
     let expected = List(vector![Number(2), Number(1)]);
+    assert_eq!(expected, actual);
+}
+
+#[test]
+fn test_user_defined_macro_call() {
+    let expression = MacroCall(s!("ignore"), vector![Number(1), Number(2)]);
+    let actual = eval(expression, environment()).run_until_complete();
+    let expected = Number(42);
     assert_eq!(expected, actual);
 }

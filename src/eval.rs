@@ -38,6 +38,28 @@ pub fn apply(
             ))
         }
         BuiltinMacro(_params, body) => (body)(args),
+        Macro(params, environment, body) => {
+            let new_env = environment.union(
+                params
+                    .iter()
+                    .cloned()
+                    .zip(args.iter().cloned())
+                    .collect::<HashMap<_, _>>(),
+            );
+
+            let eval_body = body
+                .iter()
+                .cloned()
+                .map(move |e| {
+                    let new_env = new_env.clone();
+                    Process::Running(Arc::new(move || eval(e.clone(), new_env.clone())))
+                })
+                .collect::<im::Vector<_>>();
+
+            Process::run_in_sequence(eval_body).and_then(Arc::new(
+                |results: Vector<RuntimeExpression>| Complete(results.last().unwrap().clone()),
+            ))
+        }
         _ => panic!("Not a function"),
     }
 }

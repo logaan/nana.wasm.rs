@@ -11,7 +11,7 @@ pub fn build_macros(
     match expressions.head() {
         None => panic!("We can't build macros from an empty expression list"),
         Some(LexicalExpression::MacroName(name)) => match environment.get(name) {
-            Some(RuntimeExpression::Macro(params, _)) => {
+            Some(RuntimeExpression::Macro(params, _, _)) => {
                 let (final_args, new_rest) =
                     (0..params.len()).fold((Vector::new(), rest), |(args, curr_rest), _| {
                         let (arg, remainder) = build_macros(&curr_rest, &environment);

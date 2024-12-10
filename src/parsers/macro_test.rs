@@ -13,17 +13,23 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
         String::from("Package") =>
         RuntimeExpression::Macro(
             vector!["name".to_string()],
+            hashmap!{},
             vector![],
         ),
 
         String::from("World") =>
         RuntimeExpression::Macro(
             vector!["name".to_string(), "body".to_string()],
+            hashmap!{},
             vector![],
         ),
 
         String::from("Import") =>
-        RuntimeExpression::Macro(vector!["name".to_string()], vector![]),
+        RuntimeExpression::Macro(
+            vector!["name".to_string()],
+            hashmap!{},
+            vector![],
+        ),
 
         String::from("Export") =>
         RuntimeExpression::Macro(
@@ -32,6 +38,7 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
                 "args".to_string(),
                 "return_type".to_string(),
             ],
+            hashmap!{},
             vector![],
         ),
 
@@ -43,24 +50,28 @@ pub fn create_macro_map() -> HashMap<String, RuntimeExpression> {
                 "return_type".to_string(),
                 "body".to_string(),
             ],
+            hashmap!{},
             vector![],
         ),
 
         String::from("Match") =>
         RuntimeExpression::Macro(
             vector!["condition".to_string(), "branches".to_string()],
+            hashmap!{},
             vector![],
         ),
 
         String::from("Let") =>
         RuntimeExpression::Macro(
             vector!["bindings".to_string(), "body".to_string()],
+            hashmap!{},
             vector![],
         ),
 
         String::from("For") =>
         RuntimeExpression::Macro(
             vector!["binding".to_string(), "body".to_string()],
+            hashmap!{},
             vector![],
         ),
     }
