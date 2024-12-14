@@ -138,7 +138,7 @@ fn parses_macros_in_lists() {
 fn parses_macros_in_args_to_functions() {
     assert_eq!(
         Ok((
-            RuntimeExpression::FunctionCall(
+            RuntimeExpression::TaggedTuple(
                 "println".to_string(),
                 vector![
                     RuntimeExpression::Number(1),

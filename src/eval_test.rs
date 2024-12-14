@@ -5,8 +5,8 @@ use crate::{
     expressions::{
         Environment,
         RuntimeExpression::{
-            self, BuiltinFunction, BuiltinMacro, Function, FunctionCall, List, Macro, MacroCall,
-            Number, ValueName,
+            self, BuiltinFunction, BuiltinMacro, Function, List, Macro, MacroCall, Number, Symbol,
+            TaggedTuple,
         },
     },
     process::Process,
@@ -45,9 +45,9 @@ pub fn environment_with_fn() -> Environment {
                 Number(0),
                 List(vector![
                     Number(1),
-                    ValueName(s!("n")),
+                    Symbol(s!("n")),
                     Number(3),
-                    ValueName(s!("life")),
+                    Symbol(s!("life")),
                 ])
             ]
         )
@@ -65,27 +65,27 @@ fn test_scalar_literals() {
 
 #[test]
 fn test_value_names() {
-    let result = eval(ValueName(s!("life")), environment()).run_until_complete();
+    let result = eval(Symbol(s!("life")), environment()).run_until_complete();
     assert_eq!(result, Number(42));
 }
 
 #[test]
 fn test_lists() {
-    let expression = List(vector![Number(1), ValueName(s!("life"))]);
+    let expression = List(vector![Number(1), Symbol(s!("life"))]);
     let result = eval(expression, environment()).run_until_complete();
     assert_eq!(result, List(vector![Number(1), Number(42)]));
 }
 
 #[test]
 fn test_builtin_function_call() {
-    let expression = FunctionCall(s!("foo"), vector![]);
+    let expression = TaggedTuple(s!("foo"), vector![]);
     let result = eval(expression, environment()).run_until_complete();
     assert_eq!(result, RuntimeExpression::String(s!("bar")))
 }
 
 #[test]
 fn test_user_defined_function_call() {
-    let expression = FunctionCall(s!("list-nums"), vector![ValueName(s!("life"))]);
+    let expression = TaggedTuple(s!("list-nums"), vector![Symbol(s!("life"))]);
     let actual = eval(expression, environment_with_fn()).run_until_complete();
     let expected = List(vector![Number(1), Number(2), Number(3), Number(42)]);
     assert_eq!(expected, actual)

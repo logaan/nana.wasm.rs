@@ -46,14 +46,14 @@ pub fn build_macros(
             rest,
         ),
         Some(LexicalExpression::TaggedTuple(name, expressions)) => (
-            RuntimeExpression::FunctionCall(
+            RuntimeExpression::TaggedTuple(
                 name.to_string(),
                 build_many_macros(expressions.into(), &environment),
             ),
             rest,
         ),
         Some(LexicalExpression::Symbol(name)) => {
-            (RuntimeExpression::ValueName(name.to_string()), rest)
+            (RuntimeExpression::Symbol(name.to_string()), rest)
         }
         Some(LexicalExpression::Number(value)) => (RuntimeExpression::Number(*value), rest),
         Some(LexicalExpression::String(value)) => {

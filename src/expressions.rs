@@ -18,7 +18,7 @@ pub enum LexicalExpression {
 pub enum RuntimeExpression {
     BuiltinFunction(fn(Vector<RuntimeExpression>) -> Process<RuntimeExpression>),
     Function(Vector<String>, Environment, Vector<RuntimeExpression>),
-    FunctionCall(String, Vector<RuntimeExpression>),
+    TaggedTuple(String, Vector<RuntimeExpression>),
     Hole,
     List(Vector<RuntimeExpression>),
     BuiltinMacro(
@@ -29,5 +29,5 @@ pub enum RuntimeExpression {
     MacroCall(String, Vector<RuntimeExpression>),
     Number(u8),
     String(String),
-    ValueName(String),
+    Symbol(String),
 }

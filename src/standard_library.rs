@@ -1,7 +1,7 @@
 use im::{hashmap, vector, Vector};
 
 use crate::expressions::Environment;
-use crate::expressions::RuntimeExpression::{BuiltinMacro, Function, List, ValueName};
+use crate::expressions::RuntimeExpression::{BuiltinMacro, Function, List, Symbol};
 use crate::process::Process::Complete;
 use crate::s;
 
@@ -21,7 +21,7 @@ pub fn standard_library() -> Environment {
                     match params {
                         List(params) => {
                             let param_strings = params.iter().map(|p| match p {
-                                ValueName(s) => s,
+                                Symbol(s) => s,
                                 _ => panic!("Func params must be ValueNames")
                             }).cloned().collect::<Vector<String>>();
                             Complete(Function(param_strings, hashmap!{}, vector![body]))

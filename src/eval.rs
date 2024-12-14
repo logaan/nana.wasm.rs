@@ -4,8 +4,8 @@ use im::{HashMap, Vector};
 
 use crate::expressions::Environment;
 use crate::expressions::RuntimeExpression::{
-    self, BuiltinFunction, BuiltinMacro, Function, FunctionCall, Hole, List, Macro, MacroCall,
-    Number, ValueName,
+    self, BuiltinFunction, BuiltinMacro, Function, Hole, List, Macro, MacroCall, Number, Symbol,
+    TaggedTuple,
 };
 
 use crate::parsers::macros::build_macros;
@@ -69,7 +69,7 @@ pub fn apply(
 
 pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<RuntimeExpression> {
     match expression {
-        FunctionCall(name, args) => {
+        TaggedTuple(name, args) => {
             let maybe_function = environment.get(&name);
             match maybe_function {
                 Some(function) => {
@@ -114,7 +114,7 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
             }))
         }
 
-        ValueName(name) => match environment.get(&name) {
+        Symbol(name) => match environment.get(&name) {
             // TODO: Give this clone some thought
             Some(value) => Complete(value.clone()),
             None => panic!("{} not found", &name),
