@@ -8,6 +8,8 @@ use crate::expressions::RuntimeExpression::{
     Number, ValueName,
 };
 
+use crate::parsers::macros::build_macros;
+use crate::parsers::nana::program;
 use crate::process::Process::{self, Complete};
 
 pub fn apply(
@@ -122,9 +124,21 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
         RuntimeExpression::String(_) => Complete(expression),
 
         BuiltinFunction(..) => todo!("When would you actually eval a function?"),
-        Function(..) => todo!("Nope"),
+        // TODO: I don't think this should be required. Try removing it and
+        // understanding the test failures sometime. It's not a big deal to
+        // leave functions as evaluating to themselves. That's how other scalar
+        // values behave.
+        Function(..) => Complete(expression),
         BuiltinMacro(..) => todo!("Do we eval macros?"),
         Macro(..) => todo!("Do we eval macros?"),
         Hole => todo!("I can't imagine what holes evaluate to"),
     }
+}
+
+pub fn execute(code: String, env: Environment) -> RuntimeExpression {
+    program(&code)
+        .and_then(|(_, es)| Ok(build_macros(&es, &env)))
+        .and_then(|(ast, _)| Ok(eval(ast, env)))
+        .unwrap()
+        .run_until_complete()
 }

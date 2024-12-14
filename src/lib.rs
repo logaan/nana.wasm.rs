@@ -14,26 +14,16 @@ mod standard_library;
 mod eval_test;
 #[cfg(test)]
 mod process_test;
-
-use crate::eval::eval;
+#[cfg(test)]
+mod standard_library_test;
 
 use crate::expressions::RuntimeExpression::{self, BuiltinFunction};
 use bindings::exports::wasi::cli::run::Guest as Command;
-use expressions::Environment;
+use eval::execute;
 use im::hashmap;
-use parsers::macros::build_macros;
-use parsers::nana::program;
 use process::Process;
 
 struct Component;
-
-fn execute(code: String, env: Environment) -> RuntimeExpression {
-    program(&code)
-        .and_then(|(_, es)| Ok(build_macros(&es, &env)))
-        .and_then(|(ast, _)| Ok(eval(ast, env)))
-        .unwrap()
-        .run_until_complete()
-}
 
 impl Command for Component {
     fn run() -> Result<(), ()> {
