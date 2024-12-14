@@ -33,5 +33,36 @@ pub fn standard_library() -> Environment {
                 }
             }
         ),
+        s!("Match") => BuiltinMacro(
+            vector![
+              s!("value"),
+              s!("cases")
+            ],
+            |mut args| {
+                if args.len() == 2 {
+                    let value = args.pop_front().unwrap();
+                    let cases = args.pop_front().unwrap();
+
+                    match cases {
+                        List(cases) => {
+                            if cases.len() % 2 != 0 {
+                                panic!("Cases must be a list with an even number of elements")
+                            }
+
+                            let mut iter = cases.iter();
+                            while let (Some(pattern), Some(body)) = (iter.next(), iter.next()) {
+                                if value == *pattern {
+                                    return Complete(body.clone())
+                                }
+                            }
+                            panic!("No match found")
+                        },
+                        _ => panic!("Match takes a value and a list of cases")
+                    }
+                } else {
+                    panic!("Match takes exactly 2 arguments")
+                }
+            }
+        ),
     }
 }

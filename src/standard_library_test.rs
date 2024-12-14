@@ -14,3 +14,14 @@ fn test_fn_macro() {
     let actual = execute(s!("second(1 2)"), environment);
     assert_eq!(expected, actual);
 }
+
+#[test]
+fn test_match_macro() {
+    let environment = hashmap! {
+      s!("result") => execute(s!("Match 3 [1 2 3 4 5 6]"), standard_library()),
+    };
+
+    let expected = Number(4);
+    let actual = execute(s!("result"), environment);
+    assert_eq!(expected, actual);
+}
