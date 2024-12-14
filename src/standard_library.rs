@@ -1,7 +1,7 @@
 use im::{hashmap, vector, Vector};
 
 use crate::expressions::Environment;
-use crate::expressions::RuntimeExpression::{BuiltinMacro, Function, List, Symbol};
+use crate::expressions::RuntimeExpression::{BuiltinMacro, Function, Hole, List, Symbol};
 use crate::process::Process::Complete;
 use crate::s;
 
@@ -51,7 +51,7 @@ pub fn standard_library() -> Environment {
 
                             let mut iter = cases.iter();
                             while let (Some(pattern), Some(body)) = (iter.next(), iter.next()) {
-                                if value == *pattern {
+                                if *pattern == Hole || *pattern == value {
                                     return Complete(body.clone())
                                 }
                             }
