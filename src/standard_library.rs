@@ -8,10 +8,6 @@ use crate::s;
 pub fn standard_library() -> Environment {
     // TODO: Write constructors for every `RuntimeExpression`.
     hashmap! {
-        // TODO: Write tests for Fn. You'll need to manually construct and
-        // `Environment` with the  `Fn` in it. To do that you'll need to `eval`
-        // the `Fn` and `run_until_completion`. Once that env is done you can
-        // `execute` a normal function call in a program string.
         s!("Fn") => BuiltinMacro(
             vector![
               s!("params"),

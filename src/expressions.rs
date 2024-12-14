@@ -5,13 +5,13 @@ pub type Environment = HashMap<String, RuntimeExpression>;
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum LexicalExpression {
-    FunctionCall(String, Vector<LexicalExpression>),
+    TaggedTuple(String, Vector<LexicalExpression>),
     Hole,
     List(Vector<LexicalExpression>),
     MacroName(String),
     Number(u8),
     String(String),
-    ValueName(String),
+    Symbol(String),
 }
 
 #[derive(PartialEq, Debug, Clone)]

@@ -35,38 +35,38 @@ Func print-fizzbuzz [max u8] _
 fn expected() -> Vector<LexicalExpression> {
     vector![
         MacroName("Package".to_string()),
-        ValueName("nana:examples@0.0.1".to_string()),
+        Symbol("nana:examples@0.0.1".to_string()),
         MacroName("World".to_string()),
-        ValueName("fizzbuzz".to_string()),
+        Symbol("fizzbuzz".to_string()),
         List(vector![
             MacroName("Import".to_string()),
-            ValueName("wasi:cli/stdout".to_string()),
+            Symbol("wasi:cli/stdout".to_string()),
             MacroName("Import".to_string()),
-            ValueName("wasi:streams/output-stream".to_string()),
+            Symbol("wasi:streams/output-stream".to_string()),
             MacroName("Export".to_string()),
-            ValueName("print-fizzbuzz".to_string()),
+            Symbol("print-fizzbuzz".to_string()),
             List(vector![
-                ValueName("max".to_string()),
-                ValueName("u8".to_string()),
+                Symbol("max".to_string()),
+                Symbol("u8".to_string()),
             ]),
             Hole,
         ]),
         MacroName("Func".to_string()),
-        ValueName("num-to-txt".to_string()),
+        Symbol("num-to-txt".to_string()),
         List(vector![
-            ValueName("num".to_string()),
-            ValueName("u8".to_string()),
+            Symbol("num".to_string()),
+            Symbol("u8".to_string()),
         ]),
-        ValueName("string".to_string()),
+        Symbol("string".to_string()),
         MacroName("Match".to_string()),
         List(vector![
-            FunctionCall(
+            TaggedTuple(
                 "mod".to_string(),
-                vector![ValueName("num".to_string()), Number(3)],
+                vector![Symbol("num".to_string()), Number(3)],
             ),
-            FunctionCall(
+            TaggedTuple(
                 "mod".to_string(),
-                vector![ValueName("num".to_string()), Number(5)],
+                vector![Symbol("num".to_string()), Number(5)],
             ),
         ]),
         List(vector![
@@ -77,50 +77,50 @@ fn expected() -> Vector<LexicalExpression> {
             List(vector![Hole, Number(0)]),
             String("Buzz".to_string()),
             List(vector![Hole, Hole]),
-            ValueName("n".to_string()),
+            Symbol("n".to_string()),
         ]),
         MacroName("Func".to_string()),
-        ValueName("list-to-txt".to_string()),
+        Symbol("list-to-txt".to_string()),
         List(vector![
-            ValueName("list".to_string()),
-            ValueName("list<u8>".to_string()),
+            Symbol("list".to_string()),
+            Symbol("list<u8>".to_string()),
         ]),
-        ValueName("list<string>".to_string()),
-        FunctionCall(
+        Symbol("list<string>".to_string()),
+        TaggedTuple(
             "map".to_string(),
             vector![
-                ValueName("num-to-text".to_string()),
-                ValueName("list".to_string()),
+                Symbol("num-to-text".to_string()),
+                Symbol("list".to_string()),
             ],
         ),
         MacroName("Func".to_string()),
-        ValueName("print-fizzbuzz".to_string()),
+        Symbol("print-fizzbuzz".to_string()),
         List(vector![
-            ValueName("max".to_string()),
-            ValueName("u8".to_string()),
+            Symbol("max".to_string()),
+            Symbol("u8".to_string()),
         ]),
         Hole,
         MacroName("Let".to_string()),
         List(vector![
-            ValueName("lines".to_string()),
-            FunctionCall(
+            Symbol("lines".to_string()),
+            TaggedTuple(
                 "list-to-text".to_string(),
-                vector![FunctionCall(
+                vector![TaggedTuple(
                     "range".to_string(),
                     vector![Number(1), Number(100)],
                 )],
             ),
-            ValueName("stdout".to_string()),
-            FunctionCall("stdout/get-stdout".to_string(), vector![]),
+            Symbol("stdout".to_string()),
+            TaggedTuple("stdout/get-stdout".to_string(), vector![]),
         ]),
         MacroName("For".to_string()),
         List(vector![
-            ValueName("line".to_string()),
-            ValueName("lines".to_string()),
+            Symbol("line".to_string()),
+            Symbol("lines".to_string()),
         ]),
-        FunctionCall(
+        TaggedTuple(
             "stdout.write".to_string(),
-            vector![ValueName("line".to_string())],
+            vector![Symbol("line".to_string())],
         ),
     ]
 }

@@ -26,13 +26,13 @@ fn test_macro_name() {
 fn test_value_name() {
     assert_eq!(
         value_name("hello"),
-        Ok(("", LexicalExpression::ValueName("hello".to_string())))
+        Ok(("", LexicalExpression::Symbol("hello".to_string())))
     );
     assert_eq!(
         value_name("greetings::english/hello-world"),
         Ok((
             "",
-            LexicalExpression::ValueName("greetings::english/hello-world".to_string())
+            LexicalExpression::Symbol("greetings::english/hello-world".to_string())
         ))
     );
     assert!(value_name("Hello").is_err());
