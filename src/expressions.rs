@@ -23,7 +23,7 @@ pub enum RuntimeExpression {
     List(Vector<RuntimeExpression>),
     BuiltinMacro(
         Vector<String>,
-        fn(Vector<RuntimeExpression>) -> Process<RuntimeExpression>,
+        fn(Vector<RuntimeExpression>, Environment) -> Process<RuntimeExpression>,
     ),
     Macro(Vector<String>, Environment, Vector<RuntimeExpression>),
     MacroCall(String, Vector<RuntimeExpression>),

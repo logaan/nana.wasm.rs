@@ -40,7 +40,17 @@ pub fn apply(
                 |results: Vector<RuntimeExpression>| Complete(results.last().unwrap().clone()),
             ))
         }
-        BuiltinMacro(_params, body) => (body)(args),
+        _ => panic!("Not a function"),
+    }
+}
+
+pub fn macro_expand(
+    macro_expression: RuntimeExpression,
+    args: Vector<RuntimeExpression>,
+    environment: Environment,
+) -> Process<RuntimeExpression> {
+    match macro_expression {
+        BuiltinMacro(_params, body) => (body)(args, environment),
         Macro(params, environment, body) => {
             let new_env = environment.union(
                 params
@@ -63,7 +73,7 @@ pub fn apply(
                 |results: Vector<RuntimeExpression>| Complete(results.last().unwrap().clone()),
             ))
         }
-        _ => panic!("Not a function"),
+        _ => panic!("Not a macro"),
     }
 }
 
@@ -96,7 +106,7 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
         MacroCall(name, args) => {
             let maybe_macro = environment.get(&name);
             match maybe_macro {
-                Some(a_macro) => apply(a_macro.clone(), args)
+                Some(a_macro) => macro_expand(a_macro.clone(), args, environment.clone())
                     .and_then(Arc::new(move |re| eval(re, environment.clone()))),
                 _ => panic!("No macro of that name found"),
             }

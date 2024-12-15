@@ -29,10 +29,11 @@ fn test_match_macro() {
 #[test]
 fn test_match_eval() {
     let environment = standard_library().union(hashmap! {
-     s!("foo") => Number(1)
+     s!("foo") => Number(1),
+     s!("bar") => Number(3)
     });
-    let program = s!("Match foo [1 2]");
-    let expected = Number(2);
+    let program = s!("Match foo [1 bar]");
+    let expected = Number(3);
     let actual = execute(program, environment);
     assert_eq!(expected, actual);
 }

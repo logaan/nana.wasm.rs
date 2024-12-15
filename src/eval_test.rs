@@ -24,7 +24,7 @@ pub fn environment() -> Environment {
         s!("foo") => BuiltinFunction(|_args| {
             Process::Complete(RuntimeExpression::String(s!("bar")))
         }),
-        s!("swap") => BuiltinMacro(vector![s!("left"), s!("right")], |args| {
+        s!("swap") => BuiltinMacro(vector![s!("left"), s!("right")], |args, _env| {
             let first = args.head().unwrap().clone();
             let last = args.last().unwrap().clone();
             Process::Complete(List(vector![last, first]))
