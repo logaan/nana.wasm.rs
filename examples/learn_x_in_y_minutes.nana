@@ -1,5 +1,26 @@
+# Hello and welcome to Nana!
+
+# Nana is a simple, dynamically typed, interpreted language.
+# It is designed to be easy to learn and use.
+# This file will teach you the basics of Nana.
+# Let's get started!
+
+# Comments in Nana are denoted by a hash symbol.
+# Comments are ignored by the interpreter.
+# Comments can be on their own line or at the end of a line.
+# This is a comment.
+
+# Nana has a few basic data types.
+# Numbers are written as you would expect.
+# At the moment only integers are supported.
 123
 
-"Foo bar baz"
+# Strings are written between double quotes.
+# Strings can contain any characters.
+# They may even stretch over multiple lines.
+"This is a single line string."
+
+"This is a multi line string.
+It's worth noting that any indentation will be preserved."
 
 42
