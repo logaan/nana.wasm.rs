@@ -4,5 +4,6 @@ find src \
   -type f \
   -not -name "bindings.rs" \
   -not -name "*_test.rs" \
+  -not -name "mod.rs" \
   | xargs cloc \
   --by-file

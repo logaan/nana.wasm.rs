@@ -71,7 +71,7 @@ pub fn build_macros(
     }
 }
 
-fn build_many_macros(
+pub fn build_many_macros(
     incoming_exprs: &Vector<LexicalExpression>,
     environment: &Environment,
 ) -> Vector<RuntimeExpression> {

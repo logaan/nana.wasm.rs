@@ -8,7 +8,7 @@ use crate::expressions::RuntimeExpression::{
     TaggedTuple,
 };
 
-use crate::parsers::macros::build_macros;
+use crate::parsers::macros::build_many_macros;
 use crate::parsers::nana::program;
 use crate::process::Process::{self, Complete};
 
@@ -144,8 +144,19 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
     }
 }
 
-pub fn execute(code: String, env: Environment) -> RuntimeExpression {
+pub fn execute_with_all_results(code: String, env: Environment) -> Vector<RuntimeExpression> {
     let (_, expressions) = program(&code).unwrap();
-    let (ast, _) = build_macros(&expressions, &env);
-    eval(ast.unwrap(), env).run_until_complete()
+    let ast = build_many_macros(&expressions, &env);
+
+    Process::run_in_sequence(
+        ast.iter()
+            .map(|expr| eval(expr.clone(), env.clone()))
+            .collect(),
+    )
+    .run_until_complete()
+}
+
+pub fn execute(code: String, env: Environment) -> RuntimeExpression {
+    let results = execute_with_all_results(code, env);
+    results.last().unwrap().clone()
 }

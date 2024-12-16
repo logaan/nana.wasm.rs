@@ -1,4 +1,3 @@
-[
 # Hello and welcome to Nana!
 
 # Nana is a simple, dynamically typed, interpreted language.
@@ -17,6 +16,7 @@
 # Nana has a few basic data types.
 # Numbers are written as you would expect.
 # At the moment only integers are supported.
+
 123
 
 # Strings are written between double quotes.
@@ -27,6 +27,12 @@
 
 "This is a multi line string.
 It's worth noting that any indentation will be preserved."
+
+# Lists are written between square brackets.
+# Lists can contain any data type.
+# The values are separated by whitespace.
+
+[1 2 3]
 
 ### Control Structures ###
 
@@ -69,5 +75,3 @@ Match [1 2 3]
 Match [[1 2] [1 2]] [
   [[a b] [a b]] "Match"
    _            "No match"]
-
-]

@@ -68,6 +68,7 @@ pub fn standard_library() -> Environment {
                 panic!("dec takes exactly 1 argument")
             }
         }),
+
         s!("Match") => BuiltinMacro(
             vector![
               s!("value"),
@@ -102,6 +103,7 @@ pub fn standard_library() -> Environment {
                 }
             }
         ),
+
         s!("Fn") => BuiltinMacro(
             vector![
               s!("params"),
