@@ -1,10 +1,12 @@
+use core::panic;
 use std::sync::Arc;
 
 use im::{hashmap, vector, Vector};
 
 use crate::eval::eval;
 use crate::expressions::RuntimeExpression::{
-    BuiltinFunction, BuiltinMacro, Function, Hole, List, Symbol,
+    BuiltinFunction, BuiltinMacro, Function, Hole, List, Macro, MacroCall, Number,
+    String as NString, Symbol, TaggedTuple,
 };
 use crate::expressions::{Environment, RuntimeExpression};
 use crate::process::Process::Complete;
@@ -14,8 +16,42 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
     match pattern {
         Symbol(name) => Some(hashmap! {name => value}),
         Hole => Some(hashmap! {}),
-        _ if pattern == value => Some(hashmap! {}),
-        _ => None,
+        List(patterns) if patterns.len() == 0 => match value {
+            List(values) if values.len() == 0 => Some(hashmap! {}),
+            _ => None,
+        },
+        List(patterns) => match value {
+            List(values) if values.len() == patterns.len() => patterns
+                .iter()
+                .cloned()
+                .zip(values.iter().cloned())
+                .map(|(pattern, value)| does_match(pattern, value))
+                .fold(Some(hashmap! {}), |acc, bindings| {
+                    acc.and_then(|acc| {
+                        bindings.and_then(|bindings| {
+                            for (key, value) in bindings.iter() {
+                                if let Some(existing_value) = acc.get(key) {
+                                    if existing_value != value {
+                                        return None;
+                                    }
+                                }
+                            }
+                            Some(acc.union(bindings))
+                        })
+                    })
+                }),
+            _ => None,
+        },
+        NString(_) if pattern == value => Some(hashmap! {}),
+        NString(_) => None,
+        Number(_) if pattern == value => Some(hashmap! {}),
+        Number(_) => None,
+        BuiltinFunction(_) => None,
+        Function(..) => None,
+        TaggedTuple(..) => None,
+        BuiltinMacro(..) => None,
+        Macro(..) => None,
+        MacroCall(..) => None,
     }
 }
 

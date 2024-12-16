@@ -57,4 +57,17 @@ Match 3
 Match dec(10)
   [result dec(result)]
 
+# This will also work within data structures, and collections. This example will
+# pull out the second element of a list:
+
+Match [1 2 3]
+  [[_ second _] second]
+
+# You can bind multiple values to the same symbol as long as they are the same.
+# This will return the string "Match":
+
+Match [1 1]
+  [[a a] "Match"
+   _     "No match"]
+
 ]

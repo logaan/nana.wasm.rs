@@ -25,7 +25,9 @@ fn test_learn_x_in_y_minutes() {
         NString(s!("This is a single line string.")),
         NString(s!("This is a multi line string.\nIt's worth noting that any indentation will be preserved.")),
         NString(s!("rd")),
-        Number(8)
+        Number(8),
+        Number(2),
+        NString(s!("Match")),
     ]);
     assert_eq!(expected, result);
 }
