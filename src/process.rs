@@ -17,7 +17,6 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
     fn step(&self) -> Process<B> {
         let AndThen(process, and_then) = self;
         if process.is_complete() {
-            // TODO: Can this clone be avoided?
             (and_then)(process.clone().result().unwrap())
         } else {
             let new_process = process.step();

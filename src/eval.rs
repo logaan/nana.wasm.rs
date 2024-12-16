@@ -125,7 +125,6 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
         }
 
         Symbol(name) => match environment.get(&name) {
-            // TODO: Give this clone some thought
             Some(value) => Complete(value.clone()),
             None => panic!("{} not found", &name),
         },
