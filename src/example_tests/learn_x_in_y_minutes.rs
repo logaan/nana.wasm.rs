@@ -2,8 +2,11 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+use im::vector;
+
 use crate::eval::execute;
-use crate::expressions::RuntimeExpression::Number;
+use crate::expressions::RuntimeExpression::{List, Number, String as NString};
+use crate::s;
 use crate::standard_library::standard_library;
 
 pub fn read_code(path: &str) -> String {
@@ -13,8 +16,16 @@ pub fn read_code(path: &str) -> String {
     contents
 }
 
+#[test]
 fn test_learn_x_in_y_minutes() {
     let code = read_code("examples/learn_x_in_y_minutes.nana");
     let result = execute(code, standard_library());
-    assert_eq!(Number(42), result);
+    let expected = List(vector![
+        Number(123),
+        NString(s!("This is a single line string.")),
+        NString(s!("This is a multi line string.\nIt's worth noting that any indentation will be preserved.")),
+        NString(s!("rd")),
+        Number(8)
+    ]);
+    assert_eq!(expected, result);
 }

@@ -1,3 +1,4 @@
+[
 # Hello and welcome to Nana!
 
 # Nana is a simple, dynamically typed, interpreted language.
@@ -44,10 +45,16 @@ It's worth noting that any indentation will be preserved."
 # This example will give us the ordinal indicator, if provided with the final
 # digit of a number:
 
-Match final-digit
+Match 3
   [1 "st"
    2 "nd"
    3 "rd"
    _ "th"]
 
-42
+# If you'd like to access the value you can bind it to a symbol by using that
+# symbol in the pattern. This example will return the number 8:
+
+Match dec(10)
+  [result dec(result)]
+
+]

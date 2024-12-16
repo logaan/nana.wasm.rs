@@ -37,3 +37,12 @@ fn test_match_eval() {
     let actual = execute(program, environment);
     assert_eq!(expected, actual);
 }
+
+#[test]
+fn test_match_binding() {
+    let environment = standard_library();
+    let program = s!("Match 1 [num num]");
+    let expected = Number(1);
+    let actual = execute(program, environment);
+    assert_eq!(expected, actual);
+}

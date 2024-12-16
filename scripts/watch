@@ -3,5 +3,5 @@
 fswatch \
   -o \
   `find src ! -name "bindings.rs" -type f` \
-  scripts wit Cargo.lock Cargo.toml \
+  scripts wit Cargo.lock Cargo.toml examples \
   | xargs -n1 -I{} ./scripts/test
