@@ -28,7 +28,7 @@ fn test_learn_x_in_y_minutes() {
         NString(s!("rd")),
         Number(8),
         Number(2),
-        NString(s!("Match")),
+        NString(s!("Matching pairs")),
     ];
     assert_eq!(expected, result);
 }

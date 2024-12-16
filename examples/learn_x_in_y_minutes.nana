@@ -70,8 +70,9 @@ Match [1 2 3]
   [[_ second _] second]
 
 # You can bind multiple values to the same symbol as long as they are the same.
-# This will return the string "Match":
+# This will return the string "Matching pairs":
 
 Match [[1 2] [1 2]] [
-  [[a b] [a b]] "Match"
+  [[a a] [b b]] "Two doubles"
+  [[a b] [a b]] "Matching pairs"
    _            "No match"]
