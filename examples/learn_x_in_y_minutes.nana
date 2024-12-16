@@ -5,10 +5,13 @@
 # This file will teach you the basics of Nana.
 # Let's get started!
 
-# Comments in Nana are denoted by a hash symbol.
+# Comments in Nana are start with a hash symbol.
+# They can be on their own line or at the end of a line.
 # Comments are ignored by the interpreter.
-# Comments can be on their own line or at the end of a line.
+
 # This is a comment.
+
+### Data Types ###
 
 # Nana has a few basic data types.
 # Numbers are written as you would expect.
@@ -18,9 +21,37 @@
 # Strings are written between double quotes.
 # Strings can contain any characters.
 # They may even stretch over multiple lines.
+
 "This is a single line string."
 
 "This is a multi line string.
 It's worth noting that any indentation will be preserved."
+
+### Control Structures ###
+
+# For branching, Nana has the Match macro. It is similar to a switch statement
+# in other languages, but has a few more features.
+
+# The first argument to Match is the value to match. It can be a literal value,
+# like this:
+
+Match 10
+  [1  "One"
+   2  "Two"
+   10 "Ten"]
+
+# Or it can be an expression that evaluates to a value, like a variable or a
+# function call:
+
+Match final-digit
+  [1 "st"
+   2 "nd"
+   3 "rd"
+   _ "th"]
+
+# The second argument to Match is a list with an even number of match cases. The
+# first value is a pattern, the second is an expression that will be evaluated
+# if the pattern matches the value. The pattern can be a literal value, or an
+# underscore. An underscore acts as a wildcard that matches anything.
 
 42
