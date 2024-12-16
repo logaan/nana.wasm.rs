@@ -66,8 +66,8 @@ Match [1 2 3]
 # You can bind multiple values to the same symbol as long as they are the same.
 # This will return the string "Match":
 
-Match [1 1]
-  [[a a] "Match"
-   _     "No match"]
+Match [1 2 [1 2 3] 3]
+  [[a _ [a 2 _] 3] "Match"
+   _               "No match"]
 
 ]
