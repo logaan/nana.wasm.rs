@@ -146,9 +146,7 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
 }
 
 pub fn execute(code: String, env: Environment) -> RuntimeExpression {
-    program(&code)
-        .and_then(|(_, es)| Ok(build_macros(&es, &env)))
-        .and_then(|(ast, _)| Ok(eval(ast, env)))
-        .unwrap()
-        .run_until_complete()
+    let (_, expressions) = program(&code).unwrap();
+    let (ast, _) = build_macros(&expressions, &env);
+    eval(ast.unwrap(), env).run_until_complete()
 }

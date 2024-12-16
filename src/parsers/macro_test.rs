@@ -83,10 +83,10 @@ fn parses_basic_macro() {
         .and_then(|(_, es)| Ok(build_macros(&es, &create_env_with_macros())));
     assert_eq!(
         Ok((
-            MacroCall(
+            Some(MacroCall(
                 "Package".to_string(),
                 vector![RuntimeExpression::String("foo".to_string())],
-            ),
+            )),
             vector![],
         )),
         result
@@ -99,13 +99,13 @@ fn parses_nested_macros() {
         .and_then(|(_, es)| Ok(build_macros(&es, &create_env_with_macros())));
     assert_eq!(
         Ok((
-            MacroCall(
+            Some(MacroCall(
                 "Package".to_string(),
                 vector![MacroCall(
                     "Package".to_string(),
                     vector![RuntimeExpression::String("foo".to_string())],
                 )],
-            ),
+            )),
             vector![],
         )),
         result
@@ -116,7 +116,7 @@ fn parses_nested_macros() {
 fn parses_macros_in_lists() {
     assert_eq!(
         Ok((
-            RuntimeExpression::List(vector![
+            Some(RuntimeExpression::List(vector![
                 RuntimeExpression::Number(1),
                 MacroCall(
                     "Package".to_string(),
@@ -126,7 +126,7 @@ fn parses_macros_in_lists() {
                     )],
                 ),
                 RuntimeExpression::Number(3)
-            ]),
+            ])),
             vector![],
         )),
         program("[1 Package Package \"two\" 3]")
@@ -138,7 +138,7 @@ fn parses_macros_in_lists() {
 fn parses_macros_in_args_to_functions() {
     assert_eq!(
         Ok((
-            RuntimeExpression::TaggedTuple(
+            Some(RuntimeExpression::TaggedTuple(
                 "println".to_string(),
                 vector![
                     RuntimeExpression::Number(1),
@@ -151,7 +151,7 @@ fn parses_macros_in_args_to_functions() {
                     ),
                     RuntimeExpression::Number(3)
                 ]
-            ),
+            )),
             vector![],
         )),
         program("println(1 Package Package \"two\" 3)")

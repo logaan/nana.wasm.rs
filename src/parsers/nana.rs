@@ -9,6 +9,12 @@ use nom::{
     IResult, Parser,
 };
 
+pub fn comment(input: &str) -> IResult<&str, LexicalExpression> {
+    delimited(char('#'), many0(none_of("\n")), char('\n'))
+        .map(|_| LexicalExpression::Comment)
+        .parse(input)
+}
+
 pub fn macro_name(input: &str) -> IResult<&str, LexicalExpression> {
     titlecase_word
         .map(LexicalExpression::MacroName)
@@ -51,13 +57,14 @@ pub fn hole(input: &str) -> IResult<&str, LexicalExpression> {
 
 pub fn expression(input: &str) -> IResult<&str, LexicalExpression> {
     let expressions = alt((
-        macro_name,
+        comment,
         function_call,
-        value_name,
         hole,
+        list,
+        macro_name,
         number,
         string,
-        list,
+        value_name,
     ));
     delimited(multispace0, expressions, multispace0).parse(input)
 }

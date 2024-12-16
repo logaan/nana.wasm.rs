@@ -8,6 +8,7 @@ use im::{vector, Vector};
 
 fn expected() -> Vector<LexicalExpression> {
     vector![
+        Comment,
         MacroName("Package".to_string()),
         Symbol("nana:examples@0.0.1".to_string()),
         MacroName("World".to_string()),

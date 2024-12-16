@@ -12,6 +12,7 @@ pub enum LexicalExpression {
     Number(u8),
     String(String),
     Symbol(String),
+    Comment,
 }
 
 #[derive(PartialEq, Debug, Clone)]
