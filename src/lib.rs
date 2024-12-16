@@ -12,6 +12,7 @@ mod standard_library;
 
 #[cfg(test)]
 mod eval_test;
+mod example_tests;
 #[cfg(test)]
 mod process_test;
 #[cfg(test)]
