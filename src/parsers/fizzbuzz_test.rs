@@ -1,36 +1,10 @@
 use super::nana::*;
 
-use crate::expressions::LexicalExpression::{self, *};
+use crate::{
+    example_tests::learn_x_in_y_minutes::read_code,
+    expressions::LexicalExpression::{self, *},
+};
 use im::{vector, Vector};
-
-pub static FIZZBUZZ: &str = r#"
-Package nana:examples@0.0.1
-
-World fizzbuzz [
-   Import wasi:cli/stdout
-   Import wasi:streams/output-stream
-
-   Export print-fizzbuzz [max u8] _
-]
-
-Func num-to-txt [num u8] string
-  Match [mod(num 3) mod(num 5)] [
-    [0 0] "Fizzbuzz"
-    [0 _] "Fizz"
-    [_ 0] "Buzz"
-    [_ _] n
-  ]
-
-Func list-to-txt [list list<u8>] list<string>
-  map(num-to-text list)
-
-Func print-fizzbuzz [max u8] _
-  Let[lines  list-to-text(range(1 100))
-      stdout stdout/get-stdout()]
-    For[line lines]
-      stdout.write(line)
- 
-"#;
 
 fn expected() -> Vector<LexicalExpression> {
     vector![
@@ -45,18 +19,12 @@ fn expected() -> Vector<LexicalExpression> {
             Symbol("wasi:streams/output-stream".to_string()),
             MacroName("Export".to_string()),
             Symbol("print-fizzbuzz".to_string()),
-            List(vector![
-                Symbol("max".to_string()),
-                Symbol("u8".to_string()),
-            ]),
+            List(vector![Symbol("max".to_string()), Symbol("u8".to_string()),]),
             Hole,
         ]),
         MacroName("Func".to_string()),
         Symbol("num-to-txt".to_string()),
-        List(vector![
-            Symbol("num".to_string()),
-            Symbol("u8".to_string()),
-        ]),
+        List(vector![Symbol("num".to_string()), Symbol("u8".to_string()),]),
         Symbol("string".to_string()),
         MacroName("Match".to_string()),
         List(vector![
@@ -95,10 +63,7 @@ fn expected() -> Vector<LexicalExpression> {
         ),
         MacroName("Func".to_string()),
         Symbol("print-fizzbuzz".to_string()),
-        List(vector![
-            Symbol("max".to_string()),
-            Symbol("u8".to_string()),
-        ]),
+        List(vector![Symbol("max".to_string()), Symbol("u8".to_string()),]),
         Hole,
         MacroName("Let".to_string()),
         List(vector![
@@ -127,6 +92,7 @@ fn expected() -> Vector<LexicalExpression> {
 
 #[test]
 fn parses_fizzbuzz() {
-    let result = program(FIZZBUZZ);
+    let code = read_code("examples/fizzbuzz.nana");
+    let result = program(&code);
     assert_eq!(Ok(("", expected())), result);
 }
