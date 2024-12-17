@@ -14,11 +14,11 @@ use crate::{
 };
 
 pub fn environment() -> Environment {
-    hashmap! {
+    Environment::from(hashmap! {
         s!("life") => Number(42),
         s!("Package") => Macro(
             vector![s!("name")],
-            hashmap!{},
+            Environment::new(),
             vector![],
         ),
         s!("foo") => BuiltinFunction(|_args| {
@@ -29,14 +29,14 @@ pub fn environment() -> Environment {
             let last = args.last().unwrap().clone();
             Process::Complete(List(vector![last, first]))
         }),
-        s!("ignore") => Macro(vector![s!("expression")], hashmap!{}, vector![
+        s!("ignore") => Macro(vector![s!("expression")], Environment::new(), vector![
             Number(42)
         ])
-    }
+    })
 }
 
 pub fn environment_with_fn() -> Environment {
-    hashmap! {
+    Environment::from(hashmap! {
         s!("life") => Number(2),
         s!("list-nums") => Function(
             vector![s!("n")],
@@ -51,7 +51,7 @@ pub fn environment_with_fn() -> Environment {
                 ])
             ]
         )
-    }
+    })
 }
 
 #[test]

@@ -1,21 +1,19 @@
-use crate::{
-    environment::{add, create_environment, get, prepare, provide},
-    expressions::RuntimeExpression::Number,
-    s,
-};
+use crate::{environment::Environment, expressions::RuntimeExpression::Number, s};
 
 #[test]
 pub fn test_environment() {
-    let env = create_environment();
+    let env = Environment::new();
 
-    assert_eq!(provide(&env, s!("one"), Number(1)), None);
+    assert_eq!(env.provide("one", Number(1)), None);
 
-    let env_one = prepare(env, s!("one"));
-    provide(&env_one, s!("one"), Number(1)).expect("Value was not prepared");
+    let env_one = env.prepare(s!("one"));
+    env_one
+        .provide("one", Number(1))
+        .expect("Value was not prepared");
 
-    let env_two = add(env_one, s!("two"), Number(2));
+    let env_two = env_one.add(s!("two"), Number(2));
 
-    assert_eq!(get(&env_two, s!("one")), Some(Number(1)));
-    assert_eq!(get(&env_two, s!("two")), Some(Number(2)));
-    assert_eq!(get(&env_two, s!("three")), None);
+    assert_eq!(env_two.get("one"), Some(Number(1)));
+    assert_eq!(env_two.get("two"), Some(Number(2)));
+    assert_eq!(env_two.get("three"), None);
 }

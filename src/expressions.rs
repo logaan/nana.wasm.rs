@@ -1,7 +1,6 @@
+pub use crate::environment::Environment;
 use crate::process::Process;
-use im::{HashMap, Vector};
-
-pub type Environment = HashMap<String, RuntimeExpression>;
+use im::Vector;
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum LexicalExpression {

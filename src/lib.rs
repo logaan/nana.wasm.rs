@@ -23,6 +23,7 @@ mod standard_library_test;
 
 use crate::expressions::RuntimeExpression::{self, BuiltinFunction};
 use bindings::exports::wasi::cli::run::Guest as Command;
+use environment::Environment;
 use eval::execute;
 use im::hashmap;
 use process::Process;
@@ -31,11 +32,11 @@ struct Component;
 
 impl Command for Component {
     fn run() -> Result<(), ()> {
-        let environment = hashmap! {
+        let environment = Environment::from(hashmap! {
             String::from("greet") => BuiltinFunction(|_args| {
                 Process::Complete(RuntimeExpression::String(String::from("Hello, World.")))
             }),
-        };
+        });
         let result = execute(PROGRAM_CODE.to_owned(), environment);
         println!("{:?}", result);
         Ok(())

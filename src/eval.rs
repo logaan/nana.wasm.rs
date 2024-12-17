@@ -19,13 +19,13 @@ pub fn apply(
     match function {
         BuiltinFunction(body) => (body)(args),
         Function(params, environment, body) => {
-            let new_env = environment.union(
+            let new_env = environment.union(Environment::from(
                 params
                     .iter()
                     .cloned()
                     .zip(args.iter().cloned())
                     .collect::<HashMap<_, _>>(),
-            );
+            ));
 
             let eval_body = body
                 .iter()
@@ -52,13 +52,13 @@ pub fn macro_expand(
     match macro_expression {
         BuiltinMacro(_params, body) => (body)(args, environment),
         Macro(params, environment, body) => {
-            let new_env = environment.union(
+            let new_env = environment.union(Environment::from(
                 params
                     .iter()
                     .cloned()
                     .zip(args.iter().cloned())
                     .collect::<HashMap<_, _>>(),
-            );
+            ));
 
             let eval_body = body
                 .iter()

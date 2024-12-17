@@ -9,25 +9,25 @@ use crate::expressions::Environment;
 use crate::expressions::RuntimeExpression::{self, MacroCall};
 
 pub fn create_env_with_macros() -> Environment {
-    hashmap! {
+    Environment::from(hashmap! {
         String::from("Package") =>
         RuntimeExpression::Macro(
             vector!["name".to_string()],
-            hashmap!{},
+            Environment::new(),
             vector![],
         ),
 
         String::from("World") =>
         RuntimeExpression::Macro(
             vector!["name".to_string(), "body".to_string()],
-            hashmap!{},
+            Environment::new(),
             vector![],
         ),
 
         String::from("Import") =>
         RuntimeExpression::Macro(
             vector!["name".to_string()],
-            hashmap!{},
+            Environment::new(),
             vector![],
         ),
 
@@ -38,7 +38,7 @@ pub fn create_env_with_macros() -> Environment {
                 "args".to_string(),
                 "return_type".to_string(),
             ],
-            hashmap!{},
+            Environment::new(),
             vector![],
         ),
 
@@ -50,31 +50,31 @@ pub fn create_env_with_macros() -> Environment {
                 "return_type".to_string(),
                 "body".to_string(),
             ],
-            hashmap!{},
+            Environment::new(),
             vector![],
         ),
 
         String::from("Match") =>
         RuntimeExpression::Macro(
             vector!["condition".to_string(), "branches".to_string()],
-            hashmap!{},
+            Environment::new(),
             vector![],
         ),
 
         String::from("Let") =>
         RuntimeExpression::Macro(
             vector!["bindings".to_string(), "body".to_string()],
-            hashmap!{},
+            Environment::new(),
             vector![],
         ),
 
         String::from("For") =>
         RuntimeExpression::Macro(
             vector!["binding".to_string(), "body".to_string()],
-            hashmap!{},
+            Environment::new(),
             vector![],
         ),
-    }
+    })
 }
 
 #[test]

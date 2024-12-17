@@ -14,10 +14,10 @@ use crate::s;
 
 fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<Environment> {
     match pattern {
-        Symbol(name) => Some(hashmap! {name => value}),
-        Hole => Some(hashmap! {}),
+        Symbol(name) => Some(Environment::from(hashmap! {name => value})),
+        Hole => Some(Environment::new()),
         List(patterns) if patterns.len() == 0 => match value {
-            List(values) if values.len() == 0 => Some(hashmap! {}),
+            List(values) if values.len() == 0 => Some(Environment::new()),
             _ => None,
         },
         List(patterns) => match value {
@@ -26,11 +26,11 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
                 .cloned()
                 .zip(values.iter().cloned())
                 .map(|(pattern, value)| does_match(pattern, value))
-                .fold(Some(hashmap! {}), |acc, bindings| {
+                .fold(Some(Environment::new()), |acc, bindings| {
                     acc.and_then(|acc| {
                         bindings.and_then(|bindings| {
                             for (key, value) in bindings.iter() {
-                                if let Some(existing_value) = acc.get(key) {
+                                if let Some(existing_value) = acc.get(&key) {
                                     if existing_value != value {
                                         return None;
                                     }
@@ -42,9 +42,9 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
                 }),
             _ => None,
         },
-        NString(_) if pattern == value => Some(hashmap! {}),
+        NString(_) if pattern == value => Some(Environment::new()),
         NString(_) => None,
-        Number(_) if pattern == value => Some(hashmap! {}),
+        Number(_) if pattern == value => Some(Environment::new()),
         Number(_) => None,
         BuiltinFunction(_) => None,
         Function(..) => None,
@@ -57,7 +57,7 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
 
 pub fn standard_library() -> Environment {
     // TODO: Write constructors for every `RuntimeExpression`.
-    hashmap! {
+    Environment::from(hashmap! {
         s!("dec") => BuiltinFunction(|mut args| {
             if args.len() == 1 {
                 match args.pop_front().unwrap() {
@@ -129,5 +129,5 @@ pub fn standard_library() -> Environment {
                 }
             }
         ),
-    }
+    })
 }
