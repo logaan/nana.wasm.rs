@@ -69,6 +69,35 @@ pub fn standard_library() -> Environment {
             }
         }),
 
+        s!("Def") => BuiltinMacro(
+            vector![
+              s!("name"),
+              s!("value")
+            ],
+            |mut args, env| {
+                if args.len() == 2 {
+                    let name = args.pop_front().unwrap();
+                    let value = args.pop_front().unwrap();
+
+                    match name {
+                        Symbol(name) => {
+                            let new_env = env.prepare(name.clone());
+                            eval(value, new_env.clone()).and_then(Arc::new(move |result| {
+                                new_env.provide(&name, result.clone()).expect("Providing a prepared value should not fail");
+                                // TODO: Add a new runtime expression called
+                                // Definition. Then evaluate can scoop them up
+                                // and reduce them into the running env.
+                                Complete(result.clone())
+                            }))
+                        },
+                        _ => panic!("Def takes a symbol and a value")
+                    }
+                } else {
+                    panic!("Def takes exactly 2 arguments")
+                }
+            }
+        ),
+
         s!("Match") => BuiltinMacro(
             vector![
               s!("value"),

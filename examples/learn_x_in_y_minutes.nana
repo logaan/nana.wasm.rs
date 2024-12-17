@@ -76,3 +76,8 @@ Match [[1 2] [1 2]] [
   [[a a] [b b]] "Two doubles"
   [[a b] [a b]] "Matching pairs"
    _            "No match"]
+
+
+# TODO: This causes a stack overflow. Use it to implement TCO.
+# Match Def foo Fn [] foo()
+#   [bar bar()]
