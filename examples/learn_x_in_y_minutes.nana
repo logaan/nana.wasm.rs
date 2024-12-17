@@ -77,6 +77,9 @@ Match [[1 2] [1 2]] [
   [[a b] [a b]] "Matching pairs"
    _            "No match"]
 
+### Definitions ###
+
+Def life 42
 
 # TODO: This causes a stack overflow. Use it to implement TCO.
 # Match Def foo Fn [] foo()

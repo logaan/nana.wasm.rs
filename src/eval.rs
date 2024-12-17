@@ -4,8 +4,8 @@ use im::{HashMap, Vector};
 
 use crate::expressions::Environment;
 use crate::expressions::RuntimeExpression::{
-    self, BuiltinFunction, BuiltinMacro, Function, Hole, List, Macro, MacroCall, Number, Symbol,
-    TaggedTuple,
+    self, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, List, Macro, MacroCall,
+    Number, Symbol, TaggedTuple,
 };
 
 use crate::parsers::macros::build_many_macros;
@@ -133,14 +133,11 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
         RuntimeExpression::String(_) => Complete(expression),
 
         BuiltinFunction(..) => todo!("When would you actually eval a function?"),
-        // TODO: I don't think this should be required. Try removing it and
-        // understanding the test failures sometime. It's not a big deal to
-        // leave functions as evaluating to themselves. That's how other scalar
-        // values behave.
         Function(..) => Complete(expression),
         BuiltinMacro(..) => todo!("Do we eval macros?"),
         Macro(..) => todo!("Do we eval macros?"),
         Hole => todo!("I can't imagine what holes evaluate to"),
+        Definition(..) => Complete(expression),
     }
 }
 

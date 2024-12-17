@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 pub use crate::environment::Environment;
 use crate::process::Process;
 use im::Vector;
@@ -30,4 +32,5 @@ pub enum RuntimeExpression {
     Number(u8),
     String(String),
     Symbol(String),
+    Definition(String, Arc<RuntimeExpression>),
 }

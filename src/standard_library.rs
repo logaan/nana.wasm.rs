@@ -5,7 +5,7 @@ use im::{hashmap, vector, Vector};
 
 use crate::eval::eval;
 use crate::expressions::RuntimeExpression::{
-    BuiltinFunction, BuiltinMacro, Function, Hole, List, Macro, MacroCall, Number,
+    BuiltinFunction, BuiltinMacro, Definition, Function, Hole, List, Macro, MacroCall, Number,
     String as NString, Symbol, TaggedTuple,
 };
 use crate::expressions::{Environment, RuntimeExpression};
@@ -52,6 +52,7 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
         BuiltinMacro(..) => None,
         Macro(..) => None,
         MacroCall(..) => None,
+        Definition(..) => None,
     }
 }
 
@@ -84,10 +85,15 @@ pub fn standard_library() -> Environment {
                             let new_env = env.prepare(name.clone());
                             eval(value, new_env.clone()).and_then(Arc::new(move |result| {
                                 new_env.provide(&name, result.clone()).expect("Providing a prepared value should not fail");
-                                // TODO: Add a new runtime expression called
-                                // Definition. Then evaluate can scoop them up
-                                // and reduce them into the running env.
-                                Complete(result.clone())
+                                // TODO: This is a macro. It should be returning
+                                // code that will evaluate to the final
+                                // result... maybe that's not true for builtins?
+                                //
+                                // Anyway, this is why functions and definitions
+                                // currently have to evaluate to themselves.
+                                // Becuase what we return here will be evaluated
+                                // by macroexpand.
+                                Complete(Definition(name.clone(), Arc::new(result.clone())))
                             }))
                         },
                         _ => panic!("Def takes a symbol and a value")
