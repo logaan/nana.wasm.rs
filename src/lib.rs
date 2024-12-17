@@ -4,6 +4,9 @@
 mod bindings;
 mod helpers;
 
+mod environment;
+#[cfg(test)]
+mod environment_test;
 mod eval;
 mod expressions;
 mod parsers;
