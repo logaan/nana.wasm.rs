@@ -92,6 +92,8 @@ impl<T: Clone + 'static> Process<T> {
         complete_processes
     }
 
+    // TODO: Implement something like this but have it fold definitions into the
+    // env of the next value to be evlauated.
     pub fn run_in_sequence(processes: Vector<Process<T>>) -> Process<Vector<T>> {
         Process::run_in_sequence_with_results(processes, vector![])
     }

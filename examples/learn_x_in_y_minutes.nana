@@ -81,6 +81,11 @@ Match [[1 2] [1 2]] [
 
 Def life 42
 
-# TODO: This causes a stack overflow. Use it to implement TCO.
-# Match Def foo Fn [] foo()
+# TODO: This causes a stack overflow, but rust doesn't show stack traces for
+# stack overflows. So first lets properly finish getting Def to work so that we
+# can skip this Match binding hackery. Then we can write a function that'll
+# recur a hundred times and then panic. That way we'll get a nice deep stack
+# trace to look at.
+#
+# Match deref(Def foo Fn [] foo())
 #   [bar bar()]
