@@ -58,6 +58,8 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
 
 pub fn standard_library() -> Environment {
     // TODO: Write constructors for every `RuntimeExpression`.
+    // TODO: Read and run a prelude.nana file. If we have a Macro builtin then I
+    // should be able to define DefMacro, Defn, Defm, etc.
     Environment::from(hashmap! {
         s!("dec") => BuiltinFunction(|mut args| {
             if args.len() == 1 {
@@ -93,6 +95,10 @@ pub fn standard_library() -> Environment {
                                 // currently have to evaluate to themselves.
                                 // Becuase what we return here will be evaluated
                                 // by macroexpand.
+                                //
+                                // Probably this is fine I just need to wrap it
+                                // in a Quote. Then when it's evaluated it'll
+                                // just resolve down to exactly what it is.
                                 Complete(Definition(name.clone(), Arc::new(result.clone())))
                             }))
                         },
