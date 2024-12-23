@@ -1,12 +1,11 @@
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
-use std::sync::Arc;
 
 use im::vector;
 
 use crate::eval::execute_with_all_results;
-use crate::expressions::RuntimeExpression::{Definition, List, Number, String as NString};
+use crate::expressions::RuntimeExpression::{List, Number, String as NString};
 use crate::s;
 use crate::standard_library::standard_library;
 
@@ -30,7 +29,8 @@ fn test_learn_x_in_y_minutes() {
         Number(8),
         Number(2),
         NString(s!("Matching pairs")),
-        Definition(s!("life"), Arc::new(Number(42))),
+        Number(42),
+        Number(42),
     ];
     assert_eq!(expected, result);
 }

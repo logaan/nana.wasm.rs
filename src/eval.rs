@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use im::{HashMap, Vector};
+use im::{vector, HashMap, Vector};
 
 use crate::expressions::Environment;
 use crate::expressions::RuntimeExpression::{
@@ -181,18 +181,28 @@ pub fn execute_with_all_results(code: String, env: Environment) -> Vector<Runtim
     let (_, expressions) = program(&code).unwrap();
     let ast = build_many_macros(&expressions, &env);
 
-    Process::run_in_sequence(
-        ast.iter()
-            .map(|expr| eval(expr.clone(), env.clone()))
-            .collect(),
-    )
-    .run_until_complete()
+    ast.iter()
+        .fold((vector![], env), |(mut results, env), expr| {
+            let (result, new_env) =
+                execute_with_definitions(vector![expr.clone()], env, None).run_until_complete();
+
+            results.push_back(result.unwrap());
+            (results, new_env)
+        })
+        .0
 }
 
-pub fn execute(code: String, env: Environment) -> Option<RuntimeExpression> {
+pub fn execute_with_env(
+    code: String,
+    env: Environment,
+) -> (Option<RuntimeExpression>, Environment) {
     let (_, expressions) = program(&code).unwrap();
     let ast = build_many_macros(&expressions, &env);
 
-    let (result, _env) = execute_with_definitions(ast, env, None).run_until_complete();
+    execute_with_definitions(ast, env, None).run_until_complete()
+}
+
+pub fn execute(code: String, env: Environment) -> Option<RuntimeExpression> {
+    let (result, _env) = execute_with_env(code, env);
     result
 }

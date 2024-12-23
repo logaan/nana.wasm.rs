@@ -81,6 +81,8 @@ Match [[1 2] [1 2]] [
 
 Def life 42
 
+life
+
 # TODO: This causes a stack overflow, but rust doesn't show stack traces for
 # stack overflows. So first lets properly finish getting Def to work so that we
 # can skip this Match binding hackery. Then we can write a function that'll
