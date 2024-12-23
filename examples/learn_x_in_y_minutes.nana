@@ -95,14 +95,13 @@ life
 # return the string "done":
 
 Def loop
-  Fn [l n]
+  Fn [n]
     Match n
-      [1 "done"
-       _ loop(log("looping")
-              dec(n))]
+      [0 "done"
+       _ loop(log(dec(n)))]
 
 # We don't need to be concerned about the function calling itself causing a
 # stack overflow. As long as the last thing a function does is call a function,
 # even itself, Nana will execute it safely.
     
-loop(log("looping") 5)
+loop(5)
