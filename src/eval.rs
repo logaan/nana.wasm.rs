@@ -36,9 +36,7 @@ pub fn apply(
                 })
                 .collect::<im::Vector<_>>();
 
-            Process::run_in_sequence(eval_body).and_then(Arc::new(
-                |results: Vector<RuntimeExpression>| Complete(results.last().unwrap().clone()),
-            ))
+            Process::run_in_sequence_tco(eval_body)
         }
         _ => panic!("Not a function"),
     }

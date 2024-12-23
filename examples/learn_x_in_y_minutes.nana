@@ -83,19 +83,10 @@ Def life 42
 
 life
 
-Def recur-once
+Def recur
   Fn [n]
     Match n
       [1 "done"
-       _ recur-once(1)]
+       _ recur(dec(n))]
     
-recur-once(2)
-
-# Look at this stack trace to figure out how to implement TCO
-# Def overflow
-#   Fn [n]
-#     Match n
-#       [0 panic()
-#        _ overflow(dec(n))]
-# 
-# overflow(10)
+recur(255)
