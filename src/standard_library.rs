@@ -62,8 +62,8 @@ pub fn standard_library() -> Environment {
     // should be able to define DefMacro, Defn, Defm, etc.
     Environment::from(hashmap! {
         s!("log") => BuiltinFunction(|args| {
-            println!("{:?}", args);
-            Complete(Hole)
+            println!("{:?}", args.clone());
+            Complete(args.head().unwrap().clone())
         }),
 
         s!("panic") => BuiltinFunction(|args| {

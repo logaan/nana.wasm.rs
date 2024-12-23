@@ -79,14 +79,30 @@ Match [[1 2] [1 2]] [
 
 ### Definitions ###
 
+# We can give a name to a value by using the Def macro. The first argument is a
+# symbol, the second is the value. Definitions are only respected if they're at
+# the top level of a file. This example will define the value of life to be 42: 
+
 Def life 42
+
+# Once the symbol has been defined, it can be used in place of the value. This
+# example will return 42:
 
 life
 
-Def recur
-  Fn [n]
+# Functions are also values, and can be defined in the same way. This example
+# defines a function that will loop the number of times you ask it to and then
+# return the string "done":
+
+Def loop
+  Fn [l n]
     Match n
       [1 "done"
-       _ recur(dec(n))]
+       _ loop(log("looping")
+              dec(n))]
+
+# We don't need to be concerned about the function calling itself causing a
+# stack overflow. As long as the last thing a function does is call a function,
+# even itself, Nana will execute it safely.
     
-recur(255)
+loop(log("looping") 5)
