@@ -1,0 +1,245 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/lib.rs (target/debug/deps/nana-72192a0386173b11)
+
+running 30 tests
+test environment_test::test_environment ... ok
+test eval_test::test_builtin_function_call ... ok
+test eval_test::test_builtin_macro_call ... ok
+test eval_test::test_lists ... ok
+test eval_test::test_user_defined_macro_call ... ok
+test eval_test::test_value_names ... ok
+test eval_test::test_scalar_literals ... ok
+test parsers::general_test::parse_lowercase ... ok
+test parsers::general_test::parse_uppercase ... ok
+test parsers::nana_test::test_macro_name ... ok
+test parsers::nana_test::test_value_name ... ok
+test parsers::macro_test::parses_nested_macros ... ok
+test parsers::macro_test::parses_basic_macro ... ok
+test process_test::test_and_then ... ok
+test eval_test::test_user_defined_function_call ... ok
+test parsers::fizzbuzz_test::parses_fizzbuzz ... ok
+test parsers::macro_test::parses_macros_in_args_to_functions ... ok
+test process_test::test_complete_sequence ... ok
+test parsers::macro_test::parses_macros_in_lists ... ok
+test process_test::test_process_by_steps ... ok
+test process_test::test_process_to_completion ... ok
+test process_test::test_processes_to_completion ... ok
+test process_test::test_running_sequence ... ok
+test standard_library_test::test_match_binding ... ok
+test standard_library_test::test_match_eval ... ok
+test standard_library_test::test_value_definitions ... ok
+test standard_library_test::test_fn_macro ... ok
+test standard_library_test::test_recursive_function_definitions ... ok
+test standard_library_test::test_match_macro ... ok
+test example_tests::learn_x_in_y_minutes_test::test_learn_x_in_y_minutes ... FAILED
+
+failures:
+
+---- example_tests::learn_x_in_y_minutes_test::test_learn_x_in_y_minutes stdout ----
+thread 'example_tests::learn_x_in_y_minutes_test::test_learn_x_in_y_minutes' panicked at src/standard_library.rs:65:13:
+Panic called with []
+stack backtrace:
+   0: rust_begin_unwind
+             at /rustc/f6e511eec7342f59a25f7c0534f1dbea00d01b14/library/std/src/panicking.rs:662:5
+   1: core::panicking::panic_fmt
+             at /rustc/f6e511eec7342f59a25f7c0534f1dbea00d01b14/library/core/src/panicking.rs:74:14
+   2: nana::standard_library::standard_library::{{closure}}
+             at ./src/standard_library.rs:65:13
+   3: core::ops::function::FnOnce::call_once
+             at /rustc/f6e511eec7342f59a25f7c0534f1dbea00d01b14/library/core/src/ops/function.rs:250:5
+   4: nana::eval::apply
+             at ./src/eval.rs:20:34
+   5: nana::eval::eval::{{closure}}
+             at ./src/eval.rs:99:54
+
+   6: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:20:13
+   7: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+   8: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+   9: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  10: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  11: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  12: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  13: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  14: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  15: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  16: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  17: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  18: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  19: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  20: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  21: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  22: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  23: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  24: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  25: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  26: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  27: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  28: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  29: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  30: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  31: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  32: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  33: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  34: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  35: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  36: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  37: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  38: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  39: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  40: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  41: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  42: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  43: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  44: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  45: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  46: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  47: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  48: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  49: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  50: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  51: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  52: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  53: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  54: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  55: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  56: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  57: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  58: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  59: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  60: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  61: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  62: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  63: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  64: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  65: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  66: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  67: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  68: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  69: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  70: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  71: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  72: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  73: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  74: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  75: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  76: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  77: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  78: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  79: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  80: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  81: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  82: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  83: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+  84: <F as nana::process::Stepable<T>>::step
+             at ./src/process.rs:10:9
+  85: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+
+  86: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  87: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  88: <nana::process::AndThen<A,B> as nana::process::Stepable<B>>::step
+             at ./src/process.rs:22:31
+  89: nana::process::Process<T>::step
+             at ./src/process.rs:48:27
+  90: nana::process::Process<T>::run_in_sequence_with_results
+             at ./src/process.rs:116:38
+  91: nana::process::Process<T>::run_in_sequence_with_results::{{closure}}
+             at ./src/process.rs:120:17
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+
+failures:
+    example_tests::learn_x_in_y_minutes_test::test_learn_x_in_y_minutes
+
+test result: FAILED. 29 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

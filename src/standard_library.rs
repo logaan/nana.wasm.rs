@@ -61,6 +61,10 @@ pub fn standard_library() -> Environment {
     // TODO: Read and run a prelude.nana file. If we have a Macro builtin then I
     // should be able to define DefMacro, Defn, Defm, etc.
     Environment::from(hashmap! {
+        s!("panic") => BuiltinFunction(|args| {
+            panic!("Panic called with {:?}", args);
+        }),
+
         s!("dec") => BuiltinFunction(|mut args| {
             if args.len() == 1 {
                 match args.pop_front().unwrap() {
