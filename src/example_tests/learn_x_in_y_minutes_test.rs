@@ -5,7 +5,9 @@ use std::path::Path;
 use im::{vector, Vector};
 
 use crate::eval::execute_with_all_results;
-use crate::expressions::RuntimeExpression::{self, Function, List, Number, String as NString};
+use crate::expressions::RuntimeExpression::{
+    self, Function, List, Number, String as NString, Symbol, TaggedTuple,
+};
 use crate::s;
 use crate::standard_library::standard_library;
 
@@ -43,7 +45,14 @@ fn test_learn_x_in_y_minutes() {
         NString(s!("Matching pairs")),
         Number(42),
         Number(42),
-        NString(s!("done"))
+        NString(s!("done")),
+
+        // Macros
+        Number(1),
+        Symbol(s!("life")),
+        TaggedTuple(s!("dec"), vector![Symbol(s!("life"))]),
+        TaggedTuple(s!("foo"), vector![Symbol(s!("bar"))]),
+
     ];
 
     assert_eq!(expected, results);

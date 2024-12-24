@@ -179,5 +179,18 @@ pub fn standard_library() -> Environment {
                 }
             }
         ),
+
+        s!("Quote") => BuiltinMacro(
+            vector![
+              s!("value")
+            ],
+            |mut args, _env| {
+                if args.len() == 1 {
+                    Complete(args.pop_front().unwrap())
+                } else {
+                    panic!("Quote takes exactly 1 argument")
+                }
+            }
+        ),
     })
 }

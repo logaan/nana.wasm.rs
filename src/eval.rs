@@ -104,8 +104,16 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
         MacroCall(name, args) => {
             let maybe_macro = environment.get(&name);
             match maybe_macro {
-                Some(a_macro) => macro_expand(a_macro.clone(), args, environment.clone())
-                    .and_then(Arc::new(move |re| eval(re, environment.clone()))),
+                Some(a_macro) => {
+                    let expanded = macro_expand(a_macro.clone(), args, environment.clone());
+                    match a_macro {
+                        Macro(..) => {
+                            expanded.and_then(Arc::new(move |re| eval(re, environment.clone())))
+                        }
+                        BuiltinMacro(..) => expanded,
+                        _ => panic!("No macro of that name found"),
+                    }
+                }
                 _ => panic!("No macro of that name found"),
             }
         }

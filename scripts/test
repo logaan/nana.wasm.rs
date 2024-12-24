@@ -4,9 +4,9 @@ set -e
 
 clear
 
-RUST_BACKTRACE=1 cargo test -- --nocapture
+# RUST_BACKTRACE=1 cargo test -- --nocapture
 # RUST_BACKTRACE=full cargo test
-# cargo test
+cargo test
 
 ./scripts/build-wasi
 ./scripts/run

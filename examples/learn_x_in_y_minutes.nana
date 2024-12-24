@@ -105,3 +105,33 @@ Def loop
 # even itself, Nana will execute it safely.
     
 loop(5)
+
+### Macros ###
+
+# Macros are a way to extend the language. They are very powerful, but have the
+# potential to be difficult to understand. It is best practice to avoid macros
+# in regular application code. Instead they are a good way to bring features to
+# Nana that you miss from other languages. Indeed much of Nana is written in its
+# own macro system.
+
+# Lets start with the idea of Quoting. Quoting is a way to prevent the
+# interpreter from evaluating an expression. This is useful when you want to
+# construct parts of an expression that normally evaluate to other things, such
+# as symbols and function calls.
+
+# `Quote 1` will return the number 1, just as `1` would.
+Quote 1
+
+# But `Quote a` will return the symbol `life`, not 42, which is the value that
+# we assigned to life using Def.
+Quote life
+
+# We can also quote function calls. The value that is returned will be a Tagged
+# Tuple.  Tuples are fixed length collections of values. Tagged Tuples are
+# tuples that have a symbol associated with them. This is a way to give a name
+# to a tuple, and to distinguish it from other tuples. This example will return
+# the tuple `(life)` tagged with the symbol `dec`:
+Quote dec(life)
+
+# Quoting will work even with symbols and functions that have not been defined:
+Quote foo(bar)
