@@ -139,11 +139,11 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
         RuntimeExpression::String(_) => Complete(expression),
 
         BuiltinFunction(..) => todo!("When would you actually eval a function?"),
-        Function(..) => Complete(expression),
+        Function(..) => todo!("Evalling a function"),
         BuiltinMacro(..) => todo!("Do we eval macros?"),
         Macro(..) => todo!("Do we eval macros?"),
         Hole => todo!("I can't imagine what holes evaluate to"),
-        Definition(..) => Complete(expression),
+        Definition(..) => todo!("Evalling a definition"),
     }
 }
 
@@ -187,15 +187,17 @@ pub fn execute_with_all_results(code: String, env: Environment) -> Vector<Runtim
     let (_, expressions) = program(&code).unwrap();
     let ast = build_many_macros(&expressions, &env);
 
-    ast.iter()
+    let (results, _env) = ast
+        .iter()
         .fold((vector![], env), |(mut results, env), expr| {
             let (result, new_env) =
                 execute_with_definitions(vector![expr.clone()], env, None).run_until_complete();
 
             results.push_back(result.unwrap());
             (results, new_env)
-        })
-        .0
+        });
+
+    results
 }
 
 pub fn execute_with_env(

@@ -135,3 +135,15 @@ Quote dec(life)
 
 # Quoting will work even with symbols and functions that have not been defined:
 Quote foo(bar)
+
+# TODO: Macro expansion happens all at once before evaluation begins. So any
+# macro calls of user defined macros will happen too late.
+#
+# Def "Defmacro"
+#   Macro [name args body]
+#     macro-call("Def" name
+#       macro-call("Macro" args body))
+# 
+# Defmacro "Second" [a b] b
+# 
+# Second 1 2

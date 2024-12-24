@@ -92,7 +92,7 @@ pub fn standard_library() -> Environment {
                     let value = args.pop_front().unwrap();
 
                     match name {
-                        Symbol(name) => {
+                        Symbol(name) | NString(name) => {
                             let new_env = env.prepare(name.clone());
                             eval(value, new_env.clone()).and_then(Arc::new(move |result| {
                                 new_env.provide(&name, result.clone()).expect("Providing a prepared value should not fail");
@@ -192,5 +192,45 @@ pub fn standard_library() -> Environment {
                 }
             }
         ),
+
+        s!("Macro") => BuiltinMacro(
+            vector![
+              s!("params"),
+              s!("body")
+            ],
+            |mut args, env| {
+                if args.len() == 2 {
+                    let params = args.pop_front().unwrap();
+                    let body = args.pop_front().unwrap();
+
+                    match params {
+                        List(params) => {
+                            let param_strings = params.iter().map(|p| match p {
+                                Symbol(s) => s,
+                                _ => panic!("Macro params must be symbols")
+                            }).cloned().collect::<Vector<String>>();
+                            Complete(Macro(param_strings, env, vector![body]))
+                        },
+                        _ => panic!("Macro takes a list of params and a single body expression")
+                    }
+                } else {
+                    panic!("Macro takes exactly 2 arguments")
+                }
+            }
+        ),
+
+        s!("macro-call") => BuiltinFunction(|args| {
+            if args.len() == 2 {
+                let mut args = args;
+                match (args.pop_front().unwrap(), args.pop_front().unwrap()) {
+                    (NString(name), List(macro_args)) => {
+                        Complete(MacroCall(name, macro_args))
+                    },
+                    _ => panic!("macro-call takes a string and a list")
+                }
+            } else {
+                panic!("macro-call takes exactly 2 arguments")
+            }
+        }),
     })
 }

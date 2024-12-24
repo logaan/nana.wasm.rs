@@ -44,7 +44,7 @@ pub fn build_macros(
                 )
             }
             Some(_) => panic!("A macro name should only ever point to a macro in the environment"),
-            None => panic!("Macro was referenced but has not defined"),
+            None => panic!("Macro {} was referenced but has not defined", name),
         },
         Some(LexicalExpression::List(expressions)) => (
             Some(RuntimeExpression::List(build_many_macros(

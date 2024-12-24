@@ -6,7 +6,7 @@ use im::{vector, Vector};
 
 use crate::eval::execute_with_all_results;
 use crate::expressions::RuntimeExpression::{
-    self, Function, List, Number, String as NString, Symbol, TaggedTuple,
+    self, Function, List, Macro, Number, String as NString, Symbol, TaggedTuple,
 };
 use crate::s;
 use crate::standard_library::standard_library;
@@ -25,6 +25,7 @@ fn strip_functions(expressions: Vector<RuntimeExpression>) -> Vector<RuntimeExpr
         .into_iter()
         .filter(|e| match e {
             Function(..) => false,
+            Macro(..) => false,
             _ => true,
         })
         .collect()

@@ -1,7 +1,7 @@
-use im::hashmap;
+use im::{hashmap, vector};
 
 use crate::environment::Environment;
-use crate::expressions::RuntimeExpression::{Number, String as NString};
+use crate::expressions::RuntimeExpression::{Macro, MacroCall, Number, String as NString, Symbol};
 use crate::standard_library::standard_library;
 use crate::{eval::execute, s};
 
@@ -68,5 +68,25 @@ fn test_recursive_function_definitions() {
     recur-once(2)"#;
     let actual = execute(String::from(program), standard_library());
     let expected = Some(NString(s!("done")));
+    assert_eq!(expected, actual);
+}
+
+#[test]
+fn test_macro_call() {
+    let program = r#"macro-call("Foo" [1])"#;
+    let actual = execute(String::from(program), standard_library());
+    let expected = Some(MacroCall(s!("Foo"), vector![Number(1)]));
+    assert_eq!(expected, actual);
+}
+
+#[test]
+fn test_macro() {
+    let program = r#"Macro [a b] b"#;
+    let actual = execute(String::from(program), standard_library());
+    let expected = Some(Macro(
+        vector![s!("a"), s!("b")],
+        standard_library(),
+        vector![Symbol(s!("b"))],
+    ));
     assert_eq!(expected, actual);
 }
