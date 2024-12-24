@@ -144,4 +144,4 @@ Def "Defmacro"
 
 Defmacro "Second" [a b] b
 
-Second 1 2
+Second panic() 2
