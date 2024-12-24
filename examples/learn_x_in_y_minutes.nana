@@ -136,12 +136,34 @@ Quote dec(life)
 # Quoting will work even with symbols and functions that have not been defined:
 Quote foo(bar)
 
+## Ignore this
+
 # TODO: Move this into a preface that gets merged into the standard library.
 Def "Defmacro"
   Macro [name args body]
     macro-call("Def" [name
       macro-call("Macro" [args body])])
 
+## You can stop ignoring now
+
+# Here is a simple macro that will evaluate to the second argument that is
+# passed to. Importantly the first argument is never run. This lets us define
+# control structures and other language features that we couldn't acomplish with
+# simple function calls.
 Defmacro "Second" [a b] b
 
+# Second is called and 2 is returned. panic() is never called.
 Second panic() 2
+
+
+# TODO: Implement unquote so we can demonstrate If. 
+# Defmacro "If" [cond if else]
+#   Quote Match cond
+#     [1 if
+#      0 else]
+# 
+# Def is-tuesday 0
+# 
+# If is-tuesday
+#   panic()
+#   "It's Tuesday!"
