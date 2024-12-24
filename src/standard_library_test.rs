@@ -8,10 +8,10 @@ use crate::{eval::execute, s};
 #[test]
 fn test_fn_macro() {
     let environment = Environment::from(hashmap! {
-      s!("second") => execute(s!("Fn [a b] b"), standard_library()).unwrap(),
+      s!("second") => execute(s!("Fn [a b] b"), standard_library()).head().unwrap().clone(),
     });
 
-    let expected = Some(Number(2));
+    let expected = vector!(Number(2));
     let actual = execute(s!("second(1 2)"), environment);
     assert_eq!(expected, actual);
 }
@@ -19,10 +19,10 @@ fn test_fn_macro() {
 #[test]
 fn test_match_macro() {
     let environment = Environment::from(hashmap! {
-      s!("result") => execute(s!("Match 3 [1 2 3 4 5 6]"), standard_library()).unwrap(),
+      s!("result") => execute(s!("Match 3 [1 2 3 4 5 6]"), standard_library()).head().unwrap().clone(),
     });
 
-    let expected = Some(Number(4));
+    let expected = vector!(Number(4));
     let actual = execute(s!("result"), environment);
     assert_eq!(expected, actual);
 }
@@ -34,7 +34,7 @@ fn test_match_eval() {
      s!("bar") => Number(3)
     }));
     let program = s!("Match foo [1 bar]");
-    let expected = Some(Number(3));
+    let expected = vector!(Number(3));
     let actual = execute(program, environment);
     assert_eq!(expected, actual);
 }
@@ -43,16 +43,19 @@ fn test_match_eval() {
 fn test_match_binding() {
     let environment = standard_library();
     let program = s!("Match 1 [num num]");
-    let expected = Some(Number(1));
+    let expected = vector!(Number(1));
     let actual = execute(program, environment);
     assert_eq!(expected, actual);
 }
 
 #[test]
 fn test_value_definitions() {
-    let program = s!("Def result 1 result");
+    let program = s!("
+        Def result 1
+        result
+    ");
     let actual = execute(program, standard_library());
-    let expected = Some(Number(1));
+    let expected = vector!(Number(1), Number(1));
     assert_eq!(expected, actual);
 }
 
@@ -66,8 +69,11 @@ fn test_recursive_function_definitions() {
            _ recur-once(1)]
     
     recur-once(2)"#;
-    let actual = execute(String::from(program), standard_library());
-    let expected = Some(NString(s!("done")));
+    let actual = execute(String::from(program), standard_library())
+        .back()
+        .unwrap()
+        .clone();
+    let expected = NString(s!("done"));
     assert_eq!(expected, actual);
 }
 
@@ -75,7 +81,7 @@ fn test_recursive_function_definitions() {
 fn test_macro_call() {
     let program = r#"macro-call("Foo" [1])"#;
     let actual = execute(String::from(program), standard_library());
-    let expected = Some(MacroCall(s!("Foo"), vector![Number(1)]));
+    let expected = vector!(MacroCall(s!("Foo"), vector![Number(1)]));
     assert_eq!(expected, actual);
 }
 
@@ -83,7 +89,7 @@ fn test_macro_call() {
 fn test_macro() {
     let program = r#"Macro [a b] b"#;
     let actual = execute(String::from(program), standard_library());
-    let expected = Some(Macro(
+    let expected = vector!(Macro(
         vector![s!("a"), s!("b")],
         standard_library(),
         vector![Symbol(s!("b"))],

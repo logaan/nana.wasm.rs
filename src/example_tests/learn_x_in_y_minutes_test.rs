@@ -4,7 +4,7 @@ use std::path::Path;
 
 use im::{vector, Vector};
 
-use crate::eval::execute_with_all_results;
+use crate::eval::execute;
 use crate::expressions::RuntimeExpression::{
     self, Function, List, Macro, Number, String as NString, Symbol, TaggedTuple,
 };
@@ -34,7 +34,9 @@ fn strip_functions(expressions: Vector<RuntimeExpression>) -> Vector<RuntimeExpr
 #[test]
 fn test_learn_x_in_y_minutes() {
     let code = read_code("examples/learn_x_in_y_minutes.nana");
-    let results = strip_functions(execute_with_all_results(code, standard_library()));
+    let results = execute(code, standard_library());
+    // println!("#*# Results: {:?}", results);
+    let stripped = strip_functions(results);
     let expected = vector![
         Number(123),
         NString(s!("This is a single line string.")),
@@ -54,7 +56,10 @@ fn test_learn_x_in_y_minutes() {
         TaggedTuple(s!("dec"), vector![Symbol(s!("life"))]),
         TaggedTuple(s!("foo"), vector![Symbol(s!("bar"))]),
 
+        // Defmacro
+        Number(2),
+
     ];
 
-    assert_eq!(expected, results);
+    assert_eq!(expected, stripped);
 }

@@ -8,6 +8,10 @@ pub fn build_macros(
     expressions: &Vector<LexicalExpression>,
     environment: &Environment,
 ) -> (Option<RuntimeExpression>, Vector<LexicalExpression>) {
+    if expressions.len() == 0 {
+        panic!("We can't build macros from an empty expression list")
+    }
+
     let rest = expressions.skip(1);
 
     match expressions.head() {
@@ -71,7 +75,7 @@ pub fn build_macros(
     }
 }
 
-pub fn build_many_macros(
+fn build_many_macros(
     incoming_exprs: &Vector<LexicalExpression>,
     environment: &Environment,
 ) -> Vector<RuntimeExpression> {

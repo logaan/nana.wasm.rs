@@ -4,6 +4,13 @@ pub use crate::environment::Environment;
 use crate::process::Process;
 use im::Vector;
 
+pub fn is_comment(expression: &LexicalExpression) -> bool {
+    match expression {
+        LexicalExpression::Comment => true,
+        _ => false,
+    }
+}
+
 #[derive(PartialEq, Debug, Clone)]
 pub enum LexicalExpression {
     TaggedTuple(String, Vector<LexicalExpression>),

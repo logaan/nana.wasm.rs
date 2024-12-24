@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use im::{vector, HashMap, Vector};
 
-use crate::expressions::Environment;
 use crate::expressions::RuntimeExpression::{
     self, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, List, Macro, MacroCall,
     Number, Symbol, TaggedTuple,
 };
+use crate::expressions::{is_comment, Environment, LexicalExpression};
 
-use crate::parsers::macros::build_many_macros;
+use crate::parsers::macros::build_macros;
 use crate::parsers::nana::program;
 use crate::process::Process::{self, Complete, Running};
 
@@ -148,69 +148,56 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
 }
 
 fn execute_with_definitions_and_process(
-    work: Vector<RuntimeExpression>,
+    work: Vector<LexicalExpression>,
     env: Environment,
+    mut results: Vector<RuntimeExpression>,
     process: Process<RuntimeExpression>,
-) -> Process<(Option<RuntimeExpression>, Environment)> {
+) -> Process<(Vector<RuntimeExpression>, Environment)> {
     if process.is_complete() {
         let (new_seed, new_env) = match process.result().unwrap() {
             Definition(name, value) => ((*value).clone(), env.add(name, (*value).clone())),
             value => (value, env),
         };
 
+        results.push_back(new_seed.clone());
         Running(Arc::new(move || {
-            execute_with_definitions(work.clone(), new_env.clone(), Some(new_seed.clone()))
+            execute_with_definitions(work.clone(), new_env.clone(), results.clone())
         }))
     } else {
         Running(Arc::new(move || {
-            execute_with_definitions_and_process(work.clone(), env.clone(), process.step())
+            execute_with_definitions_and_process(
+                work.clone(),
+                env.clone(),
+                results.clone(),
+                process.step(),
+            )
         }))
     }
 }
 
 pub fn execute_with_definitions(
-    work: Vector<RuntimeExpression>,
+    work: Vector<LexicalExpression>,
     env: Environment,
-    seed: Option<RuntimeExpression>,
-) -> Process<(Option<RuntimeExpression>, Environment)> {
+    results: Vector<RuntimeExpression>,
+) -> Process<(Vector<RuntimeExpression>, Environment)> {
     if work.is_empty() {
-        Complete((seed, env))
+        Complete((results, env))
     } else {
-        let (head, remaining_work) = work.split_at(1);
-        let first_expression = head.head().unwrap().clone();
-        let first_process = eval(first_expression, env.clone());
-        execute_with_definitions_and_process(remaining_work, env, first_process)
+        let (head, remaining_work) = build_macros(&work, &env);
+        match head {
+            Some(first_expression) => {
+                let first_process = eval(first_expression, env.clone());
+                execute_with_definitions_and_process(remaining_work, env, results, first_process)
+            }
+            None => Complete((vector![], env)),
+        }
     }
 }
 
-pub fn execute_with_all_results(code: String, env: Environment) -> Vector<RuntimeExpression> {
-    let (_, expressions) = program(&code).unwrap();
-    let ast = build_many_macros(&expressions, &env);
-
-    let (results, _env) = ast
-        .iter()
-        .fold((vector![], env), |(mut results, env), expr| {
-            let (result, new_env) =
-                execute_with_definitions(vector![expr.clone()], env, None).run_until_complete();
-
-            results.push_back(result.unwrap());
-            (results, new_env)
-        });
-
+pub fn execute(code: String, env: Environment) -> Vector<RuntimeExpression> {
+    let (_err, expressions) = program(&code).unwrap();
+    let comments_stripped = expressions.into_iter().filter(|e| !is_comment(e)).collect();
+    let process = execute_with_definitions(comments_stripped, env, vector![]);
+    let (results, _env) = process.run_until_complete();
     results
-}
-
-pub fn execute_with_env(
-    code: String,
-    env: Environment,
-) -> (Option<RuntimeExpression>, Environment) {
-    let (_, expressions) = program(&code).unwrap();
-    let ast = build_many_macros(&expressions, &env);
-
-    execute_with_definitions(ast, env, None).run_until_complete()
-}
-
-pub fn execute(code: String, env: Environment) -> Option<RuntimeExpression> {
-    let (result, _env) = execute_with_env(code, env);
-    result
 }
