@@ -57,7 +57,6 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
 }
 
 pub fn builtins() -> Environment {
-    // TODO: Write constructors for every `RuntimeExpression`.
     Environment::from(hashmap! {
         s!("log") => BuiltinFunction(|args| {
             println!("{:?}", args.clone());
@@ -204,20 +203,6 @@ pub fn builtins() -> Environment {
                 }
             }
         ),
-
-        s!("macro-call") => BuiltinFunction(|args| {
-            if args.len() == 2 {
-                let mut args = args;
-                match (args.pop_front().unwrap(), args.pop_front().unwrap()) {
-                    (NString(name), List(macro_args)) => {
-                        Complete(MacroCall(name, macro_args))
-                    },
-                    _ => panic!("macro-call takes a string and a list")
-                }
-            } else {
-                panic!("macro-call takes exactly 2 arguments")
-            }
-        }),
     })
 }
 

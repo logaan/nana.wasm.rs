@@ -1,7 +1,7 @@
 use im::{hashmap, vector};
 
 use crate::environment::Environment;
-use crate::expressions::RuntimeExpression::{Macro, MacroCall, Number, String as NString, Symbol};
+use crate::expressions::RuntimeExpression::{Macro, Number, String as NString, Symbol};
 use crate::standard_library::standard_library;
 use crate::{eval::execute, s};
 
@@ -74,14 +74,6 @@ fn test_recursive_function_definitions() {
         .unwrap()
         .clone();
     let expected = NString(s!("done"));
-    assert_eq!(expected, actual);
-}
-
-#[test]
-fn test_macro_call() {
-    let program = r#"macro-call("Foo" [1])"#;
-    let actual = execute(String::from(program), standard_library());
-    let expected = vector!(MacroCall(s!("Foo"), vector![Number(1)]));
     assert_eq!(expected, actual);
 }
 

@@ -1,8 +1,10 @@
+# When `Quote` sees a call to `Unquote` it will evaluate `value`.
+Def "Unquote"
+  Macro [value]
+    value
+
 Def "Defmacro"
   Macro [name args body]
-    macro-call("Def" [name
-      macro-call("Macro" [args body])])
-
-# When `Quote` sees a call to `Unquote` it will evaluate `value`.
-Defmacro "Unquote" [value]
-  value
+    Quote
+      Def Unquote name
+        Macro Unquote args Unquote body
