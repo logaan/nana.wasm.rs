@@ -88,11 +88,13 @@ fn test_macro_call() {
 #[test]
 fn test_macro() {
     let program = r#"Macro [a b] b"#;
-    let actual = execute(String::from(program), standard_library());
-    let expected = vector!(Macro(
-        vector![s!("a"), s!("b")],
-        standard_library(),
-        vector![Symbol(s!("b"))],
-    ));
-    assert_eq!(expected, actual);
+    let mut actual = execute(String::from(program), standard_library());
+    assert!(match actual.pop_front().unwrap() {
+        Macro(args, _, body) => {
+            assert_eq!(vector![s!("a"), s!("b")], args);
+            assert_eq!(vector![Symbol(s!("b"))], body);
+            true
+        }
+        _ => false,
+    });
 }

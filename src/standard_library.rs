@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use im::{hashmap, vector, Vector};
 
-use crate::eval::eval;
+use crate::eval::{eval, execute_with_env, read_code};
 use crate::expressions::RuntimeExpression::{
     BuiltinFunction, BuiltinMacro, Definition, Function, Hole, List, Macro, MacroCall, Number,
     String as NString, Symbol, TaggedTuple,
@@ -56,10 +56,8 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
     }
 }
 
-pub fn standard_library() -> Environment {
+pub fn builtins() -> Environment {
     // TODO: Write constructors for every `RuntimeExpression`.
-    // TODO: Read and run a prelude.nana file. If we have a Macro builtin then I
-    // should be able to define DefMacro, Defn, Defm, etc.
     Environment::from(hashmap! {
         s!("log") => BuiltinFunction(|args| {
             println!("{:?}", args.clone());
@@ -221,4 +219,10 @@ pub fn standard_library() -> Environment {
             }
         }),
     })
+}
+
+pub fn standard_library() -> Environment {
+    let code = read_code("examples/standard_library.nana");
+    let (_result, new_env) = execute_with_env(code, builtins());
+    new_env
 }

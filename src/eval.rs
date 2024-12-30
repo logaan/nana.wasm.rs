@@ -205,10 +205,17 @@ pub fn execute_with_definitions(
     }
 }
 
-pub fn execute(code: String, env: Environment) -> Vector<RuntimeExpression> {
+pub fn execute_with_env(
+    code: String,
+    env: Environment,
+) -> (Vector<RuntimeExpression>, Environment) {
     let (_err, expressions) = program(&code).unwrap();
     let comments_stripped = expressions.into_iter().filter(|e| !is_comment(e)).collect();
     let process = execute_with_definitions(comments_stripped, env, vector![]);
-    let (results, _env) = process.run_until_complete();
+    process.run_until_complete()
+}
+
+pub fn execute(code: String, env: Environment) -> Vector<RuntimeExpression> {
+    let (results, _env) = execute_with_env(code, env);
     results
 }

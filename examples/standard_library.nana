@@ -1,0 +1,5 @@
+Def "Defmacro"
+  Macro [name args body]
+    macro-call("Def" [name
+      macro-call("Macro" [args body])])
+
