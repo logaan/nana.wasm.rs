@@ -4,6 +4,26 @@ use crate::expressions::RuntimeExpression;
 use im::vector;
 use im::Vector;
 
+fn build_macro_args(
+    params: Vector<String>,
+    rest: Vector<LexicalExpression>,
+    environment: &Environment,
+    name: &String,
+) -> (Option<RuntimeExpression>, Vector<LexicalExpression>) {
+    let (final_args, new_rest) =
+        (0..params.len()).fold((Vector::new(), rest), |(args, curr_rest), _| {
+            let (arg, remainder) = build_macros(&curr_rest, &environment);
+            let new_args = arg
+                .and_then(|arg| Some(args.clone() + Vector::unit(arg)))
+                .unwrap_or(args);
+            (new_args, remainder)
+        });
+    (
+        Some(RuntimeExpression::MacroCall(name.to_string(), final_args)),
+        new_rest,
+    )
+}
+
 pub fn build_macros(
     expressions: &Vector<LexicalExpression>,
     environment: &Environment,
@@ -19,33 +39,10 @@ pub fn build_macros(
         Some(LexicalExpression::Comment) => (None, rest),
         Some(LexicalExpression::MacroName(name)) => match environment.get(name) {
             Some(RuntimeExpression::Macro(params, _, _)) => {
-                let (final_args, new_rest) =
-                    (0..params.len()).fold((Vector::new(), rest), |(args, curr_rest), _| {
-                        let (arg, remainder) = build_macros(&curr_rest, &environment);
-                        let new_args = arg
-                            .and_then(|arg| Some(args.clone() + Vector::unit(arg)))
-                            .unwrap_or(args);
-                        (new_args, remainder)
-                    });
-                (
-                    Some(RuntimeExpression::MacroCall(name.to_string(), final_args)),
-                    new_rest,
-                )
+                build_macro_args(params, rest, environment, name)
             }
-            // TODO: Copy paste job. Move to a fn
             Some(RuntimeExpression::BuiltinMacro(params, _)) => {
-                let (final_args, new_rest) =
-                    (0..params.len()).fold((Vector::new(), rest), |(args, curr_rest), _| {
-                        let (arg, remainder) = build_macros(&curr_rest, &environment);
-                        let new_args = arg
-                            .and_then(|arg| Some(args.clone() + Vector::unit(arg)))
-                            .unwrap_or(args);
-                        (new_args, remainder)
-                    });
-                (
-                    Some(RuntimeExpression::MacroCall(name.to_string(), final_args)),
-                    new_rest,
-                )
+                build_macro_args(params, rest, environment, name)
             }
             Some(_) => panic!("A macro name should only ever point to a macro in the environment"),
             None => panic!("Macro {} was referenced but has not defined", name),
