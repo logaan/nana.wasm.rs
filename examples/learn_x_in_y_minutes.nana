@@ -148,9 +148,9 @@ Second panic() 2
 
 # TODO: Implement unquote so we can demonstrate If. 
 # Defmacro "If" [cond if else]
-#   Quote Match cond
-#     [1 if
-#      0 else]
+#   Quote Match Unquote cond
+#     [1 Unquote if
+#      0 Unquote else]
 # 
 # Def is-tuesday 0
 # 

@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use im::{hashmap, vector, Vector};
 
-use crate::eval::{eval, execute_with_env, read_code};
+use crate::eval::{eval, execute_with_env, quote, read_code};
 use crate::expressions::RuntimeExpression::{
     BuiltinFunction, BuiltinMacro, Definition, Function, Hole, List, Macro, MacroCall, Number,
     String as NString, Symbol, TaggedTuple,
@@ -172,7 +172,7 @@ pub fn builtins() -> Environment {
             ],
             |mut args, _env| {
                 if args.len() == 1 {
-                    Complete(args.pop_front().unwrap())
+                    Complete(quote(args.pop_front().unwrap()))
                 } else {
                     panic!("Quote takes exactly 1 argument")
                 }

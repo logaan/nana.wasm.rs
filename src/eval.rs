@@ -8,7 +8,7 @@ use im::{vector, HashMap, Vector};
 
 use crate::expressions::RuntimeExpression::{
     self, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, List, Macro, MacroCall,
-    Number, Symbol, TaggedTuple,
+    Number, String as NString, Symbol, TaggedTuple,
 };
 use crate::expressions::{is_comment, Environment, LexicalExpression};
 
@@ -183,6 +183,40 @@ fn execute_with_definitions_and_process(
                 process.step(),
             )
         }))
+    }
+}
+
+// Quote needs to return a process. Because when we hit unquote we're going to
+// have to eval.
+pub fn quote(value: RuntimeExpression) -> RuntimeExpression {
+    match value {
+        BuiltinFunction(_) => value,
+        Function(params, env, body) => {
+            let new_body = body.iter().cloned().map(|re| quote(re)).collect();
+            Function(params, env, new_body)
+        }
+        TaggedTuple(tag, values) => {
+            let new_values = values.iter().cloned().map(|re| quote(re)).collect();
+            TaggedTuple(tag, new_values)
+        }
+        Hole => value,
+        List(values) => {
+            let new_values = values.iter().cloned().map(|re| quote(re)).collect();
+            List(new_values)
+        }
+        BuiltinMacro(_, _) => value,
+        Macro(params, env, body) => {
+            let new_body = body.iter().cloned().map(|re| quote(re)).collect();
+            Macro(params, env, new_body)
+        }
+        MacroCall(name, args) => {
+            let new_args = args.iter().cloned().map(|re| quote(re)).collect();
+            MacroCall(name, new_args)
+        }
+        Number(_) => value,
+        NString(_) => value,
+        Symbol(_) => value,
+        Definition(name, value) => Definition(name, Arc::new(quote((*value).clone()))),
     }
 }
 
