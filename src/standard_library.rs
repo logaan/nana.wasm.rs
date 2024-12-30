@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use im::{hashmap, vector, Vector};
 
-use crate::eval::{eval, execute_with_env, quote, read_code};
+use crate::eval::{eval, execute_with_env, quote};
 use crate::expressions::RuntimeExpression::{
     BuiltinFunction, BuiltinMacro, Definition, Function, Hole, List, Macro, MacroCall, Number,
     String as NString, Symbol, TaggedTuple,
@@ -58,6 +58,7 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
 
 pub fn builtins() -> Environment {
     Environment::from(hashmap! {
+        // TODO: Make expressions print themselves in a readable form
         s!("log") => BuiltinFunction(|args| {
             println!("{:?}", args.clone());
             Complete(args.head().unwrap().clone())
@@ -207,7 +208,8 @@ pub fn builtins() -> Environment {
 }
 
 pub fn standard_library() -> Environment {
-    let code = read_code("examples/standard_library.nana");
-    let (_result, new_env) = execute_with_env(code, builtins());
+    let (_result, new_env) = execute_with_env(PROGRAM_CODE.to_owned(), builtins());
     new_env
 }
+
+pub static PROGRAM_CODE: &str = include_str!("../examples/standard_library.nana");

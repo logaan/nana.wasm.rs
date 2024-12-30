@@ -21,30 +21,19 @@ mod process_test;
 #[cfg(test)]
 mod standard_library_test;
 
-use crate::expressions::RuntimeExpression::{self, BuiltinFunction};
 use bindings::exports::wasi::cli::run::Guest as Command;
-use environment::Environment;
 use eval::execute;
-use im::hashmap;
-use process::Process;
+use standard_library::standard_library;
 
 struct Component;
 
 impl Command for Component {
     fn run() -> Result<(), ()> {
-        let environment = Environment::from(hashmap! {
-            String::from("greet") => BuiltinFunction(|_args| {
-                Process::Complete(RuntimeExpression::String(String::from("Hello, World.")))
-            }),
-        });
-        let result = execute(PROGRAM_CODE.to_owned(), environment);
-        println!("{:?}", result);
+        execute(PROGRAM_CODE.to_owned(), standard_library());
         Ok(())
     }
 }
 
 bindings::export!(Component with_types_in bindings);
 
-pub static PROGRAM_CODE: &str = r#"
-greet()
-"#;
+pub static PROGRAM_CODE: &str = include_str!("../examples/main.nana");
