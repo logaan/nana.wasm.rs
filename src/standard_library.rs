@@ -96,18 +96,6 @@ pub fn standard_library() -> Environment {
                             let new_env = env.prepare(name.clone());
                             eval(value, new_env.clone()).and_then(Arc::new(move |result| {
                                 new_env.provide(&name, result.clone()).expect("Providing a prepared value should not fail");
-                                // TODO: This is a macro. It should be returning
-                                // code that will evaluate to the final
-                                // result... maybe that's not true for builtins?
-                                //
-                                // Anyway, this is why functions and definitions
-                                // currently have to evaluate to themselves.
-                                // Becuase what we return here will be evaluated
-                                // by macroexpand.
-                                //
-                                // Probably this is fine I just need to wrap it
-                                // in a Quote. Then when it's evaluated it'll
-                                // just resolve down to exactly what it is.
                                 Complete(Definition(name.clone(), Arc::new(result.clone())))
                             }))
                         },
