@@ -9,7 +9,7 @@ use crate::standard_library::standard_library;
 
 // Asserting against functions will cause a stack overflow because functions
 // have a reference to themselves via their closed over environment.
-fn strip_functions(expressions: Vector<RuntimeExpression>) -> Vector<RuntimeExpression> {
+pub fn strip_functions(expressions: Vector<RuntimeExpression>) -> Vector<RuntimeExpression> {
     expressions
         .into_iter()
         .filter(|e| match e {

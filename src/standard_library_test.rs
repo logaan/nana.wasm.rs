@@ -1,6 +1,7 @@
 use im::{hashmap, vector};
 
 use crate::environment::Environment;
+use crate::example_tests::learn_x_in_y_minutes_test::strip_functions;
 use crate::expressions::RuntimeExpression::{Macro, Number, String as NString, Symbol};
 use crate::standard_library::standard_library;
 use crate::{eval::execute, s};
@@ -89,4 +90,16 @@ fn test_macro() {
         }
         _ => false,
     });
+}
+
+#[test]
+fn test_func() {
+    let program = r#"
+    Func first [a b]
+        a
+    
+    first(1 2)"#;
+    let actual = strip_functions(execute(String::from(program), standard_library()));
+    let expected = vector![Number(1)];
+    assert_eq!(expected, actual);
 }

@@ -8,3 +8,9 @@ Def "Defmacro"
     Quote
       Def Unquote name
         Macro Unquote args Unquote body
+
+Defmacro "Func" [name args body]
+  Quote
+    Def Unquote name
+      Fn Unquote args Unquote body
+  
