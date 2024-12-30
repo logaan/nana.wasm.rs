@@ -1,22 +1,11 @@
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
-
 use im::{vector, Vector};
 
-use crate::eval::execute;
+use crate::eval::{execute, read_code};
 use crate::expressions::RuntimeExpression::{
     self, Function, List, Macro, Number, String as NString, Symbol, TaggedTuple,
 };
 use crate::s;
 use crate::standard_library::standard_library;
-
-pub fn read_code(path: &str) -> String {
-    let mut file = File::open(Path::new(path)).unwrap();
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-    contents
-}
 
 // Asserting against functions will cause a stack overflow because functions
 // have a reference to themselves via their closed over environment.

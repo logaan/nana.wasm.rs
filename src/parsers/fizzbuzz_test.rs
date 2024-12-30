@@ -1,7 +1,7 @@
 use super::nana::*;
 
 use crate::{
-    example_tests::learn_x_in_y_minutes_test::read_code,
+    eval::read_code,
     expressions::LexicalExpression::{self, *},
 };
 use im::{vector, Vector};

@@ -1,3 +1,7 @@
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
+
 use std::sync::Arc;
 
 use im::{vector, HashMap, Vector};
@@ -11,6 +15,13 @@ use crate::expressions::{is_comment, Environment, LexicalExpression};
 use crate::parsers::macros::build_macros;
 use crate::parsers::nana::program;
 use crate::process::Process::{self, Complete, Running};
+
+pub fn read_code(path: &str) -> String {
+    let mut file = File::open(Path::new(path)).unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    contents
+}
 
 pub fn apply(
     function: RuntimeExpression,
