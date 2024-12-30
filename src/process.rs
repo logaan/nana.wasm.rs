@@ -79,14 +79,18 @@ impl<T: Clone + 'static> Process<T> {
         let mut complete_processes: Vector<T> = vector![];
 
         while !active_processes.is_empty() {
-            // TODO: Need to handle the case where the process was already
-            // Complete (ie: don't call step)
-            let new_process = active_processes.pop_front().unwrap().step();
+            let next = active_processes.pop_front().unwrap();
 
-            if new_process.is_complete() {
-                complete_processes.push_back(new_process.result().unwrap());
+            if next.is_complete() {
+                complete_processes.push_back(next.result().unwrap());
             } else {
-                active_processes.push_back(new_process);
+                let new_process = next.step();
+
+                if new_process.is_complete() {
+                    complete_processes.push_back(new_process.result().unwrap());
+                } else {
+                    active_processes.push_back(new_process);
+                }
             }
         }
 
