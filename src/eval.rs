@@ -15,6 +15,7 @@ use crate::expressions::{is_comment, Environment, LexicalExpression};
 use crate::parsers::macros::build_macros;
 use crate::parsers::nana::program;
 use crate::process::Process::{self, Complete, Running};
+use crate::s;
 
 pub fn read_code(path: &str) -> String {
     let mut file = File::open(Path::new(path)).unwrap();
@@ -188,35 +189,77 @@ fn execute_with_definitions_and_process(
 
 // Quote needs to return a process. Because when we hit unquote we're going to
 // have to eval.
-pub fn quote(value: RuntimeExpression) -> RuntimeExpression {
+pub fn quote(value: RuntimeExpression, env: Environment) -> Process<RuntimeExpression> {
     match value {
-        BuiltinFunction(_) => value,
+        BuiltinFunction(_) => Complete(value),
         Function(params, env, body) => {
-            let new_body = body.iter().cloned().map(|re| quote(re)).collect();
-            Function(params, env, new_body)
+            let new_env = env.clone();
+            let processes = body
+                .iter()
+                .cloned()
+                .map(move |re| quote(re, env.clone()))
+                .collect();
+            Process::run_in_sequence(processes).and_then(Arc::new(move |new_body| {
+                Complete(Function(params.clone(), new_env.clone(), new_body))
+            }))
         }
         TaggedTuple(tag, values) => {
-            let new_values = values.iter().cloned().map(|re| quote(re)).collect();
-            TaggedTuple(tag, new_values)
+            let processes = values
+                .iter()
+                .cloned()
+                .map(move |re| quote(re, env.clone()))
+                .collect();
+            Process::run_in_sequence(processes).and_then(Arc::new(move |new_values| {
+                Complete(TaggedTuple(tag.clone(), new_values))
+            }))
         }
-        Hole => value,
+        Hole => Complete(value),
         List(values) => {
-            let new_values = values.iter().cloned().map(|re| quote(re)).collect();
-            List(new_values)
+            let processes = values
+                .iter()
+                .cloned()
+                .map(move |re| quote(re, env.clone()))
+                .collect();
+            Process::run_in_sequence(processes)
+                .and_then(Arc::new(|new_values| Complete(List(new_values))))
         }
-        BuiltinMacro(_, _) => value,
+        BuiltinMacro(_, _) => Complete(value),
         Macro(params, env, body) => {
-            let new_body = body.iter().cloned().map(|re| quote(re)).collect();
-            Macro(params, env, new_body)
+            let new_env = env.clone();
+            let processes = body
+                .iter()
+                .cloned()
+                .map(move |re| quote(re, env.clone()))
+                .collect();
+            Process::run_in_sequence(processes).and_then(Arc::new(move |new_body| {
+                Complete(Macro(params.clone(), new_env.clone(), new_body))
+            }))
         }
         MacroCall(name, args) => {
-            let new_args = args.iter().cloned().map(|re| quote(re)).collect();
-            MacroCall(name, new_args)
+            if name == s!("Unquote") {
+                let mut args = args;
+                let value = args.pop_front().unwrap();
+                eval(value, env)
+            } else {
+                let processes = args
+                    .iter()
+                    .cloned()
+                    .map(move |re| quote(re, env.clone()))
+                    .collect();
+                Process::run_in_sequence(processes).and_then(Arc::new(move |new_args| {
+                    Complete(MacroCall(name.clone(), new_args))
+                }))
+            }
         }
-        Number(_) => value,
-        NString(_) => value,
-        Symbol(_) => value,
-        Definition(name, value) => Definition(name, Arc::new(quote((*value).clone()))),
+        Number(_) => Complete(value),
+        NString(_) => Complete(value),
+        Symbol(_) => Complete(value),
+        Definition(name, value) => {
+            let process = quote((*value).clone(), env);
+            process.and_then(Arc::new(move |new_value| {
+                Complete(Definition(name.clone(), Arc::new(new_value)))
+            }))
+        }
     }
 }
 

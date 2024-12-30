@@ -48,6 +48,12 @@ fn test_learn_x_in_y_minutes() {
         // Defmacro
         Number(2),
 
+        // Unquote
+        Number(42),
+        List(vector![Number(1), Number(42), Number(3)]),
+        Number(1),
+        NString(s!("It's Tuesday!")),
+
     ];
 
     assert_eq!(expected, stripped);

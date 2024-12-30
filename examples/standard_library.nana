@@ -3,3 +3,6 @@ Def "Defmacro"
     macro-call("Def" [name
       macro-call("Macro" [args body])])
 
+# When `Quote` sees a call to `Unquote` it will evaluate `value`.
+Defmacro "Unquote" [value]
+  value

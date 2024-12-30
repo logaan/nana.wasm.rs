@@ -170,9 +170,9 @@ pub fn builtins() -> Environment {
             vector![
               s!("value")
             ],
-            |mut args, _env| {
+            |mut args, env| {
                 if args.len() == 1 {
-                    Complete(quote(args.pop_front().unwrap()))
+                    quote(args.pop_front().unwrap(), env)
                 } else {
                     panic!("Quote takes exactly 1 argument")
                 }

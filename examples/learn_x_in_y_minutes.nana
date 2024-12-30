@@ -145,15 +145,27 @@ Defmacro "Second" [a b] b
 # Second replaces itself with the number 2 without ever calling panic().
 Second panic() 2
 
+# To construct more complex macros we can use Unquote. It lets us evaluate code
+# that would otherwise be Quoted. This example will return the value of `life`,
+# rather than the symbol `life`.
+Quote Unquote life
 
-# TODO: Implement unquote so we can demonstrate If. 
-# Defmacro "If" [cond if else]
-#   Quote Match Unquote cond
-#     [1 Unquote if
-#      0 Unquote else]
-# 
-# Def is-tuesday 0
-# 
-# If is-tuesday
-#   panic()
-#   "It's Tuesday!"
+# It also works deep inside nested expressions.
+Quote [1 Unquote life 3]
+
+# Using `Quote` and `Unquote` it's not difficult for us to define `If` using
+# `Match`:
+Defmacro "If" [cond if else]
+  Quote
+    Match Unquote cond
+      [1 Unquote if
+       0 Unquote else]
+
+# And now we can see it in action. First a little setup:
+Def is-tuesday 1
+
+# Notice that we evalaute `is-tuesday` in order to pick a branch, but never
+# evaluate `panic()`. The string "It's Tuesday!" will be returned.
+If is-tuesday
+  "It's Tuesday!"
+  panic()
