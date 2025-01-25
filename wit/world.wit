@@ -1,5 +1,11 @@
 package component:nana;
 
+interface greeter {
+    greet: func(name: string);
+}
+
 world command {
   export wasi:cli/run@0.2.2;
+
+  import greeter;
 }

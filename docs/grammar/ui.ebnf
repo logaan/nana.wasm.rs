@@ -1,0 +1,18 @@
+/* https://rr.red-dove.com/ui */
+
+Grammar ::= Expression*
+
+Expression ::= Comment | Number | ValueName | MacroName | FunctionCall | List | String | Hole
+
+Comment ::= '#' NotNewLine* NewLine
+Number ::= [0-9]+
+ValueName ::= [a-z] NameChar*
+MacroName ::= [A-Z] NameChar*
+FunctionCall ::= ValueName '(' Expression* ')'
+List ::= '[' Expression* ']'
+String ::= '"' [^"] '"'
+Hole ::= '_'
+
+NewLine ::= #xA
+NotNewLine ::= [^#xA]
+NameChar ::= [a-zA-Z0-9:/@.<>] | '-'

@@ -1,4 +1,35 @@
 #[allow(dead_code)]
+pub mod component {
+    #[allow(dead_code)]
+    pub mod nana {
+        #[allow(dead_code, clippy::all)]
+        pub mod greeter {
+            #[used]
+            #[doc(hidden)]
+            static __FORCE_SECTION_REF: fn() = super::super::super::__link_custom_section_describing_imports;
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn greet(name: &str) {
+                unsafe {
+                    let vec0 = name;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "component:nana/greeter")]
+                    extern "C" {
+                        #[link_name = "greet"]
+                        fn wit_import(_: *mut u8, _: usize);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    fn wit_import(_: *mut u8, _: usize) {
+                        unreachable!()
+                    }
+                    wit_import(ptr0.cast_mut(), len0);
+                }
+            }
+        }
+    }
+}
+#[allow(dead_code)]
 pub mod exports {
     #[allow(dead_code)]
     pub mod wasi {
@@ -78,12 +109,13 @@ pub(crate) use __export_command_impl as export;
 #[cfg(target_arch = "wasm32")]
 #[link_section = "component-type:wit-bindgen:0.31.0:component:nana:command:encoded world"]
 #[doc(hidden)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 201] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07L\x01A\x02\x01A\x02\x01\
-B\x03\x01j\0\0\x01@\0\0\0\x04\0\x03run\x01\x01\x04\x01\x12wasi:cli/run@0.2.2\x05\
-\0\x04\x01\x16component:nana/command\x04\0\x0b\x0d\x01\0\x07command\x03\0\0\0G\x09\
-producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.216.0\x10wit-bindgen-rus\
-t\x060.31.0";
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 252] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\x7f\x01A\x02\x01A\x04\
+\x01B\x02\x01@\x01\x04names\x01\0\x04\0\x05greet\x01\0\x03\x01\x16component:nana\
+/greeter\x05\0\x01B\x03\x01j\0\0\x01@\0\0\0\x04\0\x03run\x01\x01\x04\x01\x12wasi\
+:cli/run@0.2.2\x05\x01\x04\x01\x16component:nana/command\x04\0\x0b\x0d\x01\0\x07\
+command\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.21\
+6.0\x10wit-bindgen-rust\x060.31.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {
