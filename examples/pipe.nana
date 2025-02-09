@@ -1,0 +1,57 @@
+# Collections
+
+[1 2 3 4]
+| map(even?)
+| map(math/square)
+| filter(Fn([n] (< n 10)))
+| println()
+
+[1 2 3 4] | map(even?) | map(math/square) | filter(Fn([n]<(n 10))) | println()
+
+[1 2 3 4]|map(even?)|map(math/square)|filter(Fn([n]<(n 10)))|println()
+
+[1 2 3 4]
+.map(even?)
+.map(math/square)
+.filter(Fn([n] (< n 10)))
+.println()
+
+[1 2 3 4].map(even?).map(math/square).filter(Fn([n]<(n 10))).println()
+
+
+# Nested attributes
+
+user | mother() | mother() | maiden-name()
+
+user
+| mother()
+| mother()
+| maiden-name()
+
+# Macro
+
+| [1 2 3 4]
+| map(even?)
+| map(math/square)
+| filter(Fn([n] (< n 10)))
+  println()
+
+# Slashstart
+
+[1 2 3 4]
+/map(even?)
+/map(math/square)
+/filter(Fn([n] (< n 10)))
+/println()
+
+[1 2 3 4] /map(even?) /map(math/square) /filter(Fn([n]<(n 10))) /println()
+
+# Dotstart
+
+[1 2 3 4]
+.map(even?)
+.map(math/square)
+.filter(Fn([n] (< n 10)))
+.println()
+
+[1 2 3 4].map(even?).map(math/square).filter(Fn([n]<(n 10))).println()
