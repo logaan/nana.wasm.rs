@@ -1,0 +1,223 @@
+<link href="https://cdn.jsdelivr.net/npm/vscode-codicons@0.0.17/dist/codicon.min.css" rel="stylesheet">
+<div id="container" style="min-height: 100%"></div>
+<script type="module">
+  import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/+esm';
+
+  const value = `# Hello and welcome to Nana!
+
+# Nana is a simple, dynamically typed, interpreted language.
+# It is designed to be easy to learn and use.
+# This file will teach you the basics of Nana.
+# Let's get started!
+
+# Comments in Nana are start with a hash symbol.
+# They can be on their own line or at the end of a line.
+# Comments are ignored by the interpreter.
+
+# This is a comment.
+
+### Data Types ###
+
+# Nana has a few basic data types.
+# Numbers are written as you would expect.
+# At the moment only integers are supported.
+
+123
+
+# Strings are written between double quotes.
+# Strings can contain any characters.
+# They may even stretch over multiple lines.
+
+"This is a single line string."
+
+"This is a multi line string.
+It's worth noting that any indentation will be preserved."
+
+# Lists are written between square brackets.
+# Lists can contain any data type.
+# The values are separated by whitespace.
+
+[1 2 3]
+
+### Control Structures ###
+
+# For branching, Nana has the Match macro. It is similar to a switch statement
+# in other languages, but has a few more features.
+
+# The first argument to Match is the value to match. It can be a literal value,
+# or it can be an expression that evaluates to a value, like a variable or a
+# function call.
+
+# The second argument to Match is a list with an even number of match cases. The
+# first value is a pattern, the second is an expression that will be evaluated
+# if the pattern matches the value. The pattern can be a literal value, or an
+# underscore. An underscore acts as a wildcard that matches anything.
+
+# This example will give us the ordinal indicator, if provided with the final
+# digit of a number:
+
+Match 3
+  [1 "st"
+   2 "nd"
+   3 "rd"
+   _ "th"]
+
+# If you'd like to access the value you can bind it to a symbol by using that
+# symbol in the pattern. This example will return the number 8:
+
+Match dec(10)
+  [result dec(result)]
+
+# This will also work within data structures, and collections. This example will
+# pull out the second element of a list:
+
+Match [1 2 3]
+  [[_ second _] second]
+
+# You can bind multiple values to the same symbol as long as they are the same.
+# This will return the string "Matching pairs":
+
+Match [[1 2] [1 2]] [
+  [[a a] [b b]] "Two doubles"
+  [[a b] [a b]] "Matching pairs"
+   _            "No match"]
+
+### Definitions ###
+
+# We can give a name to a value by using the Def macro. The first argument is a
+# symbol, the second is the value. Definitions are only respected if they're at
+# the top level of a file. This example will define the value of life to be 42: 
+
+Def life 42
+
+# Once the symbol has been defined, it can be used in place of the value. This
+# example will return 42:
+
+life
+
+# Functions are also values, and can be defined in the same way. This example
+# defines a function that will loop the number of times you ask it to and then
+# return the string "done":
+
+Def loop
+  Fn [n]
+    Match n
+      [0 "done"
+       _ loop(log(dec(n)))]
+
+# Because defining functions in this way is so common we have the Func macro so
+# cute out the boilerplate:
+Func loop [n]
+  Match n
+    [0 "done"
+     _ loop(log(dec(n)))]
+
+# We don't need to be concerned about the function calling itself causing a
+# stack overflow. As long as the last thing a function does is call a function,
+# even itself, Nana will execute it safely.
+    
+loop(5)
+
+### Macros ###
+
+# Macros are a way to extend the language. They are very powerful, but have the
+# potential to be difficult to understand. It is best practice to avoid macros
+# in regular application code. Instead they are a good way to bring features to
+# Nana that you miss from other languages. Indeed much of Nana is written in its
+# own macro system.
+
+# Lets start with the idea of Quoting. Quoting is a way to prevent the
+# interpreter from evaluating an expression. This is useful when you want to
+# construct parts of an expression that normally evaluate to other things, such
+# as symbols and function calls.
+
+# \`Quote 1\` will return the number 1, just as \`1\` would.
+Quote 1
+
+# But \`Quote a\` will return the symbol \`life\`, not 42, which is the value that
+# we assigned to life using Def.
+Quote life
+
+# We can also quote function calls. The value that is returned will be a Tagged
+# Tuple.  Tuples are fixed length collections of values. Tagged Tuples are
+# tuples that have a symbol associated with them. This is a way to give a name
+# to a tuple, and to distinguish it from other tuples. This example will return
+# the tuple \`(life)\` tagged with the symbol \`dec\`:
+Quote dec(life)
+
+# Quoting will work even with symbols and functions that have not been defined:
+Quote foo(bar)
+
+# Here is a simple macro that will evaluate to the second argument that is
+# passed to. Importantly the first argument is never run. This lets us define
+# control structures and other language features that we couldn't acomplish with
+# simple function calls.
+Defmacro "Second" [a b] b
+
+# Second replaces itself with the number 2 without ever calling panic().
+Second panic() 2
+
+# To construct more complex macros we can use Unquote. It lets us evaluate code
+# that would otherwise be Quoted. This example will return the value of \`life\`,
+# rather than the symbol \`life\`.
+Quote Unquote life
+
+# It also works deep inside nested expressions.
+Quote [1 Unquote life 3]
+
+# Using \`Quote\` and \`Unquote\` it's not difficult for us to define \`If\` using
+# \`Match\`:
+Defmacro "If" [cond if else]
+  Quote
+    Match Unquote cond
+      [1 Unquote if
+       0 Unquote else]
+
+# And now we can see it in action. First a little setup:
+Def is-tuesday 1
+
+# Notice that we evalaute \`is-tuesday\` in order to pick a branch, but never
+# evaluate \`panic()\`. The string "It's Tuesday!" will be returned.
+If is-tuesday
+  "It's Tuesday!"
+  panic()
+`;
+
+
+  // Register a new language
+  monaco.languages.register({ id: "nana" });
+
+  // Register a tokens provider for the language
+  monaco.languages.setMonarchTokensProvider("nana", {
+    defaultToken: 'invalid',
+
+    tokenizer: {
+      root: [
+        [/[a-z_$][\w-\.$]*/, 'identifier'],
+        [/[A-Z][\w-\.\$]*/, 'keyword'],
+        { include: '@whitespace' },
+        [/[{}()\[\]]/, '@brackets'],
+        [/\d+/, 'number'],
+        [/"/, { token: 'string.quote', bracket: '@open', next: '@string' }],
+      ],
+
+      string: [
+        [/[^\\"]+/, 'string'],
+        [/"/, { token: 'string.quote', bracket: '@close', next: '@pop' }]
+      ],
+
+      whitespace: [
+        [/[ \t\r\n]+/, 'white'],
+        [/#.*$/, 'comment'],
+      ],
+    },
+  });
+
+
+  const myEditor = monaco.editor.create(document.getElementById("container"), {
+    value,
+    language: "nana",
+    automaticLayout: true,
+  });
+
+</script>
