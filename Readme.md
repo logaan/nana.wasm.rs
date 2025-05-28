@@ -9,7 +9,7 @@ implementation:
 ![Fizzbuzz](docs/fizzbuzz.png)
 
 If you'd like to learn more please read [the language
-tutorial](examples/learn_x_in_y_minutes.nana) written in the [Learn X in Y
+tutorial]([https://logaan.github.io/nana.wasm.rs/repl/) written in the [Learn X in Y
 minutes](https://learnxinyminutes.com) style. For a more formal look at the
 language there are [Railroad diagrams describing Nana's
 grammar](docs/grammar/index.md)
