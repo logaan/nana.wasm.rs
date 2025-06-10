@@ -1,9 +1,17 @@
-<link href="https://cdn.jsdelivr.net/npm/vscode-codicons@0.0.17/dist/codicon.min.css" rel="stylesheet">
-<div id="container" style="min-height: 100%"></div>
-<script type="module">
-  import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/+esm';
+<html>
 
-  const value = `# Hello and welcome to Nana!
+<head>
+  <title>Nana REPL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/vscode-codicons@0.0.17/dist/codicon.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div id="container" style="min-height: 100%"></div>
+  <script type="module">
+    import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/+esm';
+
+    const value = `# Hello and welcome to Nana!
 
 # Nana is a small interpreted language with no static type checker.
 # It is designed to be easy to learn and use.
@@ -186,40 +194,43 @@ If is-tuesday
 `;
 
 
-  // Register a new language
-  monaco.languages.register({ id: "nana" });
+    // Register a new language
+    monaco.languages.register({ id: "nana" });
 
-  // Register a tokens provider for the language
-  monaco.languages.setMonarchTokensProvider("nana", {
-    defaultToken: 'invalid',
+    // Register a tokens provider for the language
+    monaco.languages.setMonarchTokensProvider("nana", {
+      defaultToken: 'invalid',
 
-    tokenizer: {
-      root: [
-        [/[a-z_$][\w-\.$]*/, 'identifier'],
-        [/[A-Z][\w-\.\$]*/, 'keyword'],
-        { include: '@whitespace' },
-        [/[{}()\[\]]/, '@brackets'],
-        [/\d+/, 'number'],
-        [/"/, { token: 'string.quote', bracket: '@open', next: '@string' }],
-      ],
+      tokenizer: {
+        root: [
+          [/[a-z_$][\w-\.$]*/, 'identifier'],
+          [/[A-Z][\w-\.\$]*/, 'keyword'],
+          { include: '@whitespace' },
+          [/[{}()\[\]]/, '@brackets'],
+          [/\d+/, 'number'],
+          [/"/, { token: 'string.quote', bracket: '@open', next: '@string' }],
+        ],
 
-      string: [
-        [/[^\\"]+/, 'string'],
-        [/"/, { token: 'string.quote', bracket: '@close', next: '@pop' }]
-      ],
+        string: [
+          [/[^\\"]+/, 'string'],
+          [/"/, { token: 'string.quote', bracket: '@close', next: '@pop' }]
+        ],
 
-      whitespace: [
-        [/[ \t\r\n]+/, 'white'],
-        [/#.*$/, 'comment'],
-      ],
-    },
-  });
+        whitespace: [
+          [/[ \t\r\n]+/, 'white'],
+          [/#.*$/, 'comment'],
+        ],
+      },
+    });
 
 
-  const myEditor = monaco.editor.create(document.getElementById("container"), {
-    value,
-    language: "nana",
-    automaticLayout: true,
-  });
+    const myEditor = monaco.editor.create(document.getElementById("container"), {
+      value,
+      language: "nana",
+      automaticLayout: true,
+    });
 
-</script>
+  </script>
+</body>
+
+</html>
