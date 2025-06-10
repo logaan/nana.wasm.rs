@@ -1,6 +1,6 @@
 # Hello and welcome to Nana!
 
-# Nana is a simple, dynamically typed, interpreted language.
+# Nana is a small interpreted language with no static type checker.
 # It is designed to be easy to learn and use.
 # This file will teach you the basics of Nana.
 # Let's get started!
@@ -129,15 +129,16 @@ loop(5)
 # `Quote 1` will return the number 1, just as `1` would.
 Quote 1
 
-# But `Quote a` will return the symbol `life`, not 42, which is the value that
-# we assigned to life using Def.
+# But `Quote life` will return the symbol `life`, not 42, which is the value
+# that we assigned to life using Def.
 Quote life
 
 # We can also quote function calls. The value that is returned will be a Tagged
-# Tuple.  Tuples are fixed length collections of values. Tagged Tuples are
-# tuples that have a symbol associated with them. This is a way to give a name
-# to a tuple, and to distinguish it from other tuples. This example will return
-# the tuple `(life)` tagged with the symbol `dec`:
+# Tuple containing the un-evaluated arguments. Tuples are fixed length
+# collections of values. Tagged Tuples are tuples that have a symbol associated
+# with them. This is a way to give a name to a tuple, and to distinguish it from
+# other tuples. This example will return the tuple `(life)` tagged with the
+# symbol `dec`.:
 Quote dec(life)
 
 # Quoting will work even with symbols and functions that have not been defined:
@@ -157,8 +158,8 @@ Second panic() 2
 # rather than the symbol `life`.
 Quote Unquote life
 
-# It also works deep inside nested expressions.
-Quote [1 Unquote life 3]
+# It also works deep inside nested expressions. This will return `[1 42 3 foo]`.
+Quote [1 Unquote life 3 foo]
 
 # Using `Quote` and `Unquote` it's not difficult for us to define `If` using
 # `Match`:
