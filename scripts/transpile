@@ -8,11 +8,6 @@ jco transpile \
   target/wasm32-wasip1/release/nana.wasm \
   -o target/js-transpile
 
-# > cd target/js-transpile && node
-# Welcome to Node.js v23.3.0.
-# Type ".help" for more information.
-# > const { run } = await import("./nana.js");
-# undefined
-# > run.run()
-# [String("Hello, World.")]
-# undefined
+echo 'const { run } = await import("./nana.js");run.run();' > target/js-transpile/run.js
+
+cd target/js-transpile && node run.js
