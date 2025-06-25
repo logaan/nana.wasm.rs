@@ -2,6 +2,8 @@
 
 # Learn more https://component-model.bytecodealliance.org/language-support/javascript.html#running-a-component-from-javascript-applications-including-the-browser
 
+./scripts/build-wasi
+
 rm -rf target/js-transpile
 
 jco transpile \
@@ -9,5 +11,6 @@ jco transpile \
   -o target/js-transpile
 
 echo 'const { run } = await import("./nana.js");run.run();' > target/js-transpile/run.js
+echo 'const { greeter } = await import("./nana.js");console.log(greeter.greet("World"));' >> target/js-transpile/run.js
 
 cd target/js-transpile && node run.js
