@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+# Learn more https://component-model.bytecodealliance.org/language-support/javascript.html#running-a-component-from-javascript-applications-including-the-browser
+
+rm -rf target/js-transpile
+
+jco transpile \
+  target/wasm32-wasip1/release/nana.wasm \
+  -o target/js-transpile
+
+# > cd target/js-transpile && node
+# Welcome to Node.js v23.3.0.
+# Type ".help" for more information.
+# > const { run } = await import("./nana.js");
+# undefined
+# > run.run()
+# [String("Hello, World.")]
+# undefined
