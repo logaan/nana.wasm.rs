@@ -21,7 +21,7 @@ mod process_test;
 #[cfg(test)]
 mod standard_library_test;
 
-use bindings::exports::component::nana::greeter::Guest as Greeter;
+use bindings::exports::component::nana::nana::Guest as Nana;
 use bindings::exports::wasi::cli::run::Guest as Command;
 use eval::execute;
 use standard_library::standard_library;
@@ -35,9 +35,10 @@ impl Command for Component {
     }
 }
 
-impl Greeter for Component {
-    fn greet(name: String) -> String {
-        String::from("Hello ") + &name
+impl Nana for Component {
+    fn evaluate(name: String) -> String {
+        let result = execute(name, standard_library());
+        format!("{:?}", result)
     }
 }
 

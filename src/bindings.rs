@@ -3,13 +3,13 @@ pub mod component {
     #[allow(dead_code)]
     pub mod nana {
         #[allow(dead_code, clippy::all)]
-        pub mod greeter {
+        pub mod nana {
             #[used]
             #[doc(hidden)]
             static __FORCE_SECTION_REF: fn() = super::super::super::__link_custom_section_describing_imports;
             use super::super::super::_rt;
             #[allow(unused_unsafe, clippy::all)]
-            pub fn greet(name: &str) -> _rt::String {
+            pub fn evaluate(name: &str) -> _rt::String {
                 unsafe {
                     #[repr(align(4))]
                     struct RetArea([::core::mem::MaybeUninit<u8>; 8]);
@@ -19,9 +19,9 @@ pub mod component {
                     let len0 = vec0.len();
                     let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "component:nana/greeter")]
+                    #[link(wasm_import_module = "component:nana/nana")]
                     extern "C" {
-                        #[link_name = "greet"]
+                        #[link_name = "evaluate"]
                         fn wit_import(_: *mut u8, _: usize, _: *mut u8);
                     }
                     #[cfg(not(target_arch = "wasm32"))]
@@ -46,21 +46,21 @@ pub mod exports {
         #[allow(dead_code)]
         pub mod nana {
             #[allow(dead_code, clippy::all)]
-            pub mod greeter {
+            pub mod nana {
                 #[used]
                 #[doc(hidden)]
                 static __FORCE_SECTION_REF: fn() = super::super::super::super::__link_custom_section_describing_imports;
                 use super::super::super::super::_rt;
                 #[doc(hidden)]
                 #[allow(non_snake_case)]
-                pub unsafe fn _export_greet_cabi<T: Guest>(
+                pub unsafe fn _export_evaluate_cabi<T: Guest>(
                     arg0: *mut u8,
                     arg1: usize,
                 ) -> *mut u8 {
                     #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
                     let len0 = arg1;
                     let bytes0 = _rt::Vec::from_raw_parts(arg0.cast(), len0, len0);
-                    let result1 = T::greet(_rt::string_lift(bytes0));
+                    let result1 = T::evaluate(_rt::string_lift(bytes0));
                     let ptr2 = _RET_AREA.0.as_mut_ptr().cast::<u8>();
                     let vec3 = (result1.into_bytes()).into_boxed_slice();
                     let ptr3 = vec3.as_ptr().cast::<u8>();
@@ -72,28 +72,28 @@ pub mod exports {
                 }
                 #[doc(hidden)]
                 #[allow(non_snake_case)]
-                pub unsafe fn __post_return_greet<T: Guest>(arg0: *mut u8) {
+                pub unsafe fn __post_return_evaluate<T: Guest>(arg0: *mut u8) {
                     let l0 = *arg0.add(0).cast::<*mut u8>();
                     let l1 = *arg0.add(4).cast::<usize>();
                     _rt::cabi_dealloc(l0, l1, 1);
                 }
                 pub trait Guest {
-                    fn greet(name: _rt::String) -> _rt::String;
+                    fn evaluate(name: _rt::String) -> _rt::String;
                 }
                 #[doc(hidden)]
-                macro_rules! __export_component_nana_greeter_cabi {
+                macro_rules! __export_component_nana_nana_cabi {
                     ($ty:ident with_types_in $($path_to_types:tt)*) => {
-                        const _ : () = { #[export_name = "component:nana/greeter#greet"]
-                        unsafe extern "C" fn export_greet(arg0 : * mut u8, arg1 : usize,)
-                        -> * mut u8 { $($path_to_types)*:: _export_greet_cabi::<$ty >
-                        (arg0, arg1) } #[export_name =
-                        "cabi_post_component:nana/greeter#greet"] unsafe extern "C" fn
-                        _post_return_greet(arg0 : * mut u8,) { $($path_to_types)*::
-                        __post_return_greet::<$ty > (arg0) } };
+                        const _ : () = { #[export_name = "component:nana/nana#evaluate"]
+                        unsafe extern "C" fn export_evaluate(arg0 : * mut u8, arg1 :
+                        usize,) -> * mut u8 { $($path_to_types)*::
+                        _export_evaluate_cabi::<$ty > (arg0, arg1) } #[export_name =
+                        "cabi_post_component:nana/nana#evaluate"] unsafe extern "C" fn
+                        _post_return_evaluate(arg0 : * mut u8,) { $($path_to_types)*::
+                        __post_return_evaluate::<$ty > (arg0) } };
                     };
                 }
                 #[doc(hidden)]
-                pub(crate) use __export_component_nana_greeter_cabi;
+                pub(crate) use __export_component_nana_nana_cabi;
                 #[repr(align(4))]
                 struct _RetArea([::core::mem::MaybeUninit<u8>; 8]);
                 static mut _RET_AREA: _RetArea = _RetArea(
@@ -191,8 +191,8 @@ macro_rules! __export_command_impl {
         $($path_to_types_root)*::
         exports::wasi::cli::run::__export_wasi_cli_run_0_2_2_cabi!($ty with_types_in
         $($path_to_types_root)*:: exports::wasi::cli::run); $($path_to_types_root)*::
-        exports::component::nana::greeter::__export_component_nana_greeter_cabi!($ty
-        with_types_in $($path_to_types_root)*:: exports::component::nana::greeter);
+        exports::component::nana::nana::__export_component_nana_nana_cabi!($ty
+        with_types_in $($path_to_types_root)*:: exports::component::nana::nana);
     };
 }
 #[doc(inline)]
@@ -202,10 +202,10 @@ pub(crate) use __export_command_impl as export;
 #[doc(hidden)]
 pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 304] = *b"\
 \0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xb2\x01\x01A\x02\x01\
-A\x06\x01B\x02\x01@\x01\x04names\0s\x04\0\x05greet\x01\0\x03\x01\x16component:na\
-na/greeter\x05\0\x01B\x03\x01j\0\0\x01@\0\0\0\x04\0\x03run\x01\x01\x04\x01\x12wa\
-si:cli/run@0.2.2\x05\x01\x01B\x02\x01@\x01\x04names\0s\x04\0\x05greet\x01\0\x04\x01\
-\x16component:nana/greeter\x05\x02\x04\x01\x16component:nana/command\x04\0\x0b\x0d\
+A\x06\x01B\x02\x01@\x01\x04names\0s\x04\0\x08evaluate\x01\0\x03\x01\x13component\
+:nana/nana\x05\0\x01B\x03\x01j\0\0\x01@\0\0\0\x04\0\x03run\x01\x01\x04\x01\x12wa\
+si:cli/run@0.2.2\x05\x01\x01B\x02\x01@\x01\x04names\0s\x04\0\x08evaluate\x01\0\x04\
+\x01\x13component:nana/nana\x05\x02\x04\x01\x16component:nana/command\x04\0\x0b\x0d\
 \x01\0\x07command\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-compone\
 nt\x070.216.0\x10wit-bindgen-rust\x060.31.0";
 #[inline(never)]
