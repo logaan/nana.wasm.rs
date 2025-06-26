@@ -54,6 +54,7 @@ export const myEditor = monaco.editor.create(document.getElementById("container"
   value: '',
   language: "nana",
   minimap: { enabled: false },
+  automaticLayout: true,
   theme: "vs-light",
 });
 
@@ -68,7 +69,17 @@ export const resultsEditor = monaco.editor.create(document.getElementById("resul
 # The result of each top level expression will be shown here, prefixed by \`>\`.`,
   language: "nana",
   readOnly: true,
+  automaticLayout: true,
   minimap: { enabled: false },
 });
 
 document.getElementById("evaluate")!.onclick = evaluateEditor;
+
+function setLineNumbersForWidth() {
+  const showLineNumbers = window.innerWidth >= 600;
+  myEditor.updateOptions({ lineNumbers: showLineNumbers ? 'on' : 'off' });
+  resultsEditor.updateOptions({ lineNumbers: showLineNumbers ? 'on' : 'off' });
+}
+
+window.addEventListener('resize', setLineNumbersForWidth);
+setLineNumbersForWidth();

@@ -23,6 +23,23 @@ body {
   min-height: 0;
 }
 
+@media (max-width: 1300px) {
+  #editors {
+    flex-direction: column;
+  }
+
+  #container,
+  #results {
+    height: 50%;
+    min-height: 0;
+  }
+
+  #results {
+    border-left: none;
+    border-top: 2px solid #000;
+  }
+}
+
 #container,
 #results {
   flex: 1 1 50%;
