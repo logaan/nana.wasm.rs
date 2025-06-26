@@ -1,8 +1,8 @@
 use im::{hashmap, vector};
 
 use crate::environment::Environment;
-use crate::example_tests::learn_x_in_y_minutes_test::strip_functions;
 use crate::expressions::RuntimeExpression::{Macro, Number, String as NString, Symbol};
+use crate::helpers::strip_functions;
 use crate::standard_library::standard_library;
 use crate::{eval::execute, s};
 

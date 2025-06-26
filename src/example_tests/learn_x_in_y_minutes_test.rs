@@ -1,24 +1,11 @@
-use im::{vector, Vector};
+use im::vector;
 
 use crate::eval::{execute, read_code};
-use crate::expressions::RuntimeExpression::{
-    self, Function, List, Macro, Number, String as NString, Symbol, TaggedTuple,
-};
+
+use crate::expressions::RuntimeExpression::{List, Number, String as NString, Symbol, TaggedTuple};
+use crate::helpers::strip_functions;
 use crate::s;
 use crate::standard_library::standard_library;
-
-// Asserting against functions will cause a stack overflow because functions
-// have a reference to themselves via their closed over environment.
-pub fn strip_functions(expressions: Vector<RuntimeExpression>) -> Vector<RuntimeExpression> {
-    expressions
-        .into_iter()
-        .filter(|e| match e {
-            Function(..) => false,
-            Macro(..) => false,
-            _ => true,
-        })
-        .collect()
-}
 
 #[test]
 fn test_learn_x_in_y_minutes() {

@@ -19,3 +19,6 @@ popd
 
 rm -rf repl/src/js-transpile
 cp -R target/js-transpile repl/src
+
+rm repl/public/learn_x_in_y_minutes.nana
+cp examples/learn_x_in_y_minutes.nana repl/public/learn_x_in_y_minutes.nana

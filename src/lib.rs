@@ -24,6 +24,7 @@ mod standard_library_test;
 use bindings::exports::component::nana::nana::Guest as Nana;
 use bindings::exports::wasi::cli::run::Guest as Command;
 use eval::execute;
+use helpers::strip_functions;
 use standard_library::standard_library;
 
 struct Component;
@@ -38,7 +39,7 @@ impl Command for Component {
 impl Nana for Component {
     fn evaluate(name: String) -> String {
         let result = execute(name, standard_library());
-        result
+        strip_functions(result)
             .into_iter()
             .map(|item| format!("> {:?}", item))
             .collect::<Vec<_>>()
