@@ -5,9 +5,9 @@
 # This file will teach you the basics of Nana.
 # Let's get started!
 
-# Comments in Nana are start with a hash symbol.
-# They can be on their own line or at the end of a line.
-# Comments are ignored by the interpreter.
+# Comments in Nana begin with a hash symbol (#).
+# They can appear on their own line or at the end of a line of code.
+# The interpreter ignores all comments.
 
 # This is a comment.
 
@@ -122,10 +122,9 @@ loop(5)
 # Nana that you miss from other languages. Indeed much of Nana is written in its
 # own macro system.
 
-# Let's start with the idea of Quoting. Quoting is a way to prevent the
-# interpreter from evaluating an expression. This is useful when you want to
-# construct parts of an expression that normally evaluate to other things, such
-# as symbols and function calls.
+# Let's start with the idea of Quoting. Quoting prevents the interpreter from
+# evaluating an expression.  It is useful for constructing expressions that
+# would otherwise be evaluated, such as symbols or function calls.
 
 # `Quote 1` will return the number 1, just as `1` would.
 
@@ -141,7 +140,7 @@ Quote life
 # collections of values. Tagged Tuples are tuples that have a symbol associated
 # with them. This is a way to give a name to a tuple, and to distinguish it from
 # other tuples. This example will return the tuple `(life)` tagged with the
-# symbol `dec`.:
+# symbol `dec`:
 
 Quote dec(life)
 
