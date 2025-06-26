@@ -57,22 +57,28 @@ export const myEditor = monaco.editor.create(document.getElementById("container"
   automaticLayout: true,
   scrollBeyondLastLine: false,
   theme: "vs-light",
+  padding: {
+    top: 16
+  },
 });
 
 loadInitialValue();
 
-myEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE, () => {
-  evaluateEditor();
-});
+myEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE, evaluateEditor);
+myEditor.addCommand(monaco.KeyMod.WinCtrl | monaco.KeyCode.KeyE, evaluateEditor);
 
-export const resultsEditor = monaco.editor.create(document.getElementById("results")!, {
+export const resultsEditor = monaco.editor.create(document.getElementById("output")!, {
   value: `# Evalute code by clicking the button above or pressing cmd + e.
-# The result of each top level expression will be shown here, prefixed by \`>\`.`,
+# The result of each top level expression will show here, prefixed by \`>\`.`,
   language: "nana",
   readOnly: true,
   automaticLayout: true,
   scrollBeyondLastLine: false,
   minimap: { enabled: false },
+  theme: "vs-light",
+  padding: {
+    top: 16
+  }
 });
 
 document.getElementById("evaluate")!.onclick = evaluateEditor;
