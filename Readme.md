@@ -1,7 +1,7 @@
 # Nana
 
 Nana is a simple, dynamically typed, interpreted language. It is designed to be
-easy to learn and use. The Nana interpreter runs as a WebAssembly component.
+easy to learn and use. The Nana interpreter runs as a WebAssembly component. [Try it now](https://logaan.github.io/nana.wasm.rs/repl/) in your browser.
 
 To get a feel for what Nana programs look like here is an example Fizzbuzz
 implementation:
