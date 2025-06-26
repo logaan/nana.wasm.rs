@@ -2,7 +2,7 @@ import * as monaco from 'monaco-editor';
 import { nana } from './js-transpile/nana.js';
 
 async function loadInitialValue() {
-  const response = await fetch('/learn_x_in_y_minutes.nana');
+  const response = await fetch('./learn_x_in_y_minutes.nana');
   const value = await response.text();
   myEditor.setValue(value);
 }

@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+cd docs
+echo "Open http://localhost:8000/repl"
+python3 -m http.server
