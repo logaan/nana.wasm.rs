@@ -13,4 +13,9 @@ jco transpile \
 echo 'const { run } = await import("./nana.js");run.run();' > target/js-transpile/run.js
 echo 'const { nana } = await import("./nana.js");console.log(nana.evaluate("[1 2 3]"));' >> target/js-transpile/run.js
 
-cd target/js-transpile && node run.js
+pushd target/js-transpile
+node run.js
+popd
+
+rm -rf repl/src/js-transpile
+cp -R target/js-transpile repl/src

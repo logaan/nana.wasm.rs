@@ -38,7 +38,11 @@ impl Command for Component {
 impl Nana for Component {
     fn evaluate(name: String) -> String {
         let result = execute(name, standard_library());
-        format!("{:?}", result)
+        result
+            .into_iter()
+            .map(|item| format!("> {:?}", item))
+            .collect::<Vec<_>>()
+            .join("\n")
     }
 }
 
