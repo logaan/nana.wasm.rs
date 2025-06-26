@@ -84,7 +84,7 @@ document.getElementById("evaluate")!.onclick = evaluateEditor;
 
 function clearEditor() {
   if (confirm("Are you sure you want to clear the editor?")) {
-    myEditor.setValue("");
+    myEditor.setValue(`# Write Nana code here\n\n"Hello, world!"\n`);
   }
 }
 
