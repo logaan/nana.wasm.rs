@@ -1,8 +1,6 @@
 import * as monaco from 'monaco-editor';
 import { nana } from './js-transpile/nana.js';
 
-console.log(nana.evaluate("[1 2 3]"))
-
 const value = `# Hello and welcome to Nana!
 
 # Nana is a small interpreted language with no static type checker.
