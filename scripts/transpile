@@ -28,7 +28,6 @@ cd ..
 # Copy the built repl to docs/ for GitHub Pages
 rm -rf docs/repl
 mkdir -p docs/repl
-cp examples/learn_x_in_y_minutes.nana docs/
 cp -R repl/dist/* docs/repl/
 
 echo "Production build completed and copied to docs/repl"
