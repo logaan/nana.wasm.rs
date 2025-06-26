@@ -36,20 +36,6 @@ monaco.languages.setMonarchTokensProvider("nana", {
   },
 });
 
-
-function evaluateEditor() {
-  try {
-    const result = nana.evaluate(myEditor.getValue());
-    resultsEditor.setValue(result);
-  } catch (error) {
-    if (error instanceof Error) {
-      resultsEditor.setValue(`${error.name}: ${error.message}`);
-    } else {
-      resultsEditor.setValue(`Unexpected exception: ${error}`);
-    }
-  }
-}
-
 export const myEditor = monaco.editor.create(document.getElementById("container")!, {
   value: '',
   language: "nana",
@@ -61,11 +47,6 @@ export const myEditor = monaco.editor.create(document.getElementById("container"
     top: 16
   },
 });
-
-loadInitialValue();
-
-myEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE, evaluateEditor);
-myEditor.addCommand(monaco.KeyMod.WinCtrl | monaco.KeyCode.KeyE, evaluateEditor);
 
 export const resultsEditor = monaco.editor.create(document.getElementById("output")!, {
   value: `# Evalute code by clicking the button above or pressing cmd + e.
@@ -81,7 +62,31 @@ export const resultsEditor = monaco.editor.create(document.getElementById("outpu
   }
 });
 
+loadInitialValue();
+
+function evaluateEditor() {
+  try {
+    const result = nana.evaluate(myEditor.getValue());
+    resultsEditor.setValue(result);
+  } catch (error) {
+    if (error instanceof Error) {
+      resultsEditor.setValue(`${error.name}: ${error.message}`);
+    } else {
+      resultsEditor.setValue(`Unexpected exception: ${error}`);
+    }
+  }
+}
+
+myEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE, evaluateEditor);
+myEditor.addCommand(monaco.KeyMod.WinCtrl | monaco.KeyCode.KeyE, evaluateEditor);
+
 document.getElementById("evaluate")!.onclick = evaluateEditor;
+
+function clearEditor() {
+  myEditor.setValue("");
+}
+
+document.getElementById("clear")!.onclick = clearEditor;
 
 function setLineNumbersForWidth() {
   const showLineNumbers = window.innerWidth >= 600;

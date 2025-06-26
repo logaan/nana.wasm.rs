@@ -14,8 +14,21 @@ body {
 }
 
 #controlls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 1em;
-  flex: 0 0 auto;
+  background-color: #D0E5DB;
+}
+
+#controlls .left {
+  display: flex;
+  align-items: center;
+}
+
+#controlls .right {
+  display: flex;
+  align-items: center;
 }
 
 #editors {
@@ -67,17 +80,7 @@ body {
   overflow: auto;
 }
 
-#controlls {
-  background-color: #D0E5DB;
-}
-
 #results .monaco-editor {
   --vscode-editor-background: #F3F9F6;
   --vscode-editorGutter-background: #F3F9F6;
 }
-
-/* #container .monaco-editor,
-#output .monaco-editor {
-  padding-top: 1em;
-  padding-bottom: 0.5em;
-} */
