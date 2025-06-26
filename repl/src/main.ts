@@ -83,7 +83,9 @@ myEditor.addCommand(monaco.KeyMod.WinCtrl | monaco.KeyCode.KeyE, evaluateEditor)
 document.getElementById("evaluate")!.onclick = evaluateEditor;
 
 function clearEditor() {
-  myEditor.setValue("");
+  if (confirm("Are you sure you want to clear the editor?")) {
+    myEditor.setValue("");
+  }
 }
 
 document.getElementById("clear")!.onclick = clearEditor;
