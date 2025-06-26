@@ -55,6 +55,7 @@ export const myEditor = monaco.editor.create(document.getElementById("container"
   language: "nana",
   minimap: { enabled: false },
   automaticLayout: true,
+  scrollBeyondLastLine: false,
   theme: "vs-light",
 });
 
@@ -70,6 +71,7 @@ export const resultsEditor = monaco.editor.create(document.getElementById("resul
   language: "nana",
   readOnly: true,
   automaticLayout: true,
+  scrollBeyondLastLine: false,
   minimap: { enabled: false },
 });
 
