@@ -2,7 +2,9 @@ use im::vector;
 
 use crate::eval::{execute, read_code};
 
-use crate::expressions::RuntimeExpression::{List, Number, String as NString, Symbol, TaggedTuple};
+use crate::expressions::RuntimeExpression::{
+    Keyword, List, Number, String as NString, Symbol, TaggedTuple,
+};
 use crate::helpers::strip_functions;
 use crate::s;
 use crate::standard_library::standard_library;
@@ -18,6 +20,7 @@ fn test_learn_x_in_y_minutes() {
         NString(s!("This is a single line string.")),
         NString(s!("This is a multi line string.\nIt's worth noting that any indentation will be preserved.")),
         List(vector![Number(1), Number(2), Number(3)]),
+        List(vector![Keyword(s!("north")), Keyword(s!("south")), Keyword(s!("east")), Keyword(s!("west"))]),
         NString(s!("rd")),
         Number(8),
         Number(2),
@@ -37,7 +40,7 @@ fn test_learn_x_in_y_minutes() {
 
         // Unquote
         Number(42),
-        List(vector![Number(1), Number(42), Number(3)]),
+        List(vector![Number(1), Number(42), Number(3), Symbol(s!("foo"))]),
         Number(1),
         NString(s!("It's Tuesday!")),
 

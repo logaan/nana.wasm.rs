@@ -5,8 +5,8 @@ use im::{hashmap, vector, Vector};
 
 use crate::eval::{eval, execute_with_env, quote};
 use crate::expressions::RuntimeExpression::{
-    BuiltinFunction, BuiltinMacro, Definition, Function, Hole, List, Macro, MacroCall, Number,
-    String as NString, Symbol, TaggedTuple,
+    BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro, MacroCall,
+    Number, String as NString, Symbol, TaggedTuple,
 };
 use crate::expressions::{Environment, RuntimeExpression};
 use crate::process::Process::Complete;
@@ -46,6 +46,8 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
         NString(_) => None,
         Number(_) if pattern == value => Some(Environment::new()),
         Number(_) => None,
+        Keyword(_) if pattern == value => Some(Environment::new()),
+        Keyword(_) => None,
         // TODO: If someone sees a function call on the left they're going to
         // think it's being evaluated. Here's maybe the issue with my current
         // tagged tuples, because they're tagged with strings there's no

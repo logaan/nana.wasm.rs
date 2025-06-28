@@ -61,6 +61,9 @@ pub fn build_macros(
             )),
             rest,
         ),
+        Some(LexicalExpression::Keyword(name)) => {
+            (Some(RuntimeExpression::Keyword(name.to_string())), rest)
+        }
         Some(LexicalExpression::Symbol(name)) => {
             (Some(RuntimeExpression::Symbol(name.to_string())), rest)
         }

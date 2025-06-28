@@ -7,8 +7,8 @@ use std::sync::Arc;
 use im::{vector, HashMap, Vector};
 
 use crate::expressions::RuntimeExpression::{
-    self, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, List, Macro, MacroCall,
-    Number, String as NString, Symbol, TaggedTuple,
+    self, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro,
+    MacroCall, Number, String as NString, Symbol, TaggedTuple,
 };
 use crate::expressions::{is_comment, Environment, LexicalExpression};
 
@@ -147,6 +147,7 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
             None => panic!("{} not found", &name),
         },
 
+        Keyword(_) => Complete(expression),
         Number(_) => Complete(expression),
         RuntimeExpression::String(_) => Complete(expression),
 
@@ -253,6 +254,7 @@ pub fn quote(value: RuntimeExpression, env: Environment) -> Process<RuntimeExpre
         }
         Number(_) => Complete(value),
         NString(_) => Complete(value),
+        Keyword(_) => Complete(value),
         Symbol(_) => Complete(value),
         Definition(name, value) => {
             let process = quote((*value).clone(), env);

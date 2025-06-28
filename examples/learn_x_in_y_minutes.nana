@@ -34,6 +34,11 @@ It's worth noting that any indentation will be preserved."
 
 [1 2 3]
 
+# Keywords evaluate to themselves and are used like Ruby Symbols, Erlang atoms,
+# or enums in most other languages.
+
+[:north :south :east :west]
+
 ### Control Structures ###
 
 # For branching, Nana has the Match macro. It is similar to a switch statement

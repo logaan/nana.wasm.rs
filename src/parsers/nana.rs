@@ -51,6 +51,12 @@ pub fn string(input: &str) -> IResult<&str, LexicalExpression> {
         .parse(input)
 }
 
+pub fn keyword(input: &str) -> IResult<&str, LexicalExpression> {
+    tuple((char(':'), lower_start_word))
+        .map(|(_, name)| LexicalExpression::Keyword(name))
+        .parse(input)
+}
+
 pub fn hole(input: &str) -> IResult<&str, LexicalExpression> {
     char('_').map(|_| LexicalExpression::Hole).parse(input)
 }
@@ -59,6 +65,7 @@ pub fn expression(input: &str) -> IResult<&str, LexicalExpression> {
     let expressions = alt((
         comment,
         function_call,
+        keyword,
         hole,
         list,
         macro_name,

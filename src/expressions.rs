@@ -14,6 +14,7 @@ pub fn is_comment(expression: &LexicalExpression) -> bool {
 #[derive(PartialEq, Debug, Clone)]
 pub enum LexicalExpression {
     TaggedTuple(String, Vector<LexicalExpression>),
+    Keyword(String),
     Hole,
     List(Vector<LexicalExpression>),
     MacroName(String),
@@ -39,5 +40,6 @@ pub enum RuntimeExpression {
     Number(u8),
     String(String),
     Symbol(String),
+    Keyword(String),
     Definition(String, Arc<RuntimeExpression>),
 }
