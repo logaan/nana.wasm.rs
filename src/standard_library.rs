@@ -46,13 +46,66 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
         NString(_) => None,
         Number(_) if pattern == value => Some(Environment::new()),
         Number(_) => None,
-        BuiltinFunction(_) => None,
-        Function(..) => None,
+        // TODO: If someone sees a function call on the left they're going to
+        // think it's being evaluated. Here's maybe the issue with my current
+        // tagged tuples, because they're tagged with strings there's no
+        // distinction between one that'll evaluate to a function vs one that we
+        // might be using to store a tag. Like (foo 1 2) vs ('foo 1 2) or (:foo
+        // 1 2)
+        //
+        // If we ignore the syntax we can maybe get to the heart of it:
+        //
+        //   Match data
+        //     [tagged-tuple(function, [arg1, arg2]) [function, arg1, arg2]]
+        //
+        //   Match data
+        //     [function(arg1, arg2) [function, arg1, arg2]]
+        //
+        // These two examples should do the same thing: pull the tag and the
+        // args out, because in both cases `function`, `arg1`, and `arg2` are
+        // each symbols. The complication comes from the similarity between the two.
+        // If we want to be able to match on `function` in the second exampel
+        // then `tagged-tuple` in the first example also becomes a match, rather
+        // than acting as a tag.
+        //
+        // We also have the issue of being unable to specify a concrete type
+        // that we want to match on:
+        //
+        //   Match data
+        //     [tagged-tuple(point, [x, y]) [point, x, y]]
+        //
+        //   Match data
+        //     [point(x, y) [point, x, y]]
+        //
+        // In these cases "point" isn't acting as a way of saying "match against
+        // a point" instead it's just binding whatever the function happens to
+        // be to a variable called "point".
+        //
+        // Keywords help us here. There's no ambiguity to:
+        //
+        //   Match data
+        //     [tagged-tuple(:point, [x, y]) [x, y]]
+        //
+        //   Match data
+        //     [:point(x, y) [x, y]]
+        //
+        // But it forces quite a concrete match style. You can't use
+        // abstractions to match. But that's probably fine. Abstractions can
+        // provide methods for matching with If:
+        //
+        // If matches(SomeHashMap, OtherHashMap) do-a() do-b()
+        //
+        // I guess it'll mean people can't swap out the foundational data
+        // structures, as I'd often like to for more functional ones. But maybe
+        // macros save us there. Libraries for those data structures can write
+        // their own Match fn.
         TaggedTuple(..) => None,
-        BuiltinMacro(..) => None,
-        Macro(..) => None,
-        MacroCall(..) => None,
-        Definition(..) => None,
+        MacroCall(..) => None, // Macro calls should maybe evaluate and then compare
+        BuiltinFunction(_) => None, // Builtins shouldn't be comparable
+        Function(..) => None,  // Functions shouldn't be comparable
+        BuiltinMacro(..) => None, // Builtins shouldn't be comparable
+        Macro(..) => None,     // Macros shouldn't be comparable
+        Definition(..) => None, // Definitions should just be at the top level.
     }
 }
 
