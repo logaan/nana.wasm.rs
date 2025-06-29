@@ -18,7 +18,7 @@
 - [ ] Update monaco syntax highlighting with expression tagged tuples
 - [ ] Update monaco syntax highlighting with keywords
 
-- [ ] Githuba action to transpile so it stops poluting my commits
+- [ ] Github action to transpile so it stops poluting my commits
 - [ ] Github action to run the tests
 - [ ] Github action to perform a release
 
@@ -26,10 +26,12 @@
 
 - [ ] Add constructors for each data type
 
-- [ ] Boolean macros
+- [x] Boolean macros
 
-- [ ] Switch to larger ints
+- [x] Switch to larger ints
 - [ ] Basic math functions
+- [ ] Literal syntax for negative numbers
+- [ ] Floats
 
 - [ ] MacroName tagged tuples should evaluate as macros
 
