@@ -15,12 +15,28 @@ Defmacro "Func" [name args body]
     Def Unquote name
       Fn Unquote args Unquote body
 
+Defmacro "Defm" [name args matches]
+  Quote
+    Func Unquote name Unquote args
+      Match Unquote args
+        Unquote matches
+
 # TODO: Tests
 Defmacro "If" [cond if else]
   Quote
     Match Unquote cond
       [:true  Unquote if
        _      Unquote else]
+
+Defmacro "Log" [form]
+  log(form)
+
+Defmacro "AssertEq" [left right]
+  Quote
+    Match Unquote right
+      [Unquote left :equal
+       _             Log ["Assertion failed. Left: " Unquote left
+                          " does not equal right: " Unquote right]]
  
 # TODO: Tests
 Defmacro "Or" [left right]
@@ -30,7 +46,22 @@ Defmacro "Or" [left right]
       If Unquote right
         :true
         :false 
+
+AssertEq :true  Or :true  :true
+AssertEq :true  Or :true  :false
+AssertEq :true  Or :false :true
+AssertEq :false Or :false :false
  
+Defm or [left right]
+  [[:true _] :true
+   [_ :true] :true
+   _         :false]
+
+AssertEq :true  or(:true  :true)
+AssertEq :true  or(:true  :false)
+AssertEq :true  or(:false :true)
+AssertEq :false or(:false :false)
+
 # TODO: Tests
 Defmacro "And" [left right]
   Quote
@@ -40,7 +71,23 @@ Defmacro "And" [left right]
         :false 
       :false
 
-Func not [bool]
-  Match bool
-    [:true  :false
-     :false :true]
+AssertEq :true  And :true  :true
+AssertEq :false And :true  :false
+AssertEq :false And :false :true
+AssertEq :false And :false :false
+
+Defm and [left right]
+  [[:true :true] :true
+    _            :false]
+
+AssertEq :true  and(:true  :true)
+AssertEq :false and(:true  :false)
+AssertEq :false and(:false :true)
+AssertEq :false and(:false :false)
+
+Defm not [bool]
+  [[:true]  :false
+   [:false] :true]
+
+AssertEq :false not(:true)
+AssertEq :true  not(:false)
