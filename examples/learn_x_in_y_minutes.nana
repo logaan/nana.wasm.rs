@@ -181,7 +181,7 @@ Defmacro "If" [cond if else]
   Quote
     Match Unquote cond
       [:true  Unquote if
-       :false Unquote else]
+       _      Unquote else]
 
 # And now we can see it in action. First a little setup:
 

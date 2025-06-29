@@ -14,6 +14,13 @@ Defmacro "Func" [name args body]
   Quote
     Def Unquote name
       Fn Unquote args Unquote body
+
+# TODO: Tests
+Defmacro "If" [cond if else]
+  Quote
+    Match Unquote cond
+      [:true  Unquote if
+       _      Unquote else]
  
 # TODO: Tests
 Defmacro "Or" [left right]
