@@ -51,6 +51,7 @@ Defmacro "Or" [left right]
 
 AssertEq :true  Or :true  :true
 AssertEq :true  Or :true  :false
+AssertEq :true  Or :true  panic()
 AssertEq :true  Or :false :true
 AssertEq :false Or :false :false
  
@@ -76,6 +77,7 @@ AssertEq :true  And :true  :true
 AssertEq :false And :true  :false
 AssertEq :false And :false :true
 AssertEq :false And :false :false
+AssertEq :false And :false panic()
 
 Defm and [left right]
   [[:true :true] :true
