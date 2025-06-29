@@ -43,7 +43,7 @@ fn test_learn_x_in_y_minutes() {
         // Unquote
         Number(42),
         List(vector![Number(1), Number(42), Number(3), Symbol(s!("foo"))]),
-        Number(1),
+        Keyword(s!("true")),
         NString(s!("It's Tuesday!")),
 
     ];

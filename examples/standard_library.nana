@@ -39,3 +39,8 @@ Defmacro "And" [left right]
         :true
         :false 
       :false
+
+Func not [bool]
+  Match bool
+    [:true  :false
+     :false :true]
