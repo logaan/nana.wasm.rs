@@ -10,6 +10,16 @@ Def "Defmacro"
       Def Unquote name
         Macro Unquote args Unquote body
 
+Defmacro "Log" [form]
+  log(form)
+
+Defmacro "AssertEq" [left right]
+  Quote
+    Match Unquote right
+      [Unquote left :equal
+       _             Log ["Assertion failed. Left: " Unquote left
+                          " does not equal right: " Unquote right]]
+
 Defmacro "Func" [name args body]
   Quote
     Def Unquote name
@@ -27,16 +37,6 @@ Defmacro "If" [cond if else]
     Match Unquote cond
       [:true  Unquote if
        _      Unquote else]
-
-Defmacro "Log" [form]
-  log(form)
-
-Defmacro "AssertEq" [left right]
-  Quote
-    Match Unquote right
-      [Unquote left :equal
-       _             Log ["Assertion failed. Left: " Unquote left
-                          " does not equal right: " Unquote right]]
  
 # TODO: Tests
 Defmacro "Or" [left right]
