@@ -34,7 +34,7 @@ fn test_learn_x_in_y_minutes() {
         // Macros
         Number(1),
         Symbol(s!("life")),
-        TaggedTuple(Arc::new(Symbol(s!("dec"))), vector![Symbol(s!("life"))]),
+        TaggedTuple(Arc::new(Symbol(s!("decrement"))), vector![Symbol(s!("life"))]),
         TaggedTuple(Arc::new(Symbol(s!("foo"))), vector![Symbol(s!("bar"))]),
 
         // Defmacro

@@ -65,8 +65,8 @@ Match 3
 # If you'd like to access the value you can bind it to a symbol by using that
 # symbol in the pattern. This example will return the number 8:
 
-Match dec(10)
-  [result dec(result)]
+Match decrement(10)
+  [result decrement(result)]
 
 # This will also work within data structures, and collections. This example will
 # pull out the second element of a list:
@@ -103,7 +103,7 @@ Def loop
   Fn [n]
     Match n
       [0 "done"
-       _ loop(log(dec(n)))]
+       _ loop(log(decrement(n)))]
 
 # Because defining functions in this way is so common we have the Func macro so
 # cut out the boilerplate:
@@ -111,7 +111,7 @@ Def loop
 Func loop [n]
   Match n
     [0 "done"
-     _ loop(log(dec(n)))]
+     _ loop(log(decrement(n)))]
 
 # We don't need to be concerned about the function calling itself causing a
 # stack overflow. As long as the last thing a function does is call a function,
@@ -147,7 +147,7 @@ Quote life
 # other tuples. This example will return the tuple `(life)` tagged with the
 # symbol `dec`:
 
-Quote dec(life)
+Quote decrement(life)
 
 # Quoting will work even with symbols and functions that have not been defined:
 

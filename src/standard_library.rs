@@ -70,14 +70,22 @@ pub fn builtins() -> Environment {
             panic!("Panic called with {:?}", args);
         }),
 
-        s!("dec") => BuiltinFunction(|mut args| {
+        // TODO: equality
+        // TODO: add
+        // TODO: subtract
+        // TODO: multiply
+        // TODO: divide
+        // TODO: modulo
+        // TODO: increment
+
+        s!("decrement") => BuiltinFunction(|mut args| {
             if args.len() == 1 {
                 match args.pop_front().unwrap() {
                     RuntimeExpression::Number(n) => Complete(RuntimeExpression::Number(n - 1)),
-                    _ => panic!("dec takes a number")
+                    _ => panic!("decrement takes a number")
                 }
             } else {
-                panic!("dec takes exactly 1 argument")
+                panic!("decrement takes exactly 1 argument")
             }
         }),
 
