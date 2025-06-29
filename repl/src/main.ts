@@ -77,8 +77,8 @@ function evaluateEditor() {
   }
 }
 
-myEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE, evaluateEditor);
-myEditor.addCommand(monaco.KeyMod.WinCtrl | monaco.KeyCode.KeyE, evaluateEditor);
+myEditor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, evaluateEditor);
+myEditor.addCommand(monaco.KeyMod.WinCtrl | monaco.KeyCode.Enter, evaluateEditor);
 
 document.getElementById("evaluate")!.onclick = evaluateEditor;
 

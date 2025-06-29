@@ -117,6 +117,25 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
                     _ => panic!("No function of that name found"),
                 }
             }
+            Keyword(_) => {
+                // TODO: There's a bunch of copy/paste between this and the
+                // symbol match. Should be abstracted into a fn.
+                let environment = environment.clone();
+                let eval_processes = args
+                    .iter()
+                    .cloned()
+                    .map(move |e| {
+                        let environment = environment.clone();
+                        Process::Running(Arc::new(move || eval(e.clone(), environment.clone())))
+                    })
+                    .collect::<im::Vector<_>>();
+
+                Process::run_in_sequence(eval_processes).and_then(Arc::new(
+                    move |evaluated_expressions| {
+                        Complete(TaggedTuple(tag.clone(), evaluated_expressions))
+                    },
+                ))
+            }
             _ => todo!(),
         },
 

@@ -27,11 +27,11 @@ pub fn value_name(input: &str) -> IResult<&str, LexicalExpression> {
     lower_start_word.map(LexicalExpression::Symbol).parse(input)
 }
 
-pub fn function_call(input: &str) -> IResult<&str, LexicalExpression> {
-    tuple((lower_start_word, char('('), many0(expression), char(')')))
-        .map(|(name, _, args, _)| {
-            LexicalExpression::TaggedTuple(Arc::new(LexicalExpression::Symbol(name)), args.into())
-        })
+pub fn tagged_tuple(input: &str) -> IResult<&str, LexicalExpression> {
+    // TODO: Allow tagging tagged_tuples
+    let taggable = alt((value_name, keyword, list, macro_name, string));
+    tuple((taggable, char('('), many0(expression), char(')')))
+        .map(|(expr, _, args, _)| LexicalExpression::TaggedTuple(Arc::new(expr), args.into()))
         .parse(input)
 }
 
@@ -68,7 +68,7 @@ pub fn hole(input: &str) -> IResult<&str, LexicalExpression> {
 pub fn expression(input: &str) -> IResult<&str, LexicalExpression> {
     let expressions = alt((
         comment,
-        function_call,
+        tagged_tuple,
         keyword,
         hole,
         list,
