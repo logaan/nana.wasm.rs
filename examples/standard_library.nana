@@ -31,14 +31,16 @@ Defmacro "Defm" [name args matches]
       Match Unquote args
         Unquote matches
 
-# TODO: Tests
 Defmacro "If" [cond if else]
   Quote
     Match Unquote cond
       [:true  Unquote if
        _      Unquote else]
- 
-# TODO: Tests
+
+AssertEq :if   If :true  :if :else
+AssertEq :else If :false :if :else
+AssertEq :else If :other :if :else
+
 Defmacro "Or" [left right]
   Quote
     If Unquote left
@@ -62,7 +64,6 @@ AssertEq :true  or(:true  :false)
 AssertEq :true  or(:false :true)
 AssertEq :false or(:false :false)
 
-# TODO: Tests
 Defmacro "And" [left right]
   Quote
     If Unquote left
