@@ -92,3 +92,22 @@ Defm not [bool]
 
 AssertEq :false not(:true)
 AssertEq :true  not(:false)
+
+Func increment [n]
+  add(n 1)
+
+AssertEq 2 increment(1)
+
+Func decrement [n]
+  subtract(n 1)
+
+AssertEq 0 decrement(1)
+
+## Assertions for builtins ##
+
+AssertEq 3 add(1 2)
+AssertEq 1 subtract(2 1)
+AssertEq 6 multiply(2 3)
+AssertEq 3 divide(6 2)
+AssertEq 3 divide(10 3)
+AssertEq 1 remainder(10 3)

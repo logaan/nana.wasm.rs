@@ -71,21 +71,59 @@ pub fn builtins() -> Environment {
         }),
 
         // TODO: equality
-        // TODO: add
-        // TODO: subtract
-        // TODO: multiply
-        // TODO: divide
-        // TODO: modulo
-        // TODO: increment
 
-        s!("decrement") => BuiltinFunction(|mut args| {
-            if args.len() == 1 {
-                match args.pop_front().unwrap() {
-                    RuntimeExpression::Number(n) => Complete(RuntimeExpression::Number(n - 1)),
-                    _ => panic!("decrement takes a number")
+        s!("add") => BuiltinFunction(|mut args| {
+            if args.len() == 2 {
+                match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
+                    [Number(l), Number(r)] => Complete(Number(l + r)),
+                    _ => panic!("add takes exactly 2 numbers")
                 }
             } else {
-                panic!("decrement takes exactly 1 argument")
+                panic!("add takes exactly 2 numbers")
+            }
+        }),
+
+        s!("subtract") => BuiltinFunction(|mut args| {
+            if args.len() == 2 {
+                match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
+                    [Number(l), Number(r)] => Complete(Number(l - r)),
+                    _ => panic!("subtract takes exactly 2 numbers")
+                }
+            } else {
+                panic!("subtract takes exactly 2 numbers")
+            }
+        }),
+
+        s!("multiply") => BuiltinFunction(|mut args| {
+            if args.len() == 2 {
+                match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
+                    [Number(l), Number(r)] => Complete(Number(l * r)),
+                    _ => panic!("multiply takes exactly 2 numbers")
+                }
+            } else {
+                panic!("multiply takes exactly 2 numbers")
+            }
+        }),
+
+        s!("divide") => BuiltinFunction(|mut args| {
+            if args.len() == 2 {
+                match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
+                    [Number(l), Number(r)] => Complete(Number(l / r)),
+                    _ => panic!("divide takes exactly 2 numbers")
+                }
+            } else {
+                panic!("divide takes exactly 2 numbers")
+            }
+        }),
+
+        s!("remainder") => BuiltinFunction(|mut args| {
+            if args.len() == 2 {
+                match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
+                    [Number(l), Number(r)] => Complete(Number(l % r)),
+                    _ => panic!("remainder takes exactly 2 numbers")
+                }
+            } else {
+                panic!("remainder takes exactly 2 numbers")
             }
         }),
 
