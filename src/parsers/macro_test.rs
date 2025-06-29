@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use im::hashmap;
 
 use im::vector;
@@ -139,7 +141,7 @@ fn parses_macros_in_args_to_functions() {
     assert_eq!(
         Ok((
             Some(RuntimeExpression::TaggedTuple(
-                "println".to_string(),
+                Arc::new(RuntimeExpression::Symbol("println".to_string())),
                 vector![
                     RuntimeExpression::Number(1),
                     MacroCall(

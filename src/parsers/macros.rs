@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::expressions::Environment;
 use crate::expressions::LexicalExpression;
 use crate::expressions::RuntimeExpression;
@@ -24,6 +26,30 @@ fn build_macro_args(
     )
 }
 
+fn build_non_macro(expression: LexicalExpression, environment: &Environment) -> RuntimeExpression {
+    match expression {
+        LexicalExpression::MacroName(_) => {
+            panic!("Macro should've been handled by build_macros")
+        }
+        LexicalExpression::Comment => {
+            panic!("Comment should've been handled by build_macros")
+        }
+        LexicalExpression::List(expressions) => {
+            RuntimeExpression::List(build_many_macros(&expressions, &environment))
+        }
+
+        LexicalExpression::TaggedTuple(tag, expressions) => RuntimeExpression::TaggedTuple(
+            Arc::new(build_non_macro((*tag).clone(), environment)),
+            build_many_macros(&expressions, &environment),
+        ),
+        LexicalExpression::Keyword(name) => RuntimeExpression::Keyword(name.to_string()),
+        LexicalExpression::Symbol(name) => RuntimeExpression::Symbol(name.to_string()),
+        LexicalExpression::Number(value) => RuntimeExpression::Number(value),
+        LexicalExpression::String(value) => RuntimeExpression::String(value.to_string()),
+        LexicalExpression::Hole => RuntimeExpression::Hole,
+    }
+}
+
 pub fn build_macros(
     expressions: &Vector<LexicalExpression>,
     environment: &Environment,
@@ -47,31 +73,7 @@ pub fn build_macros(
             Some(_) => panic!("A macro name should only ever point to a macro in the environment"),
             None => panic!("Macro {} was referenced but has not defined", name),
         },
-        Some(LexicalExpression::List(expressions)) => (
-            Some(RuntimeExpression::List(build_many_macros(
-                expressions,
-                &environment,
-            ))),
-            rest,
-        ),
-        Some(LexicalExpression::TaggedTuple(name, expressions)) => (
-            Some(RuntimeExpression::TaggedTuple(
-                name.to_string(),
-                build_many_macros(expressions.into(), &environment),
-            )),
-            rest,
-        ),
-        Some(LexicalExpression::Keyword(name)) => {
-            (Some(RuntimeExpression::Keyword(name.to_string())), rest)
-        }
-        Some(LexicalExpression::Symbol(name)) => {
-            (Some(RuntimeExpression::Symbol(name.to_string())), rest)
-        }
-        Some(LexicalExpression::Number(value)) => (Some(RuntimeExpression::Number(*value)), rest),
-        Some(LexicalExpression::String(value)) => {
-            (Some(RuntimeExpression::String(value.to_string())), rest)
-        }
-        Some(LexicalExpression::Hole) => (Some(RuntimeExpression::Hole), rest),
+        Some(expression) => (Some(build_non_macro(expression.clone(), environment)), rest),
     }
 }
 

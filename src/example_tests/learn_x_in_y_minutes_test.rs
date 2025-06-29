@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use im::vector;
 
 use crate::eval::{execute, read_code};
@@ -32,8 +34,8 @@ fn test_learn_x_in_y_minutes() {
         // Macros
         Number(1),
         Symbol(s!("life")),
-        TaggedTuple(s!("dec"), vector![Symbol(s!("life"))]),
-        TaggedTuple(s!("foo"), vector![Symbol(s!("bar"))]),
+        TaggedTuple(Arc::new(Symbol(s!("dec"))), vector![Symbol(s!("life"))]),
+        TaggedTuple(Arc::new(Symbol(s!("foo"))), vector![Symbol(s!("bar"))]),
 
         // Defmacro
         Number(2),

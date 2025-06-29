@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::nana::*;
 
 use crate::{
@@ -30,11 +32,11 @@ fn expected() -> Vector<LexicalExpression> {
         MacroName("Match".to_string()),
         List(vector![
             TaggedTuple(
-                "mod".to_string(),
+                Arc::new(Symbol("mod".to_string())),
                 vector![Symbol("num".to_string()), Number(3)],
             ),
             TaggedTuple(
-                "mod".to_string(),
+                Arc::new(Symbol("mod".to_string())),
                 vector![Symbol("num".to_string()), Number(5)],
             ),
         ]),
@@ -56,7 +58,7 @@ fn expected() -> Vector<LexicalExpression> {
         ]),
         Symbol("list<string>".to_string()),
         TaggedTuple(
-            "map".to_string(),
+            Arc::new(Symbol("map".to_string())),
             vector![
                 Symbol("num-to-text".to_string()),
                 Symbol("list".to_string()),
@@ -70,14 +72,14 @@ fn expected() -> Vector<LexicalExpression> {
         List(vector![
             Symbol("lines".to_string()),
             TaggedTuple(
-                "list-to-text".to_string(),
+                Arc::new(Symbol("list-to-text".to_string())),
                 vector![TaggedTuple(
-                    "range".to_string(),
+                    Arc::new(Symbol("range".to_string())),
                     vector![Number(1), Number(100)],
                 )],
             ),
             Symbol("stdout".to_string()),
-            TaggedTuple("stdout/get-stdout".to_string(), vector![]),
+            TaggedTuple(Arc::new(Symbol("stdout/get-stdout".to_string())), vector![]),
         ]),
         MacroName("For".to_string()),
         List(vector![
@@ -85,7 +87,7 @@ fn expected() -> Vector<LexicalExpression> {
             Symbol("lines".to_string()),
         ]),
         TaggedTuple(
-            "stdout.write".to_string(),
+            Arc::new(Symbol("stdout.write".to_string())),
             vector![Symbol("line".to_string())],
         ),
     ]

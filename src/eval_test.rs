@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use im::{hashmap, vector};
 
 use crate::{
@@ -78,14 +80,17 @@ fn test_lists() {
 
 #[test]
 fn test_builtin_function_call() {
-    let expression = TaggedTuple(s!("foo"), vector![]);
+    let expression = TaggedTuple(Arc::new(RuntimeExpression::Symbol(s!("foo"))), vector![]);
     let result = eval(expression, environment()).run_until_complete();
     assert_eq!(result, RuntimeExpression::String(s!("bar")))
 }
 
 #[test]
 fn test_user_defined_function_call() {
-    let expression = TaggedTuple(s!("list-nums"), vector![Symbol(s!("life"))]);
+    let expression = TaggedTuple(
+        Arc::new(RuntimeExpression::Symbol(s!("list-nums"))),
+        vector![Symbol(s!("life"))],
+    );
     let actual = eval(expression, environment_with_fn()).run_until_complete();
     let expected = List(vector![Number(1), Number(2), Number(3), Number(42)]);
     assert_eq!(expected, actual)

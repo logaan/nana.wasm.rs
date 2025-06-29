@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::general::*;
 use crate::expressions::LexicalExpression;
 use im::Vector;
@@ -27,7 +29,9 @@ pub fn value_name(input: &str) -> IResult<&str, LexicalExpression> {
 
 pub fn function_call(input: &str) -> IResult<&str, LexicalExpression> {
     tuple((lower_start_word, char('('), many0(expression), char(')')))
-        .map(|(name, _, args, _)| LexicalExpression::TaggedTuple(name, args.into()))
+        .map(|(name, _, args, _)| {
+            LexicalExpression::TaggedTuple(Arc::new(LexicalExpression::Symbol(name)), args.into())
+        })
         .parse(input)
 }
 

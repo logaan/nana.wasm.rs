@@ -89,29 +89,36 @@ pub fn macro_expand(
 
 pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<RuntimeExpression> {
     match expression {
-        TaggedTuple(name, args) => {
-            let maybe_function = environment.get(&name);
-            match maybe_function {
-                Some(function) => {
-                    let environment = environment.clone();
-                    let eval_processes = args
-                        .iter()
-                        .cloned()
-                        .map(move |e| {
-                            let environment = environment.clone();
-                            Process::Running(Arc::new(move || eval(e.clone(), environment.clone())))
-                        })
-                        .collect::<im::Vector<_>>();
+        TaggedTuple(tag, args) => match (*tag).clone() {
+            Symbol(name) => {
+                let maybe_function = environment.get(&name);
+                match maybe_function {
+                    Some(function) => {
+                        let environment = environment.clone();
+                        let eval_processes = args
+                            .iter()
+                            .cloned()
+                            .map(move |e| {
+                                let environment = environment.clone();
+                                Process::Running(Arc::new(move || {
+                                    eval(e.clone(), environment.clone())
+                                }))
+                            })
+                            .collect::<im::Vector<_>>();
 
-                    let function = function.clone();
+                        let function = function.clone();
 
-                    Process::run_in_sequence(eval_processes).and_then(Arc::new(
-                        move |evaluated_expressions| apply(function.clone(), evaluated_expressions),
-                    ))
+                        Process::run_in_sequence(eval_processes).and_then(Arc::new(
+                            move |evaluated_expressions| {
+                                apply(function.clone(), evaluated_expressions)
+                            },
+                        ))
+                    }
+                    _ => panic!("No function of that name found"),
                 }
-                _ => panic!("No function of that name found"),
             }
-        }
+            _ => todo!(),
+        },
 
         MacroCall(name, args) => {
             let maybe_macro = environment.get(&name);
