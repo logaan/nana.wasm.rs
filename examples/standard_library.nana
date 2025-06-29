@@ -1,5 +1,5 @@
-# TODO: Does Unquote even need to be in the standard library?
-# When `Quote` sees a call to `Unquote` it will evaluate `value`.
+# Calls to Unquote are recognised by Quote and evaluated. But Unquote still
+# needs to be defined so that the parser hows how many arguments it takes.
 Def "Unquote"
   Macro [value]
     value
@@ -19,6 +19,9 @@ Defmacro "AssertEq" [left right]
       [Unquote left :equal
        _             Log ["Assertion failed. Left: " Unquote left
                           " does not equal right: " Unquote right]]
+
+AssertEq :true Unquote :true
+AssertEq 42 Unquote add(41 1)
 
 Defmacro "Func" [name args body]
   Quote
