@@ -94,21 +94,9 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
                 let maybe_function = environment.get(&name);
                 match maybe_function {
                     Some(function) => {
-                        let environment = environment.clone();
-                        let eval_processes = args
-                            .iter()
-                            .cloned()
-                            .map(move |e| {
-                                let environment = environment.clone();
-                                Process::Running(Arc::new(move || {
-                                    eval(e.clone(), environment.clone())
-                                }))
-                            })
-                            .collect::<im::Vector<_>>();
-
                         let function = function.clone();
 
-                        Process::run_in_sequence(eval_processes).and_then(Arc::new(
+                        eval_expressions(&args, &environment).and_then(Arc::new(
                             move |evaluated_expressions| {
                                 apply(function.clone(), evaluated_expressions)
                             },
@@ -117,25 +105,11 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
                     _ => panic!("No function of that name found"),
                 }
             }
-            Keyword(_) => {
-                // TODO: There's a bunch of copy/paste between this and the
-                // symbol match. Should be abstracted into a fn.
-                let environment = environment.clone();
-                let eval_processes = args
-                    .iter()
-                    .cloned()
-                    .map(move |e| {
-                        let environment = environment.clone();
-                        Process::Running(Arc::new(move || eval(e.clone(), environment.clone())))
-                    })
-                    .collect::<im::Vector<_>>();
-
-                Process::run_in_sequence(eval_processes).and_then(Arc::new(
-                    move |evaluated_expressions| {
-                        Complete(TaggedTuple(tag.clone(), evaluated_expressions))
-                    },
-                ))
-            }
+            Keyword(_) => eval_expressions(&args, &environment).and_then(Arc::new(
+                move |evaluated_expressions| {
+                    Complete(TaggedTuple(tag.clone(), evaluated_expressions))
+                },
+            )),
             _ => todo!(),
         },
 
@@ -323,4 +297,19 @@ pub fn execute_with_env(
 pub fn execute(code: String, env: Environment) -> Vector<RuntimeExpression> {
     let (results, _env) = execute_with_env(code, env);
     results
+}
+
+fn eval_expressions(
+    args: &Vector<RuntimeExpression>,
+    environment: &Environment,
+) -> Process<Vector<RuntimeExpression>> {
+    Process::run_in_sequence(
+        args.iter()
+            .cloned()
+            .map(|e| {
+                let environment = environment.clone();
+                Process::Running(Arc::new(move || eval(e.clone(), environment.clone())))
+            })
+            .collect::<im::Vector<_>>(),
+    )
 }

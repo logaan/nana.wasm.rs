@@ -3,9 +3,12 @@
    off new processes and they could be added into the round robin pool.
 - [ ] Promises
 - [ ] Atoms
-- [ ] Keyword tagged tupples
-- [ ] Expression tagged tupples
+- [x] Keyword tagged tupples
+- [x] Expression tagged tupples
 - [x] Keywords
+
+- [ ] Eval for String, List, and MacroName tagged tuples
+- [ ] `nth` for lists
 
 - [ ] Add tagged tuples to Match
 - [ ] Update railroad diagrams with expression tagged tuples
@@ -14,6 +17,10 @@
 - [ ] Update VS Code syntax highlighting with keywords
 - [ ] Update monaco syntax highlighting with expression tagged tuples
 - [ ] Update monaco syntax highlighting with keywords
+
+- [ ] Githuba action to transpile so it stops poluting my commits
+- [ ] Github action to run the tests
+- [ ] Github action to perform a release
 
 - [ ] Expressions should be able to print themselves in parseable forms
 

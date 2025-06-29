@@ -1,3 +1,4 @@
+# TODO: Does Unquote even need to be in the standard library?
 # When `Quote` sees a call to `Unquote` it will evaluate `value`.
 Def "Unquote"
   Macro [value]
@@ -13,4 +14,21 @@ Defmacro "Func" [name args body]
   Quote
     Def Unquote name
       Fn Unquote args Unquote body
-  
+ 
+# TODO: Tests
+Defmacro "Or" [left right]
+  Quote
+    If Unquote left
+      :true
+      If Unquote right
+        :true
+        :false 
+ 
+# TODO: Tests
+Defmacro "And" [left right]
+  Quote
+    If Unquote left
+      If Unquote right
+        :true
+        :false 
+      :false

@@ -180,12 +180,12 @@ Quote [1 Unquote life 3 foo]
 Defmacro "If" [cond if else]
   Quote
     Match Unquote cond
-      [1 Unquote if
-       0 Unquote else]
+      [:true  Unquote if
+       :false Unquote else]
 
 # And now we can see it in action. First a little setup:
 
-Def is-tuesday 1
+Def is-tuesday :true
 
 # Notice that we evaluate `is-tuesday` in order to pick a branch, but never
 # evaluate `panic()`. The string "It's Tuesday!" will be returned.
