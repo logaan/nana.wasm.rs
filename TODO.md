@@ -29,7 +29,7 @@
 - [x] Boolean macros
 
 - [x] Switch to larger ints
-- [ ] Basic math functions
+- [x] Basic math functions
 - [ ] Literal syntax for negative numbers
 - [ ] Floats
 
