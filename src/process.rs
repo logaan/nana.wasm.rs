@@ -33,8 +33,6 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
 
 #[derive(Clone)]
 pub enum Process<T: Clone> {
-    // TODO: If the fn returned a list of processes then running processes could
-    // kick off new processes and they could be added into the round robin pool.
     Running(Arc<dyn Stepable<T>>),
     Complete(T),
 }
