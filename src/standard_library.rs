@@ -252,6 +252,24 @@ pub fn builtins() -> Environment {
                 }
             }
         ),
+
+        s!("spawn") => BuiltinFunction(|mut args| {
+            if args.len() == 1 {
+                match args.pop_front().unwrap() {
+                    Function(..) => todo!(),
+                    // spawn needs to:
+                    // 1. Create a promise
+                    // 2. Wrap the readable side of the promise in a Complete process
+                    // 3. Create a Running process that will call the Fn and
+                    // when it completes use its return value to resolve the
+                    // process.
+                    // 4. Return the (Complete(..), Some(Running(..)))
+                    _ => panic!("spawn takes 1 function as an argument")
+                }
+            } else {
+                panic!("spawn takes 1 function as an argument")
+            }
+        })
     })
 }
 
