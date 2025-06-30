@@ -1,6 +1,55 @@
 use core::panic;
 use std::sync::Arc;
 
+// TODO: This is the right place for processes to split. We could go with:
+//
+//   (Process<T>, Option<Process<T>>)
+//
+// But it feels inelegant to me. Like a null. It's not nonsense though; it
+// doesn't introduce any invalid representations. A new type would be clean and
+// expressive:
+//
+//   pub enum MaybeFork<T: Clone> {
+//       Continue(Process<T>),
+//       Split(Process<T>, Process<T>),
+//   }
+//
+// But I can't think of a meaningful name for it. We could flatten the idea down.
+// Consider Process to be a kind of 2, 1, or 0 outcome. Where 0 is a completed
+// process, 1 is a continuing one, and 2 is a splitting one. But it's possible
+// that in the split we'll actually have 2 completed processes. And what would
+// you call this new abstraction? Certainly not singular process.
+//
+//   #[derive(Clone)]
+//   pub enum Process<T: Clone> {
+//       Splitting(Process<T>, Process<T>),
+//       Running(Arc<dyn Stepable<T>>),
+//       Complete(T),
+//   }
+//
+// It's also bad because we don't want our list of running processes to include
+// splitting ones. Either seems appropriate but it isn't part of Rust's core
+// libraries so I'm slightly reluctant to pull it in.
+//
+// fn step(&self) -> Either<Process<T>, (Process<T>, Process<T>)>;
+//
+// Perhaps we treat stepping a bit like Mapcat / Flatmap. Step always returns a
+// collection of processes and they just get appended onto the list of running
+// ones.
+//
+//   fn step(&self) -> Vec<Process<T>>;
+//
+// Then spawning becomes quite natural. The existing:
+//
+//   active_processes.push_back(new_process);
+//
+// just becomes:
+//
+//   active_processes.append(new_processes);
+//
+// However it opens up the case of an empty array of processes. That shouldn't
+// happen unless they've completed. So it's elegant in one way but it introduces
+// an invalid state.
 pub trait Stepable<T: Clone> {
     fn step(&self) -> Process<T>;
 }
