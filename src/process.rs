@@ -60,6 +60,27 @@ use Process::{Complete, Running};
 // Then we don't risk returning 0 processes, because the left one must alwasy be
 // present. And we don't need to worry about at some point returning more than
 // one spawned process.
+//
+// ----------------------------------------------------------------------
+//
+// After a few failed attempts at implementing this I think I've learned a
+// couple of things:
+//
+//  1: Some of the eval code really expects there to be a concept of a main
+//  thread. Something that's updating definitions and maybe accumulating return
+//  values of each top level expression.
+//
+//  2: The type for process isn't always the same. Sometimes it's
+//  (Vector<RuntimeExpression>, Environment), and sometimes it's
+//  Vector<Process<(Vector<RuntimeExpression>, Environment)>>. Which really
+//  complicates things because the spawned threads don't nessisarily match.
+//
+// My best idea at the moment is that Running processes maybe add a set of child
+// processes as a second field. Though it'll be hard to track the state of which
+// children have been run as we're doing the round robin (which will now be a
+// tree traversal).
+//
+// It might also be worth thinking about how to represent blocked processes.
 pub trait Stepable<T: Clone> {
     fn step(&self) -> Process<T>;
 }
