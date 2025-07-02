@@ -172,27 +172,6 @@ impl<T: Clone + 'static> Process<T> {
         Process::run_in_sequence_with_results(processes, vector![])
     }
 
-    pub fn run_in_sequence_tco(processes: Vector<Process<T>>) -> Process<T> {
-        if processes.is_empty() {
-            panic!("We must run at least one process");
-        } else if processes.len() == 1 {
-            let mut processes = processes;
-            processes.pop_front().unwrap()
-        } else {
-            let mut processes = processes;
-
-            let active_process = processes.pop_front().unwrap();
-
-            if !active_process.is_complete() {
-                processes.push_front(active_process.step());
-            }
-
-            Running(Arc::new(move || {
-                Process::run_in_sequence_tco(processes.clone())
-            }))
-        }
-    }
-
     fn run_in_sequence_with_results(
         processes: Vector<Process<T>>,
         results: Vector<T>,
@@ -213,6 +192,27 @@ impl<T: Clone + 'static> Process<T> {
 
             Running(Arc::new(move || {
                 Process::run_in_sequence_with_results(processes.clone(), results.clone())
+            }))
+        }
+    }
+
+    pub fn run_in_sequence_tco(processes: Vector<Process<T>>) -> Process<T> {
+        if processes.is_empty() {
+            panic!("We must run at least one process");
+        } else if processes.len() == 1 {
+            let mut processes = processes;
+            processes.pop_front().unwrap()
+        } else {
+            let mut processes = processes;
+
+            let active_process = processes.pop_front().unwrap();
+
+            if !active_process.is_complete() {
+                processes.push_front(active_process.step());
+            }
+
+            Running(Arc::new(move || {
+                Process::run_in_sequence_tco(processes.clone())
             }))
         }
     }
