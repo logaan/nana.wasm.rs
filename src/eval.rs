@@ -284,6 +284,8 @@ pub fn execute_with_definitions(
     }
 }
 
+// TODO: This really expects a main thread that may be making changes to the
+// environment.
 pub fn execute_with_env(
     code: String,
     env: Environment,
@@ -294,6 +296,7 @@ pub fn execute_with_env(
     process.run_until_complete()
 }
 
+// TODO: This really expects a main thread who's results we will return.
 pub fn execute(code: String, env: Environment) -> Vector<RuntimeExpression> {
     let (results, _env) = execute_with_env(code, env);
     results
