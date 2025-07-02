@@ -1,5 +1,7 @@
 use core::panic;
+use im::{vector, Vector};
 use std::sync::Arc;
+use Process::{Complete, Running};
 
 // TODO: This is the right place for processes to split. We could go with:
 //
@@ -50,8 +52,22 @@ use std::sync::Arc;
 // However it opens up the case of an empty array of processes. That shouldn't
 // happen unless they've completed. So it's elegant in one way but it introduces
 // an invalid state.
+//
+// Step should be returning "1 or more" new processes. We can represent that with
+//
+//   (Process<T>, Vector<Process<T>>)
+//
+// Then we don't risk returning 0 processes, because the left one must alwasy be
+// present. And we don't need to worry about at some point returning more than
+// one spawned process.
 pub trait Stepable<T: Clone> {
     fn step(&self) -> Process<T>;
+}
+
+#[derive(Clone)]
+pub enum Process<T: Clone> {
+    Running(Arc<dyn Stepable<T>>),
+    Complete(T),
 }
 
 // Functions that return Processes count as Stepable by just calling themselves
@@ -61,6 +77,15 @@ impl<T: Clone + 'static, F: Fn() -> Process<T> + 'static> Stepable<T> for F {
     }
 }
 
+// AndThen wraps an existing process. It will proxy calls to step(), wrapping
+// any Running process returned by the wrapped step() until the wrapped process
+// ends. The result will be passed to the function passed as a second argument
+// to AndThen. That function should return a new process that will be returned
+// directly by AndThen, ending the cycle of wrapping.
+//
+// At any stage a wrapped step() spawning a new process should have that new
+// process exposed without wrapping. We only call step() at most once per cycle
+// so there's no need for Vec rather than Option for spawned processes.
 struct AndThen<A: Clone, B: Clone>(Process<A>, Arc<dyn Fn(A) -> Process<B>>);
 
 impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
@@ -80,15 +105,11 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
     }
 }
 
-#[derive(Clone)]
-pub enum Process<T: Clone> {
-    Running(Arc<dyn Stepable<T>>),
-    Complete(T),
-}
-
-use im::{vector, Vector};
-use Process::{Complete, Running};
-
+// The process data structure itself mostly just wraps a "running" thunk, or a
+// complete value. It's just a way of marking whether we've reached the end or
+// not. Most of the time Running will be holding a lambda, or an AndThen
+// wrapping a lambda. step on the process just proxies down to the contained
+// stepable (or panics).
 impl<T: Clone + 'static> Process<T> {
     pub fn step(&self) -> Process<T> {
         match self {
@@ -112,6 +133,9 @@ impl<T: Clone + 'static> Process<T> {
         !self.is_complete()
     }
 
+    // This is used in tests, and for eval. round_robin hasn't been adopted yet.
+    // But this should probably be deprecated because it can't support spawning
+    // new processes.
     pub fn run_until_complete(self) -> T {
         let mut active_process = self;
         while active_process.is_running() {
