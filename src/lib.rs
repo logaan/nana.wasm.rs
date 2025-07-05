@@ -8,6 +8,8 @@ mod environment;
 #[cfg(test)]
 mod environment_test;
 mod eval;
+#[cfg(test)]
+mod expression_test;
 mod expressions;
 mod parsers;
 mod process;
@@ -24,7 +26,7 @@ mod standard_library_test;
 use bindings::exports::component::nana::nana::Guest as Nana;
 use bindings::exports::wasi::cli::run::Guest as Command;
 use eval::execute;
-use helpers::strip_functions;
+use expressions::print;
 use standard_library::standard_library;
 
 struct Component;
@@ -39,9 +41,9 @@ impl Command for Component {
 impl Nana for Component {
     fn evaluate(name: String) -> String {
         let result = execute(name, standard_library());
-        strip_functions(result)
+        result
             .into_iter()
-            .map(|item| format!("> {:?}", item))
+            .map(|item| print(item))
             .collect::<Vec<_>>()
             .join("\n")
     }

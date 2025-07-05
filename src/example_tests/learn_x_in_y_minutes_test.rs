@@ -15,7 +15,6 @@ use crate::standard_library::standard_library;
 fn test_learn_x_in_y_minutes() {
     let code = read_code("examples/learn_x_in_y_minutes.nana");
     let results = execute(code, standard_library());
-    // println!("#*# Results: {:?}", results);
     let stripped = strip_functions(results);
     let expected = vector![
         Number(123),
