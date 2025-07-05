@@ -52,13 +52,13 @@ pub enum RuntimeExpression {
 pub fn print(expression: RuntimeExpression) -> String {
     match expression {
         BuiltinFunction(..) => s!("BuiltinFunction(..)"),
-        Function(args, _env, _body) => format!("Function({})", print_strings(args, " ")),
-        BuiltinMacro(args, _body) => format!("BuiltinMacro({})", print_strings(args, " ")),
+        Function(args, _env, _body) => format!("Function([{}] _)", print_strings(args, " ")),
+        BuiltinMacro(args, _body) => format!("BuiltinMacro([{}] _)", print_strings(args, " ")),
         Definition(name, value) => format!("Definition({} {})", name, print((*value).clone())),
         Hole => s!("_"),
         Keyword(name) => format!(":{}", name),
         List(values) => format!("[{}]", print_many(values.clone(), " ")),
-        Macro(args, _env, _body) => format!("Macro({})", print_strings(args, " ")),
+        Macro(args, _env, _body) => format!("Macro([{}] _)", print_strings(args, " ")),
         MacroCall(name, args) => format!("{}({})", name, print_many(args, " ")),
         Number(value) => format!("{}", value),
         NString(value) => format!("\"{}\"", value),

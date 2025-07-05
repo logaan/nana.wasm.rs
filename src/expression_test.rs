@@ -20,7 +20,7 @@ fn test_print_function() {
         Environment::new(),
         vector![],
     );
-    assert_eq!(print(expr), "Function(x y)");
+    assert_eq!(print(expr), "Function([x y] _)");
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn test_print_builtin_macro() {
         panic!("not called")
     }
     let expr = BuiltinMacro(vector!["x".to_string(), "y".to_string()], dummy);
-    assert_eq!(print(expr), "BuiltinMacro(x y)");
+    assert_eq!(print(expr), "BuiltinMacro([x y] _)");
 }
 
 #[test]
@@ -63,7 +63,7 @@ fn test_print_macro() {
         Environment::new(),
         vector![],
     );
-    assert_eq!(print(expr), "Macro(a b)");
+    assert_eq!(print(expr), "Macro([a b] _)");
 }
 
 #[test]

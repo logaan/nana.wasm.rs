@@ -22,7 +22,7 @@
 - [ ] Github action to run the tests
 - [ ] Github action to perform a release
 
-- [ ] Expressions should be able to print themselves in parseable forms
+- [x] Expressions should be able to print themselves in parseable forms
 
 - [ ] Add constructors for each data type
 
