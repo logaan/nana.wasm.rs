@@ -86,7 +86,7 @@ use Process::{Complete, Running};
 //
 // Here's the plan:
 // 1. [x] Remove step() from process. Replace any breakages with match.
-// 2. [ ] Remove is_complete() and is_running(). Replace and breakages with match.
+// 2. [x] Remove is_complete() and is_running(). Replace and breakages with match.
 // 3. [x] Remove result(). Replace break match.
 // 4. [ ] Add a third Process type: Spawn(Arc<Process>), update all matches to
 //        handle it. Spawning will be a side effect, for now it evaluates to :ok
@@ -143,14 +143,6 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
 // wrapping a lambda. step on the process just proxies down to the contained
 // stepable (or panics).
 impl<T: Clone + 'static> Process<T> {
-    pub fn is_complete(&self) -> bool {
-        matches!(self, Complete(_))
-    }
-
-    pub fn is_running(&self) -> bool {
-        !self.is_complete()
-    }
-
     // This is used in tests, and for eval. round_robin hasn't been adopted yet.
     // But this should probably be deprecated because it can't support spawning
     // new processes.
