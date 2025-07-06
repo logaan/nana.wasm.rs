@@ -81,6 +81,13 @@ use Process::{Complete, Running};
 // tree traversal).
 //
 // It might also be worth thinking about how to represent blocked processes.
+//
+// ----------------------------------------------------------------------
+//
+// After another run at (Process<T>, Option<Process<T>>) I think that AndThen
+// and needs (Process<A>, Option<Process<B>>). But I think I remember
+// run_in_sequence needed them the same. I might try just hard coding the second
+// to be RuntimeExpression.
 pub trait Stepable<T: Clone> {
     fn step(&self) -> Process<T>;
 }
