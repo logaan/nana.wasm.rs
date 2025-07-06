@@ -26,12 +26,11 @@ fn step_process(process: Process<RuntimeExpression>) -> Process<RuntimeExpressio
 fn test_process_by_steps() {
     let actual = step_process(step_process(step_process(make_process(1, 2, 3))));
 
-    assert!(actual.is_complete());
-    assert!(!actual.is_running());
-
     let expected = List(vector![Number(1), Number(2), Number(3)]);
-
-    assert_eq!(expected, actual.result().unwrap());
+    match actual {
+        Complete(result) => assert_eq!(expected, result),
+        Running(_) => assert!(false), // Actual should be complete
+    }
 }
 
 #[test]

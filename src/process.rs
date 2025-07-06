@@ -87,7 +87,7 @@ use Process::{Complete, Running};
 // Here's the plan:
 // 1. [x] Remove step() from process. Replace any breakages with match.
 // 2. [ ] Remove is_complete() and is_running(). Replace and breakages with match.
-// 3. [ ] Remove result(). Replace break match.
+// 3. [x] Remove result(). Replace break match.
 // 4. [ ] Add a third Process type: Spawn(Arc<Process>), update all matches to
 //        handle it. Spawning will be a side effect, for now it evaluates to :ok
 // 5. [ ] Add a spawn() function that returns a Spawn process.
@@ -128,10 +128,9 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
             Running(stepable) => {
                 let new_process = stepable.step();
 
-                if new_process.is_complete() {
-                    (and_then)(new_process.result().unwrap())
-                } else {
-                    Running(Arc::new(AndThen(new_process, and_then.clone())))
+                match new_process {
+                    Complete(result) => (and_then)(result),
+                    Running(_) => Running(Arc::new(AndThen(new_process, and_then.clone()))),
                 }
             }
         }
@@ -144,13 +143,6 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
 // wrapping a lambda. step on the process just proxies down to the contained
 // stepable (or panics).
 impl<T: Clone + 'static> Process<T> {
-    pub fn result(self) -> Result<T, String> {
-        match self {
-            Complete(result) => Ok(result),
-            Running(_) => Err("Process still running".to_string()),
-        }
-    }
-
     pub fn is_complete(&self) -> bool {
         matches!(self, Complete(_))
     }
