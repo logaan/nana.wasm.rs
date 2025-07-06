@@ -15,9 +15,16 @@ fn make_process(a: i64, b: i64, c: i64) -> Process<RuntimeExpression> {
     }))
 }
 
+fn step_process(process: Process<RuntimeExpression>) -> Process<RuntimeExpression> {
+    match process {
+        Running(stepable) => stepable.step(),
+        Complete(_) => panic!("Tried to step a complete process"),
+    }
+}
+
 #[test]
 fn test_process_by_steps() {
-    let actual = make_process(1, 2, 3).step().step().step();
+    let actual = step_process(step_process(step_process(make_process(1, 2, 3))));
 
     assert!(actual.is_complete());
     assert!(!actual.is_running());

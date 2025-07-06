@@ -81,6 +81,16 @@ use Process::{Complete, Running};
 // tree traversal).
 //
 // It might also be worth thinking about how to represent blocked processes.
+//
+// ----------------------------------------------------------------------
+//
+// Here's the plan:
+// 1. [x] Remove step() from process. Replace any breakages with match.
+// 2. [ ] Remove is_complete() and is_running(). Replace and breakages with match.
+// 3. [ ] Remove result(). Replace break match.
+// 4. [ ] Add a third Process type: Spawn(Arc<Process>), update all matches to
+//        handle it. Spawning will be a side effect, for now it evaluates to :ok
+// 5. [ ] Add a spawn() function that returns a Spawn process.
 pub trait Stepable<T: Clone> {
     fn step(&self) -> Process<T>;
 }
@@ -112,15 +122,17 @@ struct AndThen<A: Clone, B: Clone>(Process<A>, Arc<dyn Fn(A) -> Process<B>>);
 impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
     fn step(&self) -> Process<B> {
         let AndThen(process, and_then) = self;
-        if process.is_complete() {
-            (and_then)(process.clone().result().unwrap())
-        } else {
-            let new_process = process.step();
 
-            if new_process.is_complete() {
-                (and_then)(new_process.result().unwrap())
-            } else {
-                Running(Arc::new(AndThen(new_process, and_then.clone())))
+        match process {
+            Complete(result) => (and_then)(result.clone()),
+            Running(stepable) => {
+                let new_process = stepable.step();
+
+                if new_process.is_complete() {
+                    (and_then)(new_process.result().unwrap())
+                } else {
+                    Running(Arc::new(AndThen(new_process, and_then.clone())))
+                }
             }
         }
     }
@@ -132,13 +144,6 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
 // wrapping a lambda. step on the process just proxies down to the contained
 // stepable (or panics).
 impl<T: Clone + 'static> Process<T> {
-    pub fn step(&self) -> Process<T> {
-        match self {
-            Complete(_) => panic!("Process is already complete"),
-            Running(f) => f.step(),
-        }
-    }
-
     pub fn result(self) -> Result<T, String> {
         match self {
             Complete(result) => Ok(result),
@@ -159,11 +164,12 @@ impl<T: Clone + 'static> Process<T> {
     // new processes.
     pub fn run_until_complete(self) -> T {
         let mut active_process = self;
-        while active_process.is_running() {
-            active_process = active_process.step();
+        loop {
+            match active_process {
+                Complete(result) => return result,
+                Running(stepable) => active_process = stepable.step(),
+            }
         }
-
-        active_process.result().unwrap()
     }
 
     pub fn round_robin(processes: Vector<Process<T>>) -> Vector<T> {
@@ -171,18 +177,9 @@ impl<T: Clone + 'static> Process<T> {
         let mut complete_processes: Vector<T> = vector![];
 
         while !active_processes.is_empty() {
-            let next = active_processes.pop_front().unwrap();
-
-            if next.is_complete() {
-                complete_processes.push_back(next.result().unwrap());
-            } else {
-                let new_process = next.step();
-
-                if new_process.is_complete() {
-                    complete_processes.push_back(new_process.result().unwrap());
-                } else {
-                    active_processes.push_back(new_process);
-                }
+            match active_processes.pop_front().unwrap() {
+                Complete(result) => complete_processes.push_back(result),
+                Running(stepable) => active_processes.push_back(stepable.step()),
             }
         }
 
@@ -205,10 +202,9 @@ impl<T: Clone + 'static> Process<T> {
 
             let active_process = processes.pop_front().unwrap();
 
-            if active_process.is_complete() {
-                results.push_back(active_process.result().unwrap());
-            } else {
-                processes.push_front(active_process.step());
+            match active_process {
+                Complete(result) => results.push_back(result),
+                Running(stepable) => processes.push_front(stepable.step()),
             }
 
             Running(Arc::new(move || {
@@ -226,10 +222,10 @@ impl<T: Clone + 'static> Process<T> {
         } else {
             let mut processes = processes;
 
-            let active_process = processes.pop_front().unwrap();
-
-            if !active_process.is_complete() {
-                processes.push_front(active_process.step());
+            match processes.pop_front().unwrap() {
+                // TODO: Give this case some thought. It's a red flag.
+                Complete(_) => {}
+                Running(stepable) => processes.push_front(stepable.step()),
             }
 
             Running(Arc::new(move || {

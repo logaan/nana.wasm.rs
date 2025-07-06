@@ -166,25 +166,26 @@ fn execute_with_definitions_and_process(
     mut results: Vector<RuntimeExpression>,
     process: Process<RuntimeExpression>,
 ) -> Process<(Vector<RuntimeExpression>, Environment)> {
-    if process.is_complete() {
-        let (new_seed, new_env) = match process.result().unwrap() {
-            Definition(name, value) => ((*value).clone(), env.add(name, (*value).clone())),
-            value => (value, env),
-        };
+    match process {
+        Complete(result) => {
+            let (new_seed, new_env) = match result {
+                Definition(name, value) => ((*value).clone(), env.add(name, (*value).clone())),
+                value => (value, env),
+            };
 
-        results.push_back(new_seed.clone());
-        Running(Arc::new(move || {
-            execute_with_definitions(work.clone(), new_env.clone(), results.clone())
-        }))
-    } else {
-        Running(Arc::new(move || {
+            results.push_back(new_seed.clone());
+            Running(Arc::new(move || {
+                execute_with_definitions(work.clone(), new_env.clone(), results.clone())
+            }))
+        }
+        Running(stepable) => Running(Arc::new(move || {
             execute_with_definitions_and_process(
                 work.clone(),
                 env.clone(),
                 results.clone(),
-                process.step(),
+                stepable.step(),
             )
-        }))
+        })),
     }
 }
 
