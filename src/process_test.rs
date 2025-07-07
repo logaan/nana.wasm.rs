@@ -1,11 +1,11 @@
-use im::vector;
+use im::{vector, Vector};
 use std::sync::Arc;
 
 use crate::expressions::RuntimeExpression::{self, List, Number};
 use crate::process::Process::{Complete, Running, Spawn};
 use crate::process::*;
 
-fn make_process(a: i64, b: i64, c: i64) -> Process<RuntimeExpression> {
+fn make_process(a: i64, b: i64, c: i64) -> Process<RuntimeExpression, RuntimeExpression> {
     Running(Arc::new(move || {
         Running(Arc::new(move || {
             Running(Arc::new(move || {
@@ -15,7 +15,9 @@ fn make_process(a: i64, b: i64, c: i64) -> Process<RuntimeExpression> {
     }))
 }
 
-fn step_process(process: Process<RuntimeExpression>) -> Process<RuntimeExpression> {
+fn step_process(
+    process: Process<RuntimeExpression, RuntimeExpression>,
+) -> Process<RuntimeExpression, RuntimeExpression> {
     match process {
         Running(stepable) => stepable.step(),
         Complete(_) => panic!("Tried to step a complete process"),
@@ -45,7 +47,7 @@ fn test_process_to_completion() {
 
 #[test]
 fn test_round_robin_processes_to_completion() {
-    let actual = Process::<RuntimeExpression>::round_robin(vector![
+    let actual = Process::<RuntimeExpression, RuntimeExpression>::round_robin(vector![
         make_process(1, 2, 3),
         make_process(4, 5, 6),
         make_process(7, 8, 9),
@@ -61,7 +63,7 @@ fn test_round_robin_processes_to_completion() {
 }
 #[test]
 fn test_round_robin_processes_with_complete() {
-    let actual = Process::<RuntimeExpression>::round_robin(vector![
+    let actual = Process::<RuntimeExpression, RuntimeExpression>::round_robin(vector![
         make_process(1, 2, 3),
         Complete(List(vector![Number(4), Number(5), Number(6)])),
         make_process(7, 8, 9),
@@ -78,7 +80,7 @@ fn test_round_robin_processes_with_complete() {
 
 #[test]
 fn test_complete_sequence() {
-    let input = vector![
+    let input: Vector<Process<RuntimeExpression, RuntimeExpression>> = vector![
         Complete(Number(1)),
         Complete(Number(2)),
         Complete(Number(3))
@@ -116,6 +118,7 @@ fn test_running_sequence() {
 
 #[test]
 fn test_and_then() {
-    let process = Running(Arc::new(|| Complete(1))).and_then(Arc::new(|n| Complete((n, 2))));
+    let process =
+        Running(Arc::new(|| Complete::<i32, i32>(1))).and_then(Arc::new(|n| Complete((n, 2))));
     assert_eq!((1, 2), process.run_until_complete());
 }

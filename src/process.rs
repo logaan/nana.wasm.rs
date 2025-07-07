@@ -3,8 +3,6 @@ use im::{vector, Vector};
 use std::sync::Arc;
 use Process::{Complete, Running, Spawn};
 
-use crate::expressions::RuntimeExpression;
-
 // TODO: This is the right place for processes to split. We could go with:
 //
 //   (Process<T>, Option<Process<T>>)
@@ -90,15 +88,20 @@ use crate::expressions::RuntimeExpression;
 // 1. [x] Remove step() from process. Replace any breakages with match.
 // 2. [x] Remove is_complete() and is_running(). Replace and breakages with match.
 // 3. [x] Remove result(). Replace break match.
-// 4. [ ] Add a third Process type: Spawn(Arc<Process>), update all matches to
+// 4. [x] Add a third Process type: Spawn(Arc<Process>), update all matches to
 //        handle it. Spawning will be a side effect, for now it evaluates to :ok
-// 5. [ ] Add a spawn() function that returns a Spawn process.
-pub trait Stepable<T: Clone> {
-    fn step(&self) -> Process<T>;
+// 5. [x] Add a spawn() function that returns a Spawn process.
+// 6. [ ] Replace hard coded RuntimeExpression in Process with a type parameter
+// 7. [ ] Use round robin for Nana#evaluate
+
+// I: Intermeidate (whatever form we need for this step in execution)
+// R: Root (The type right up top used for all round robin threads)
+pub trait Stepable<I: Clone, R: Clone> {
+    fn step(&self) -> Process<I, R>;
 }
 
 #[derive(Clone)]
-pub enum Process<T: Clone> {
+pub enum Process<I: Clone, R: Clone> {
     // 1. I'm not sure that Vector is strictly needed here. But I need some kind
     // of indirection, Option isn't sufficient. And Option inside Arc feels a
     // little inelegant.
@@ -106,14 +109,14 @@ pub enum Process<T: Clone> {
     // IntermediateResultType and RuntimeExpression becomes TopResultType. But
     // that would involve updating all references to Process. I'd prefer to make
     // some progress and then come back to clean up.
-    Spawn(Arc<Process<T>>, Vector<Process<RuntimeExpression>>),
-    Running(Arc<dyn Stepable<T>>),
-    Complete(T),
+    Spawn(Arc<Process<I, R>>, Vector<Process<I, R>>),
+    Running(Arc<dyn Stepable<I, R>>),
+    Complete(I),
 }
 
 // Functions that return Processes count as Stepable by just calling themselves
-impl<T: Clone + 'static, F: Fn() -> Process<T> + 'static> Stepable<T> for F {
-    fn step(&self) -> Process<T> {
+impl<I: Clone + 'static, R: Clone, F: Fn() -> Process<I, R> + 'static> Stepable<I, R> for F {
+    fn step(&self) -> Process<I, R> {
         self()
     }
 }
@@ -127,10 +130,12 @@ impl<T: Clone + 'static, F: Fn() -> Process<T> + 'static> Stepable<T> for F {
 // At any stage a wrapped step() spawning a new process should have that new
 // process exposed without wrapping. We only call step() at most once per cycle
 // so there's no need for Vec rather than Option for spawned processes.
-struct AndThen<A: Clone, B: Clone>(Process<A>, Arc<dyn Fn(A) -> Process<B>>);
+struct AndThen<A: Clone, B: Clone, R: Clone>(Process<A, R>, Arc<dyn Fn(A) -> Process<B, R>>);
 
-impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
-    fn step(&self) -> Process<B> {
+impl<A: Clone + 'static, B: Clone + 'static, R: Clone + 'static> Stepable<B, R>
+    for AndThen<A, B, R>
+{
+    fn step(&self) -> Process<B, R> {
         let AndThen(process, and_then) = self;
 
         match process {
@@ -147,11 +152,11 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
 // not. Most of the time Running will be holding a lambda, or an AndThen
 // wrapping a lambda. step on the process just proxies down to the contained
 // stepable (or panics).
-impl<T: Clone + 'static> Process<T> {
+impl<I: Clone + 'static, R: Clone + 'static> Process<I, R> {
     // This is used in tests, and for eval. round_robin hasn't been adopted yet.
     // But this should probably be deprecated because it can't support spawning
     // new processes.
-    pub fn run_until_complete(self) -> T {
+    pub fn run_until_complete(self) -> I {
         let mut active_process = self;
         loop {
             match active_process {
@@ -164,9 +169,11 @@ impl<T: Clone + 'static> Process<T> {
     }
 
     // Round robin only works with top level processes.
-    pub fn round_robin(processes: Vector<Process<RuntimeExpression>>) -> Vector<RuntimeExpression> {
+    // TODO: These Is used to be RuntimeExpressions, so I think they should be
+    // Rs. If they aren't, then I don't think anything should be.
+    pub fn round_robin(processes: Vector<Process<I, R>>) -> Vector<I> {
         let mut active_processes = processes;
-        let mut complete_processes: Vector<RuntimeExpression> = vector![];
+        let mut complete_processes: Vector<I> = vector![];
 
         while !active_processes.is_empty() {
             match active_processes.pop_front().unwrap() {
@@ -187,14 +194,14 @@ impl<T: Clone + 'static> Process<T> {
         complete_processes
     }
 
-    pub fn run_in_sequence(processes: Vector<Process<T>>) -> Process<Vector<T>> {
+    pub fn run_in_sequence(processes: Vector<Process<I, R>>) -> Process<Vector<I>, R> {
         Process::run_in_sequence_with_results(processes, vector![])
     }
 
     fn run_in_sequence_with_results(
-        processes: Vector<Process<T>>,
-        results: Vector<T>,
-    ) -> Process<Vector<T>> {
+        processes: Vector<Process<I, R>>,
+        results: Vector<I>,
+    ) -> Process<Vector<I>, R> {
         if processes.is_empty() {
             Complete(results)
         } else {
@@ -216,7 +223,7 @@ impl<T: Clone + 'static> Process<T> {
         }
     }
 
-    pub fn run_in_sequence_tco(processes: Vector<Process<T>>) -> Process<T> {
+    pub fn run_in_sequence_tco(processes: Vector<Process<I, R>>) -> Process<I, R> {
         if processes.is_empty() {
             panic!("We must run at least one process");
         } else if processes.len() == 1 {
@@ -260,8 +267,8 @@ impl<T: Clone + 'static> Process<T> {
 
     pub fn and_then<B: Clone + 'static>(
         self,
-        and_then: Arc<dyn Fn(T) -> Process<B>>,
-    ) -> Process<B> {
+        and_then: Arc<dyn Fn(I) -> Process<B, R>>,
+    ) -> Process<B, R> {
         Running(Arc::new(AndThen(self, and_then)))
     }
 }
