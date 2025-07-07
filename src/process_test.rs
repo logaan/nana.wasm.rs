@@ -2,7 +2,7 @@ use im::vector;
 use std::sync::Arc;
 
 use crate::expressions::RuntimeExpression::{self, List, Number};
-use crate::process::Process::{Complete, Running};
+use crate::process::Process::{Complete, Running, Spawn};
 use crate::process::*;
 
 fn make_process(a: i64, b: i64, c: i64) -> Process<RuntimeExpression> {
@@ -19,6 +19,7 @@ fn step_process(process: Process<RuntimeExpression>) -> Process<RuntimeExpressio
     match process {
         Running(stepable) => stepable.step(),
         Complete(_) => panic!("Tried to step a complete process"),
+        Spawn(..) => panic!("Tried to step a spawn process"),
     }
 }
 
@@ -30,6 +31,7 @@ fn test_process_by_steps() {
     match actual {
         Complete(result) => assert_eq!(expected, result),
         Running(_) => assert!(false), // Actual should be complete
+        Spawn(..) => assert!(false),  // Actual should be complete
     }
 }
 

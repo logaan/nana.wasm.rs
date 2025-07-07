@@ -1,7 +1,9 @@
 use core::panic;
 use im::{vector, Vector};
 use std::sync::Arc;
-use Process::{Complete, Running};
+use Process::{Complete, Running, Spawn};
+
+use crate::expressions::RuntimeExpression;
 
 // TODO: This is the right place for processes to split. We could go with:
 //
@@ -97,6 +99,14 @@ pub trait Stepable<T: Clone> {
 
 #[derive(Clone)]
 pub enum Process<T: Clone> {
+    // 1. I'm not sure that Vector is strictly needed here. But I need some kind
+    // of indirection, Option isn't sufficient. And Option inside Arc feels a
+    // little inelegant.
+    // 2. I think RuntimeExpression could be a type parameter. T becomes
+    // IntermediateResultType and RuntimeExpression becomes TopResultType. But
+    // that would involve updating all references to Process. I'd prefer to make
+    // some progress and then come back to clean up.
+    Spawn(Arc<Process<T>>, Vector<Process<RuntimeExpression>>),
     Running(Arc<dyn Stepable<T>>),
     Complete(T),
 }
@@ -131,8 +141,10 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
                 match new_process {
                     Complete(result) => (and_then)(result),
                     Running(_) => Running(Arc::new(AndThen(new_process, and_then.clone()))),
+                    Spawn(..) => todo!(),
                 }
             }
+            Spawn(..) => todo!(),
         }
     }
 }
@@ -152,6 +164,7 @@ impl<T: Clone + 'static> Process<T> {
             match active_process {
                 Complete(result) => return result,
                 Running(stepable) => active_process = stepable.step(),
+                Spawn(..) => todo!(),
             }
         }
     }
@@ -164,6 +177,7 @@ impl<T: Clone + 'static> Process<T> {
             match active_processes.pop_front().unwrap() {
                 Complete(result) => complete_processes.push_back(result),
                 Running(stepable) => active_processes.push_back(stepable.step()),
+                Spawn(..) => todo!(),
             }
         }
 
@@ -189,6 +203,7 @@ impl<T: Clone + 'static> Process<T> {
             match active_process {
                 Complete(result) => results.push_back(result),
                 Running(stepable) => processes.push_front(stepable.step()),
+                Spawn(..) => todo!(),
             }
 
             Running(Arc::new(move || {
@@ -207,9 +222,18 @@ impl<T: Clone + 'static> Process<T> {
             let mut processes = processes;
 
             match processes.pop_front().unwrap() {
-                // TODO: Give this case some thought. It's a red flag.
+                // A function's body is a list of expressions. We checked above
+                // that we're not on the last one, so seeing a completed process
+                // here means that we've finished some intermediate expression
+                // who's result we're discarding.
                 Complete(_) => {}
                 Running(stepable) => processes.push_front(stepable.step()),
+                // TODO: This is an important case. Either Complete or Running
+                // should just returning the Running object constructed below.
+                // But if we're spawning we should return both the continuation
+                // below and also the spawned process. I think this means that
+                // Spawn needs a second field.
+                Spawn(..) => todo!(),
             }
 
             Running(Arc::new(move || {

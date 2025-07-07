@@ -14,7 +14,7 @@ use crate::expressions::{is_comment, Environment, LexicalExpression};
 
 use crate::parsers::macros::build_macros;
 use crate::parsers::nana::program;
-use crate::process::Process::{self, Complete, Running};
+use crate::process::Process::{self, Complete, Running, Spawn};
 use crate::s;
 
 pub fn read_code(path: &str) -> String {
@@ -186,6 +186,7 @@ fn execute_with_definitions_and_process(
                 stepable.step(),
             )
         })),
+        Spawn(..) => todo!(),
     }
 }
 
