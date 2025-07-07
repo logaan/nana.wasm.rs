@@ -141,9 +141,11 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
                 match new_process {
                     Complete(result) => (and_then)(result),
                     Running(_) => Running(Arc::new(AndThen(new_process, and_then.clone()))),
+                    // TODO: AndThen running
                     Spawn(..) => todo!(),
                 }
             }
+            // TODO: AndThen spawn
             Spawn(..) => todo!(),
         }
     }
@@ -164,6 +166,7 @@ impl<T: Clone + 'static> Process<T> {
             match active_process {
                 Complete(result) => return result,
                 Running(stepable) => active_process = stepable.step(),
+                // TODO: run_until_complete spawn
                 Spawn(..) => todo!(),
             }
         }
@@ -212,6 +215,7 @@ impl<T: Clone + 'static> Process<T> {
             match active_process {
                 Complete(result) => results.push_back(result),
                 Running(stepable) => processes.push_front(stepable.step()),
+                // TODO: run_in_sequence_with_results spawn
                 Spawn(..) => todo!(),
             }
 

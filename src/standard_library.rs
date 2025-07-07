@@ -3,13 +3,13 @@ use std::sync::Arc;
 
 use im::{hashmap, vector, Vector};
 
-use crate::eval::{eval, execute_with_env, quote};
+use crate::eval::{apply, eval, execute_with_env, quote};
 use crate::expressions::RuntimeExpression::{
     BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro, MacroCall,
     Number, String as NString, Symbol, TaggedTuple,
 };
 use crate::expressions::{Environment, RuntimeExpression};
-use crate::process::Process::Complete;
+use crate::process::Process::{Complete, Spawn};
 use crate::s;
 
 fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<Environment> {
@@ -253,21 +253,24 @@ pub fn builtins() -> Environment {
             }
         ),
 
+        // TODO: spawn needs to:
+        // 1. Create a promise
+        // 2. Wrap the readable side of the promise in a Complete process
+        // 3. Create a Running process that will call the Fn and
+        // when it completes use its return value to resolve the
+        // process.
+        // 4. Return the (Complete(..), Some(Running(..)))
         s!("spawn") => BuiltinFunction(|mut args| {
             if args.len() == 1 {
-                match args.pop_front().unwrap() {
-                    Function(..) => todo!(),
-                    // spawn needs to:
-                    // 1. Create a promise
-                    // 2. Wrap the readable side of the promise in a Complete process
-                    // 3. Create a Running process that will call the Fn and
-                    // when it completes use its return value to resolve the
-                    // process.
-                    // 4. Return the (Complete(..), Some(Running(..)))
-                    _ => panic!("spawn takes 1 function as an argument")
+                let first_arg = args.pop_front().unwrap();
+                match first_arg {
+                    Function(..) => Spawn(Arc::new(Complete(Keyword(s!("ok")))),
+                                          vector![apply(first_arg, vector![])]),
+                    // TODO: Should probably support BuiltinFunction too
+                    _ => panic!("spawn takes 1 function (with no arguments) as an argument")
                 }
             } else {
-                panic!("spawn takes 1 function as an argument")
+                panic!("spawn takes 1 function (with no arguments) as an argument")
             }
         })
     })

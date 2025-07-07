@@ -110,6 +110,7 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
                     Complete(TaggedTuple(tag.clone(), evaluated_expressions))
                 },
             )),
+            // TODO: Eval tagged tuples other than Symbols and Keywords
             _ => todo!(),
         },
 
@@ -186,6 +187,7 @@ fn execute_with_definitions_and_process(
                 stepable.step(),
             )
         })),
+        // TODO: Spawn execute_with_definitions_and_process
         Spawn(..) => todo!(),
     }
 }
