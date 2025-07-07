@@ -96,12 +96,12 @@ use Process::{Complete, Running, Spawn};
 
 // I: Intermeidate (whatever form we need for this step in execution)
 // R: Root (The type right up top used for all round robin threads)
-pub trait Stepable<I: Clone, R: Clone> {
-    fn step(&self) -> Process<I, R>;
+pub trait Stepable<I: Clone> {
+    fn step(&self) -> Process<I>;
 }
 
 #[derive(Clone)]
-pub enum Process<I: Clone, R: Clone> {
+pub enum Process<I: Clone> {
     // 1. I'm not sure that Vector is strictly needed here. But I need some kind
     // of indirection, Option isn't sufficient. And Option inside Arc feels a
     // little inelegant.
@@ -109,14 +109,14 @@ pub enum Process<I: Clone, R: Clone> {
     // IntermediateResultType and RuntimeExpression becomes TopResultType. But
     // that would involve updating all references to Process. I'd prefer to make
     // some progress and then come back to clean up.
-    Spawn(Arc<Process<I, R>>, Vector<Process<I, R>>),
-    Running(Arc<dyn Stepable<I, R>>),
+    Spawn(Arc<Process<I>>, Vector<Process<I>>),
+    Running(Arc<dyn Stepable<I>>),
     Complete(I),
 }
 
 // Functions that return Processes count as Stepable by just calling themselves
-impl<I: Clone + 'static, R: Clone, F: Fn() -> Process<I, R> + 'static> Stepable<I, R> for F {
-    fn step(&self) -> Process<I, R> {
+impl<I: Clone + 'static, F: Fn() -> Process<I> + 'static> Stepable<I> for F {
+    fn step(&self) -> Process<I> {
         self()
     }
 }
@@ -130,12 +130,10 @@ impl<I: Clone + 'static, R: Clone, F: Fn() -> Process<I, R> + 'static> Stepable<
 // At any stage a wrapped step() spawning a new process should have that new
 // process exposed without wrapping. We only call step() at most once per cycle
 // so there's no need for Vec rather than Option for spawned processes.
-struct AndThen<A: Clone, B: Clone, R: Clone>(Process<A, R>, Arc<dyn Fn(A) -> Process<B, R>>);
+struct AndThen<A: Clone, B: Clone>(Process<A>, Arc<dyn Fn(A) -> Process<B>>);
 
-impl<A: Clone + 'static, B: Clone + 'static, R: Clone + 'static> Stepable<B, R>
-    for AndThen<A, B, R>
-{
-    fn step(&self) -> Process<B, R> {
+impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
+    fn step(&self) -> Process<B> {
         let AndThen(process, and_then) = self;
 
         match process {
@@ -152,7 +150,7 @@ impl<A: Clone + 'static, B: Clone + 'static, R: Clone + 'static> Stepable<B, R>
 // not. Most of the time Running will be holding a lambda, or an AndThen
 // wrapping a lambda. step on the process just proxies down to the contained
 // stepable (or panics).
-impl<I: Clone + 'static, R: Clone + 'static> Process<I, R> {
+impl<I: Clone + 'static> Process<I> {
     // This is used in tests, and for eval. round_robin hasn't been adopted yet.
     // But this should probably be deprecated because it can't support spawning
     // new processes.
@@ -171,7 +169,7 @@ impl<I: Clone + 'static, R: Clone + 'static> Process<I, R> {
     // Round robin only works with top level processes.
     // TODO: These Is used to be RuntimeExpressions, so I think they should be
     // Rs. If they aren't, then I don't think anything should be.
-    pub fn round_robin(processes: Vector<Process<I, R>>) -> Vector<I> {
+    pub fn round_robin(processes: Vector<Process<I>>) -> Vector<I> {
         let mut active_processes = processes;
         let mut complete_processes: Vector<I> = vector![];
 
@@ -194,14 +192,14 @@ impl<I: Clone + 'static, R: Clone + 'static> Process<I, R> {
         complete_processes
     }
 
-    pub fn run_in_sequence(processes: Vector<Process<I, R>>) -> Process<Vector<I>, R> {
+    pub fn run_in_sequence(processes: Vector<Process<I>>) -> Process<Vector<I>> {
         Process::run_in_sequence_with_results(processes, vector![])
     }
 
     fn run_in_sequence_with_results(
-        processes: Vector<Process<I, R>>,
+        processes: Vector<Process<I>>,
         results: Vector<I>,
-    ) -> Process<Vector<I>, R> {
+    ) -> Process<Vector<I>> {
         if processes.is_empty() {
             Complete(results)
         } else {
@@ -223,7 +221,7 @@ impl<I: Clone + 'static, R: Clone + 'static> Process<I, R> {
         }
     }
 
-    pub fn run_in_sequence_tco(processes: Vector<Process<I, R>>) -> Process<I, R> {
+    pub fn run_in_sequence_tco(processes: Vector<Process<I>>) -> Process<I> {
         if processes.is_empty() {
             panic!("We must run at least one process");
         } else if processes.len() == 1 {
@@ -267,8 +265,8 @@ impl<I: Clone + 'static, R: Clone + 'static> Process<I, R> {
 
     pub fn and_then<B: Clone + 'static>(
         self,
-        and_then: Arc<dyn Fn(I) -> Process<B, R>>,
-    ) -> Process<B, R> {
+        and_then: Arc<dyn Fn(I) -> Process<B>>,
+    ) -> Process<B> {
         Running(Arc::new(AndThen(self, and_then)))
     }
 }

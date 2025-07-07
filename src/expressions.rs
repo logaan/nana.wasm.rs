@@ -31,14 +31,14 @@ pub enum LexicalExpression {
 #[derive(PartialEq, Debug, Clone)]
 pub enum RuntimeExpression {
     // Maybe builtin functions should have a name for more useful printing
-    BuiltinFunction(fn(Vector<RuntimeExpression>) -> Process<RuntimeExpression, RuntimeExpression>),
+    BuiltinFunction(fn(Vector<RuntimeExpression>) -> Process<RuntimeExpression>),
     Function(Vector<String>, Environment, Vector<RuntimeExpression>),
     TaggedTuple(Arc<RuntimeExpression>, Vector<RuntimeExpression>),
     Hole,
     List(Vector<RuntimeExpression>),
     BuiltinMacro(
         Vector<String>,
-        fn(Vector<RuntimeExpression>, Environment) -> Process<RuntimeExpression, RuntimeExpression>,
+        fn(Vector<RuntimeExpression>, Environment) -> Process<RuntimeExpression>,
     ),
     Macro(Vector<String>, Environment, Vector<RuntimeExpression>),
     MacroCall(String, Vector<RuntimeExpression>),

@@ -6,7 +6,7 @@ use RuntimeExpression::*;
 
 #[test]
 fn test_print_builtin_function() {
-    fn dummy(_: im::Vector<RuntimeExpression>) -> Process<RuntimeExpression, RuntimeExpression> {
+    fn dummy(_: im::Vector<RuntimeExpression>) -> Process<RuntimeExpression> {
         panic!("not called")
     }
     let expr = BuiltinFunction(dummy);
@@ -25,10 +25,7 @@ fn test_print_function() {
 
 #[test]
 fn test_print_builtin_macro() {
-    fn dummy(
-        _: im::Vector<RuntimeExpression>,
-        _: Environment,
-    ) -> Process<RuntimeExpression, RuntimeExpression> {
+    fn dummy(_: im::Vector<RuntimeExpression>, _: Environment) -> Process<RuntimeExpression> {
         panic!("not called")
     }
     let expr = BuiltinMacro(vector!["x".to_string(), "y".to_string()], dummy);

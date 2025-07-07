@@ -27,7 +27,7 @@ pub fn read_code(path: &str) -> String {
 pub fn apply(
     function: RuntimeExpression,
     args: Vector<RuntimeExpression>,
-) -> Process<RuntimeExpression, RuntimeExpression> {
+) -> Process<RuntimeExpression> {
     match function {
         BuiltinFunction(body) => (body)(args),
         Function(params, environment, body) => {
@@ -58,7 +58,7 @@ pub fn macro_expand(
     macro_expression: RuntimeExpression,
     args: Vector<RuntimeExpression>,
     environment: Environment,
-) -> Process<RuntimeExpression, RuntimeExpression> {
+) -> Process<RuntimeExpression> {
     match macro_expression {
         BuiltinMacro(_params, body) => (body)(args, environment),
         Macro(params, environment, body) => {
@@ -87,10 +87,7 @@ pub fn macro_expand(
     }
 }
 
-pub fn eval(
-    expression: RuntimeExpression,
-    environment: Environment,
-) -> Process<RuntimeExpression, RuntimeExpression> {
+pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<RuntimeExpression> {
     match expression {
         TaggedTuple(tag, args) => match (*tag).clone() {
             Symbol(name) => {
@@ -168,8 +165,8 @@ fn execute_with_definitions_and_process(
     work: Vector<LexicalExpression>,
     env: Environment,
     mut results: Vector<RuntimeExpression>,
-    process: Process<RuntimeExpression, RuntimeExpression>,
-) -> Process<(Vector<RuntimeExpression>, Environment), RuntimeExpression> {
+    process: Process<RuntimeExpression>,
+) -> Process<(Vector<RuntimeExpression>, Environment)> {
     match process {
         Complete(result) => {
             let (new_seed, new_env) = match result {
@@ -197,10 +194,7 @@ fn execute_with_definitions_and_process(
 
 // Quote needs to return a process. Because when we hit unquote we're going to
 // have to eval.
-pub fn quote(
-    value: RuntimeExpression,
-    env: Environment,
-) -> Process<RuntimeExpression, RuntimeExpression> {
+pub fn quote(value: RuntimeExpression, env: Environment) -> Process<RuntimeExpression> {
     match value {
         BuiltinFunction(_) => Complete(value),
         Function(params, env, body) => {
@@ -279,7 +273,7 @@ pub fn execute_with_definitions(
     work: Vector<LexicalExpression>,
     env: Environment,
     results: Vector<RuntimeExpression>,
-) -> Process<(Vector<RuntimeExpression>, Environment), RuntimeExpression> {
+) -> Process<(Vector<RuntimeExpression>, Environment)> {
     if work.is_empty() {
         Complete((results, env))
     } else {
@@ -315,7 +309,7 @@ pub fn execute(code: String, env: Environment) -> Vector<RuntimeExpression> {
 fn eval_expressions(
     args: &Vector<RuntimeExpression>,
     environment: &Environment,
-) -> Process<Vector<RuntimeExpression>, RuntimeExpression> {
+) -> Process<Vector<RuntimeExpression>> {
     Process::run_in_sequence(
         args.iter()
             .cloned()
