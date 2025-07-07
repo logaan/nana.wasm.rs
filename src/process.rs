@@ -91,7 +91,8 @@ use Process::{Complete, Running, Spawn};
 // 4. [x] Add a third Process type: Spawn(Arc<Process>), update all matches to
 //        handle it. Spawning will be a side effect, for now it evaluates to :ok
 // 5. [x] Add a spawn() function that returns a Spawn process.
-// 6. [ ] Replace hard coded RuntimeExpression in Process with a type parameter
+// 6. [x] Replace hard coded RuntimeExpression in Process with a type parameter
+// 6. [x] Remove it
 // 7. [ ] Use round robin for Nana#evaluate
 
 // I: Intermeidate (whatever form we need for this step in execution)
@@ -155,15 +156,11 @@ impl<I: Clone + 'static> Process<I> {
     // But this should probably be deprecated because it can't support spawning
     // new processes.
     pub fn run_until_complete(self) -> I {
-        let mut active_process = self;
-        loop {
-            match active_process {
-                Complete(result) => return result,
-                Running(stepable) => active_process = stepable.step(),
-                // TODO: run_until_complete spawn
-                Spawn(..) => todo!(),
-            }
-        }
+        Process::round_robin(vector![self])
+            .iter()
+            .next()
+            .unwrap()
+            .clone()
     }
 
     // Round robin only works with top level processes.
