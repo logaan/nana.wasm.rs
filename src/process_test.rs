@@ -45,7 +45,7 @@ fn test_process_to_completion() {
 
 #[test]
 fn test_round_robin_processes_to_completion() {
-    let actual = Process::round_robin(vector![
+    let actual = Process::<RuntimeExpression>::round_robin(vector![
         make_process(1, 2, 3),
         make_process(4, 5, 6),
         make_process(7, 8, 9),
@@ -61,7 +61,7 @@ fn test_round_robin_processes_to_completion() {
 }
 #[test]
 fn test_round_robin_processes_with_complete() {
-    let actual = Process::round_robin(vector![
+    let actual = Process::<RuntimeExpression>::round_robin(vector![
         make_process(1, 2, 3),
         Complete(List(vector![Number(4), Number(5), Number(6)])),
         make_process(7, 8, 9),

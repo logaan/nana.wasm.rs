@@ -169,15 +169,24 @@ impl<T: Clone + 'static> Process<T> {
         }
     }
 
-    pub fn round_robin(processes: Vector<Process<T>>) -> Vector<T> {
+    // Round robin only works with top level processes.
+    pub fn round_robin(processes: Vector<Process<RuntimeExpression>>) -> Vector<RuntimeExpression> {
         let mut active_processes = processes;
-        let mut complete_processes: Vector<T> = vector![];
+        let mut complete_processes: Vector<RuntimeExpression> = vector![];
 
         while !active_processes.is_empty() {
             match active_processes.pop_front().unwrap() {
                 Complete(result) => complete_processes.push_back(result),
                 Running(stepable) => active_processes.push_back(stepable.step()),
-                Spawn(..) => todo!(),
+                Spawn(continuation, spawned_processes) => {
+                    // The continuation might be a Vector<Process<T>> or
+                    // something with an Environment. Where the spawned
+                    // processes will always be a top level process... maybe it
+                    // is worth looking into process trees... traversing one
+                    // probably wouldn't be so different to a queue.
+                    active_processes.append(spawned_processes);
+                    active_processes.push_back((*continuation).clone());
+                }
             }
         }
 
@@ -226,19 +235,31 @@ impl<T: Clone + 'static> Process<T> {
                 // that we're not on the last one, so seeing a completed process
                 // here means that we've finished some intermediate expression
                 // who's result we're discarding.
-                Complete(_) => {}
-                Running(stepable) => processes.push_front(stepable.step()),
-                // TODO: This is an important case. Either Complete or Running
-                // should just returning the Running object constructed below.
-                // But if we're spawning we should return both the continuation
-                // below and also the spawned process. I think this means that
-                // Spawn needs a second field.
-                Spawn(..) => todo!(),
-            }
+                Complete(_) => Running(Arc::new(move || {
+                    Process::run_in_sequence_tco(processes.clone())
+                })),
+                Running(stepable) => {
+                    processes.push_front(stepable.step());
+                    // TODO: These 3 lines are duplicated 3 times. Might be
+                    // worth moving into a fn.
+                    Running(Arc::new(move || {
+                        Process::run_in_sequence_tco(processes.clone())
+                    }))
+                }
+                // We unwrap the continuation and pop it back where the spawn
+                // came from. Then lift the spawned process up a level, helping
+                // it trickle outwards.
+                Spawn(continuation, spawned_processes) => {
+                    processes.push_front((*continuation).clone());
 
-            Running(Arc::new(move || {
-                Process::run_in_sequence_tco(processes.clone())
-            }))
+                    Spawn(
+                        Arc::new(Running(Arc::new(move || {
+                            Process::run_in_sequence_tco(processes.clone())
+                        }))),
+                        spawned_processes,
+                    )
+                }
+            }
         }
     }
 
