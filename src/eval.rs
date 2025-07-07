@@ -161,37 +161,6 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
     }
 }
 
-fn execute_with_definitions_and_process(
-    work: Vector<LexicalExpression>,
-    env: Environment,
-    mut results: Vector<RuntimeExpression>,
-    process: Process<RuntimeExpression>,
-) -> Process<(Vector<RuntimeExpression>, Environment)> {
-    match process {
-        Complete(result) => {
-            let (new_seed, new_env) = match result {
-                Definition(name, value) => ((*value).clone(), env.add(name, (*value).clone())),
-                value => (value, env),
-            };
-
-            results.push_back(new_seed.clone());
-            Running(Arc::new(move || {
-                execute_with_definitions(work.clone(), new_env.clone(), results.clone())
-            }))
-        }
-        Running(stepable) => Running(Arc::new(move || {
-            execute_with_definitions_and_process(
-                work.clone(),
-                env.clone(),
-                results.clone(),
-                stepable.step(),
-            )
-        })),
-        // TODO: Spawn execute_with_definitions_and_process
-        Spawn(..) => todo!("Spawn execute_with_definitions_and_process"),
-    }
-}
-
 // Quote needs to return a process. Because when we hit unquote we're going to
 // have to eval.
 pub fn quote(value: RuntimeExpression, env: Environment) -> Process<RuntimeExpression> {
@@ -269,6 +238,58 @@ pub fn quote(value: RuntimeExpression, env: Environment) -> Process<RuntimeExpre
     }
 }
 
+fn execute_with_definitions_and_process(
+    work: Vector<LexicalExpression>,
+    env: Environment,
+    mut results: Vector<RuntimeExpression>,
+    process: Process<RuntimeExpression>,
+) -> Process<(Vector<RuntimeExpression>, Environment)> {
+    match process {
+        Complete(result) => {
+            let (new_seed, new_env) = match result {
+                Definition(name, value) => ((*value).clone(), env.add(name, (*value).clone())),
+                value => (value, env),
+            };
+
+            results.push_back(new_seed.clone());
+            Running(Arc::new(move || {
+                execute_with_definitions(work.clone(), new_env.clone(), results.clone())
+            }))
+        }
+        Running(stepable) => Running(Arc::new(move || {
+            execute_with_definitions_and_process(
+                work.clone(),
+                env.clone(),
+                results.clone(),
+                stepable.step(),
+            )
+        })),
+        // TODO: Spawn execute_with_definitions_and_process
+        Spawn(continuation, spawned_processes) => Spawn(
+            Arc::new(execute_with_definitions_and_process(
+                work.clone(),
+                env.clone(),
+                results.clone(),
+                (*continuation).clone(),
+            )),
+            spawned_processes
+                .iter()
+                .map(move |process| {
+                    execute_with_definitions_and_process(
+                        work.clone(),
+                        env.clone(),
+                        results.clone(),
+                        (*process).clone(),
+                    )
+                })
+                .collect::<im::Vector<_>>(),
+        ),
+    }
+}
+
+// Runs lexical expressions, basically code prior to macro parsing, and returns
+// a process that will eventually produce the result of each top level
+// expression, as well as an environment containing all new definitions
 pub fn execute_with_definitions(
     work: Vector<LexicalExpression>,
     env: Environment,
@@ -288,8 +309,8 @@ pub fn execute_with_definitions(
     }
 }
 
-// TODO: This really expects a main thread that may be making changes to the
-// environment.
+// Runs a string of code and returns the result of each top level expression, as
+// well as an environment containing all new definitions
 pub fn execute_with_env(
     code: String,
     env: Environment,
@@ -300,7 +321,7 @@ pub fn execute_with_env(
     process.run_until_complete()
 }
 
-// TODO: This really expects a main thread who's results we will return.
+// Runs a string of code and returns the result of each top level expression
 pub fn execute(code: String, env: Environment) -> Vector<RuntimeExpression> {
     let (results, _env) = execute_with_env(code, env);
     results

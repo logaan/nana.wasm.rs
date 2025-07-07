@@ -8,7 +8,7 @@ use crate::expressions::RuntimeExpression::{
     BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro, MacroCall,
     Number, String as NString, Symbol, TaggedTuple,
 };
-use crate::expressions::{Environment, RuntimeExpression};
+use crate::expressions::{print_many, Environment, RuntimeExpression};
 use crate::process::Process::{Complete, Spawn};
 use crate::s;
 
@@ -62,7 +62,7 @@ pub fn builtins() -> Environment {
     Environment::from(hashmap! {
         // TODO: Make expressions print themselves in a readable form
         s!("log") => BuiltinFunction(|args| {
-            println!("{:?}", args.clone());
+            println!("{}", print_many(args.clone(), " "));
             Complete(args.head().unwrap().clone())
         }),
 

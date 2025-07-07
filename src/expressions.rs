@@ -69,7 +69,7 @@ pub fn print(expression: RuntimeExpression) -> String {
     }
 }
 
-fn print_many(expressions: Vector<RuntimeExpression>, seperator: &str) -> String {
+pub fn print_many(expressions: Vector<RuntimeExpression>, seperator: &str) -> String {
     expressions
         .into_iter()
         .map(|item| print(item))
