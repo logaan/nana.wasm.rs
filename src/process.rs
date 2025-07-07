@@ -135,16 +135,7 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
 
         match process {
             Complete(result) => (and_then)(result.clone()),
-            Running(stepable) => {
-                let new_process = stepable.step();
-
-                match new_process {
-                    Complete(result) => (and_then)(result),
-                    Running(_) => Running(Arc::new(AndThen(new_process, and_then.clone()))),
-                    // TODO: AndThen running
-                    Spawn(..) => todo!(),
-                }
-            }
+            Running(stepable) => Running(Arc::new(AndThen(stepable.step(), and_then.clone()))),
             // TODO: AndThen spawn
             Spawn(..) => todo!(),
         }
