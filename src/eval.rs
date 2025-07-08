@@ -264,7 +264,6 @@ fn execute_with_definitions_and_process(
                 stepable.step(),
             )
         })),
-        // TODO: Spawn execute_with_definitions_and_process
         Spawn(continuation, spawned_processes) => Spawn(
             Arc::new(execute_with_definitions_and_process(
                 work.clone(),
