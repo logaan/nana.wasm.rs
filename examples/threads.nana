@@ -1,0 +1,14 @@
+Func second [a b]
+  b
+
+Func log-label [label value]
+    second(log([label value]) value)
+
+Func loop [from n]
+    Match n
+        [0 :done
+         _ loop(from log-label(from decrement(n)))]
+
+spawn(Fn [] loop(:a 5))
+spawn(Fn [] loop(:bb 5))
+loop(:ccc 5)
