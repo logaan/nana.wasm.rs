@@ -1,0 +1,39 @@
+# I was thinking about making symbols into macros:
+
+    + 1 1
+      => 2
+
+# Which is kind of elegant. But it had me worrying about things like:
+
+    [1 2 3]
+    (4 5 6)
+
+# And it occurred to me that maybe we make two kinds of macros. What if you
+# could say:
+
+    Defmacro "Or" [left right]
+      Quote
+        If Unquote left
+          :true
+          If Unquote right
+            :true
+            :false 
+
+# And it would treat Or as having exactly two arguments. And you could also say:
+
+    Defmacro ["[", "]"] [expressions]
+      tagged-tuple(Quote list list-to-tuple(expressions))
+
+# Which would macro expand like this:
+
+    [1 2 3]
+      => list(1 2 3)
+
+# I guess you get an infinite regress when it comes to parens though.
+
+    (1 2 3)
+      => tuple(1 2 3)
+        => tagged-tuple(Quote tuple tuple(1 2 3))
+          => # etc
+
+# I mean maybe it's not that weird. Parens can just be a builtin macro.

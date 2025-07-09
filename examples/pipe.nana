@@ -55,3 +55,60 @@ user
 .println()
 
 [1 2 3 4].map(even?).map(math/square).filter(Fn([n]<(n 10))).println()
+
+# I'm toying with the idea of treating any symbol that starts with a
+# non-alphanumeric character as a macro. It would open up prefix notation math,
+# which might be more acceptable than `divide` etc as functions. It still
+# wouldn't respect operator prescedence. Eg:
+
+     * 2 + 1 4
+         => 10
+
+# One other outcome of this is that piping could become a prefix operation.
+# Which of course I thought of before..
+
+     | [1 2 3 4]
+     | map(even?)
+     | map(math/square)
+     | filter(Fn([n] (< n 10)))
+       println()
+
+# Or on one line:
+
+
+     | [1 2 3 4] | map(even?) | map(math/square) | filter(Fn([n] (< n 10))) println()
+
+# I don't love it... The trailing fn call feels a bit weird, not well connected
+# to the others.
+#
+# Ugh, it would be so annoying to make symbols infix macros. Maybe I could do it
+# just for |. Call it the tag operator or something.
+
+     [1 2 3 4]map(even?)map(math/square)filter(Fn([n] (< n 10)))println()
+
+# It could also just be a uppercase 1 letter macro, without any changes.
+
+     I [1 2 3 4] I map(even?) I map(math/square) I filter(Fn([n] (< n 10))) println()
+
+# Period would make a nicer tag operator. And I don't feel so violated when I
+# think of it as just the way of writing a tagged operation. It maybe even makes
+# nested symbols not so nasty.
+
+    [1 2 3 4].map(even?).map(math/square).filter(Fn([n]<(n 10))).println()
+
+# It could maybe represent types on values.
+
+    45.u32
+
+# And on arguments to functions?
+
+    Func double [num.u32] u32
+      multiply num 2.u32
+
+# I had also considered using macros for types
+
+    Func double U32 [U32 num]
+      multiply num U32 2
+
+# I don't hate that. The syntax highlighting would make it pretty readable. But
+# it doesn't help with pipes at all.
