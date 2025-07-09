@@ -275,7 +275,7 @@ fn execute_with_definitions_and_process(
                 .iter()
                 .map(move |process| {
                     execute_with_definitions_and_process(
-                        work.clone(),
+                        vector![],
                         env.clone(),
                         results.clone(),
                         (*process).clone(),
