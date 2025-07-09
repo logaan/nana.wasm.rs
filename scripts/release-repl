@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+# Copy the built repl to docs/ for GitHub Pages
+rm -rf docs/repl
+mkdir -p docs/repl
+cp -R repl/dist/* docs/repl/

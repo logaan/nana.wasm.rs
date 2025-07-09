@@ -25,11 +25,3 @@ cp examples/learn_x_in_y_minutes.nana repl/public/
 # Build production version of the repl
 cd repl
 npm run build
-cd ..
-
-# Copy the built repl to docs/ for GitHub Pages
-rm -rf docs/repl
-mkdir -p docs/repl
-cp -R repl/dist/* docs/repl/
-
-echo "Production build completed and copied to docs/repl"
