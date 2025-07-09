@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use im::vector;
 
-use crate::eval::{execute, read_code};
+use crate::eval::{execute_once, read_code};
 
 use crate::expressions::RuntimeExpression::{
     Keyword, List, Number, String as NString, Symbol, TaggedTuple,
@@ -14,7 +14,7 @@ use crate::standard_library::standard_library;
 #[test]
 fn test_learn_x_in_y_minutes() {
     let code = read_code("examples/learn_x_in_y_minutes.nana");
-    let results = execute(code, standard_library());
+    let results = execute_once(code, standard_library());
     let stripped = strip_functions(results);
     let expected = vector![
         Number(123),

@@ -1,5 +1,5 @@
-use crate::expressions::RuntimeExpression::Keyword;
-use im::vector;
+use crate::expressions::RuntimeExpression::{Keyword, List};
+use im::{vector, Vector};
 
 use crate::{
     eval::{execute, read_code},
@@ -11,12 +11,18 @@ use crate::{
 fn test_spawn_2_and_loop() {
     let code = read_code("examples/threads.nana");
     let results = execute(code, standard_library());
-    let stripped = strip_functions(results);
+    let stripped = results
+        .into_iter()
+        .map(|(r, _e)| strip_functions(r))
+        .collect::<Vector<_>>();
     let expected = vector![
-        // spawn() really should return a value. It's broken for now.
-        // Keyword(s!("ok")),
-        // Keyword(s!("ok")),
-        Keyword(s!("done")),
+        vector![List(vector![Keyword(s!("b")), Keyword(s!("done"))])],
+        vector![List(vector![Keyword(s!("a")), Keyword(s!("done"))])],
+        vector![
+            Keyword(s!("ok")),
+            Keyword(s!("ok")),
+            List(vector![Keyword(s!("c")), Keyword(s!("done"))]),
+        ]
     ];
 
     assert_eq!(expected, stripped);

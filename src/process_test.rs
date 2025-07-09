@@ -37,7 +37,7 @@ fn test_process_by_steps() {
 
 #[test]
 fn test_process_to_completion() {
-    let actual = make_process(1, 2, 3).run_until_complete();
+    let actual = make_process(1, 2, 3).run_once_until_complete();
 
     let expected = List(vector![Number(1), Number(2), Number(3)]);
     assert_eq!(expected, actual);
@@ -86,7 +86,7 @@ fn test_complete_sequence() {
 
     let process = Process::run_in_sequence(input);
 
-    let actual = process.run_until_complete();
+    let actual = process.run_once_until_complete();
 
     let expected = vector![Number(1), Number(2), Number(3)];
 
@@ -103,7 +103,7 @@ fn test_running_sequence() {
 
     let process = Process::run_in_sequence(input);
 
-    let actual = process.run_until_complete();
+    let actual = process.run_once_until_complete();
 
     let expected = vector![
         List(vector![Number(1), Number(2), Number(3)]),
@@ -117,5 +117,5 @@ fn test_running_sequence() {
 #[test]
 fn test_and_then() {
     let process = Running(Arc::new(|| Complete(1))).and_then(Arc::new(|n| Complete((n, 2))));
-    assert_eq!((1, 2), process.run_until_complete());
+    assert_eq!((1, 2), process.run_once_until_complete());
 }

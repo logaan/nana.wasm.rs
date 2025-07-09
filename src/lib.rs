@@ -40,12 +40,18 @@ impl Command for Component {
 
 impl Nana for Component {
     fn evaluate(name: String) -> String {
-        let result = execute(name, standard_library());
-        result
+        let results = execute(name, standard_library());
+        results
             .into_iter()
-            .map(|item| print(item))
+            .map(|(result, _env)| {
+                result
+                    .into_iter()
+                    .map(|item| print(item))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            })
             .collect::<Vec<_>>()
-            .join("\n")
+            .join("\n#-------- Results from threads in order of completion ----------------\n")
     }
 }
 

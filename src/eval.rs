@@ -277,7 +277,7 @@ fn execute_with_definitions_and_process(
                     execute_with_definitions_and_process(
                         vector![],
                         env.clone(),
-                        results.clone(),
+                        vector![],
                         (*process).clone(),
                     )
                 })
@@ -310,20 +310,16 @@ pub fn execute_with_definitions(
 
 // Runs a string of code and returns the result of each top level expression, as
 // well as an environment containing all new definitions
-pub fn execute_with_env(
-    code: String,
-    env: Environment,
-) -> (Vector<RuntimeExpression>, Environment) {
+pub fn execute(code: String, env: Environment) -> Vector<(Vector<RuntimeExpression>, Environment)> {
     let (_err, expressions) = program(&code).unwrap();
     let comments_stripped = expressions.into_iter().filter(|e| !is_comment(e)).collect();
     let process = execute_with_definitions(comments_stripped, env, vector![]);
     process.run_until_complete()
 }
 
-// Runs a string of code and returns the result of each top level expression
-pub fn execute(code: String, env: Environment) -> Vector<RuntimeExpression> {
-    let (results, _env) = execute_with_env(code, env);
-    results
+pub fn execute_once(code: String, env: Environment) -> Vector<RuntimeExpression> {
+    let (result, _new_env) = execute(code, env).head().unwrap().clone();
+    result
 }
 
 fn eval_expressions(

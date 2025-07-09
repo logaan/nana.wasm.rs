@@ -6,9 +6,9 @@ Func log-label [label value]
 
 Func loop [from n]
     Match n
-        [0 :done
+        [0 [from :done]
          _ loop(from log-label(from decrement(n)))]
 
-spawn(Fn [] loop(:a 5))
-spawn(Fn [] loop(:bb 5))
-loop(:ccc 5)
+spawn(Fn [] loop(:a 10))
+spawn(Fn [] loop(:b 5))
+loop(:c 10)

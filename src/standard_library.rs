@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use im::{hashmap, vector, Vector};
 
-use crate::eval::{apply, eval, execute_with_env, quote};
+use crate::eval::{apply, eval, execute, quote};
 use crate::expressions::RuntimeExpression::{
     BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro, MacroCall,
     Number, String as NString, Symbol, TaggedTuple,
@@ -277,7 +277,10 @@ pub fn builtins() -> Environment {
 }
 
 pub fn standard_library() -> Environment {
-    let (_result, new_env) = execute_with_env(PROGRAM_CODE.to_owned(), builtins());
+    let (_result, new_env) = execute(PROGRAM_CODE.to_owned(), builtins())
+        .head()
+        .unwrap()
+        .clone();
     new_env
 }
 

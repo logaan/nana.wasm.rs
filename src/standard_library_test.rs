@@ -4,27 +4,27 @@ use crate::environment::Environment;
 use crate::expressions::RuntimeExpression::{Macro, Number, String as NString, Symbol};
 use crate::helpers::strip_functions;
 use crate::standard_library::standard_library;
-use crate::{eval::execute, s};
+use crate::{eval::execute_once, s};
 
 #[test]
 fn test_fn_macro() {
     let environment = Environment::from(hashmap! {
-      s!("second") => execute(s!("Fn [a b] b"), standard_library()).head().unwrap().clone(),
+      s!("second") => execute_once(s!("Fn [a b] b"), standard_library()).head().unwrap().clone(),
     });
 
     let expected = vector!(Number(2));
-    let actual = execute(s!("second(1 2)"), environment);
+    let actual = execute_once(s!("second(1 2)"), environment);
     assert_eq!(expected, actual);
 }
 
 #[test]
 fn test_match_macro() {
     let environment = Environment::from(hashmap! {
-      s!("result") => execute(s!("Match 3 [1 2 3 4 5 6]"), standard_library()).head().unwrap().clone(),
+      s!("result") => execute_once(s!("Match 3 [1 2 3 4 5 6]"), standard_library()).head().unwrap().clone(),
     });
 
     let expected = vector!(Number(4));
-    let actual = execute(s!("result"), environment);
+    let actual = execute_once(s!("result"), environment);
     assert_eq!(expected, actual);
 }
 
@@ -36,7 +36,7 @@ fn test_match_eval() {
     }));
     let program = s!("Match foo [1 bar]");
     let expected = vector!(Number(3));
-    let actual = execute(program, environment);
+    let actual = execute_once(program, environment);
     assert_eq!(expected, actual);
 }
 
@@ -45,7 +45,7 @@ fn test_match_binding() {
     let environment = standard_library();
     let program = s!("Match 1 [num num]");
     let expected = vector!(Number(1));
-    let actual = execute(program, environment);
+    let actual = execute_once(program, environment);
     assert_eq!(expected, actual);
 }
 
@@ -55,7 +55,7 @@ fn test_value_definitions() {
         Def result 1
         result
     ");
-    let actual = execute(program, standard_library());
+    let actual = execute_once(program, standard_library());
     let expected = vector!(Number(1), Number(1));
     assert_eq!(expected, actual);
 }
@@ -70,7 +70,7 @@ fn test_recursive_function_definitions() {
            _ recur-once(1)]
     
     recur-once(2)"#;
-    let actual = execute(String::from(program), standard_library())
+    let actual = execute_once(String::from(program), standard_library())
         .back()
         .unwrap()
         .clone();
@@ -81,7 +81,7 @@ fn test_recursive_function_definitions() {
 #[test]
 fn test_macro() {
     let program = r#"Macro [a b] b"#;
-    let mut actual = execute(String::from(program), standard_library());
+    let mut actual = execute_once(String::from(program), standard_library());
     assert!(match actual.pop_front().unwrap() {
         Macro(args, _, body) => {
             assert_eq!(vector![s!("a"), s!("b")], args);
@@ -99,7 +99,7 @@ fn test_func() {
         a
     
     first(1 2)"#;
-    let actual = strip_functions(execute(String::from(program), standard_library()));
+    let actual = strip_functions(execute_once(String::from(program), standard_library()));
     let expected = vector![Number(1)];
     assert_eq!(expected, actual);
 }

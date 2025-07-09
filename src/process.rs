@@ -155,12 +155,12 @@ impl<I: Clone + 'static> Process<I> {
     // This is used in tests, and for eval. round_robin hasn't been adopted yet.
     // But this should probably be deprecated because it can't support spawning
     // new processes.
-    pub fn run_until_complete(self) -> I {
+    pub fn run_until_complete(self) -> Vector<I> {
         Process::round_robin(vector![self])
-            .iter()
-            .next()
-            .unwrap()
-            .clone()
+    }
+
+    pub fn run_once_until_complete(self) -> I {
+        Process::round_robin(vector![self]).head().unwrap().clone()
     }
 
     // Round robin only works with top level processes.
