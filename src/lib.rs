@@ -51,7 +51,7 @@ impl Nana for Component {
                     .join("\n")
             })
             .collect::<Vec<_>>()
-            .join("\n#-------- Results from threads in order of completion ----------------\n")
+            .join("\n#-------- Results from processes in order of completion ----------------\n")
     }
 }
 

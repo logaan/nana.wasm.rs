@@ -264,7 +264,7 @@ pub fn builtins() -> Environment {
             if args.len() == 1 {
                 let first_arg = args.pop_front().unwrap();
                 match first_arg {
-                    Function(..) => Spawn(Arc::new(Complete(Keyword(s!("ok")))),
+                    Function(..) => Spawn(Arc::new(Complete(Keyword(s!("process-spawned")))),
                                           vector![apply(first_arg, vector![])]),
                     // TODO: Should probably support BuiltinFunction too
                     _ => panic!("spawn takes 1 function (with no arguments) as an argument")

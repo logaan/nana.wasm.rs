@@ -9,7 +9,7 @@ use crate::{
 
 #[test]
 fn test_spawn_2_and_loop() {
-    let code = read_code("examples/threads.nana");
+    let code = read_code("examples/spawn.nana");
     let results = execute(code, standard_library());
     let stripped = results
         .into_iter()
@@ -19,8 +19,8 @@ fn test_spawn_2_and_loop() {
         vector![List(vector![Keyword(s!("b")), Keyword(s!("done"))])],
         vector![List(vector![Keyword(s!("a")), Keyword(s!("done"))])],
         vector![
-            Keyword(s!("ok")),
-            Keyword(s!("ok")),
+            Keyword(s!("process-spawned")),
+            Keyword(s!("process-spawned")),
             List(vector![Keyword(s!("c")), Keyword(s!("done"))]),
         ]
     ];

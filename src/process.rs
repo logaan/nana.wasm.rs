@@ -3,113 +3,12 @@ use im::{vector, Vector};
 use std::sync::Arc;
 use Process::{Complete, Running, Spawn};
 
-// TODO: This is the right place for processes to split. We could go with:
-//
-//   (Process<T>, Option<Process<T>>)
-//
-// But it feels inelegant to me. Like a null. It's not nonsense though; it
-// doesn't introduce any invalid representations. A new type would be clean and
-// expressive:
-//
-//   pub enum MaybeFork<T: Clone> {
-//       Continue(Process<T>),
-//       Split(Process<T>, Process<T>),
-//   }
-//
-// But I can't think of a meaningful name for it. We could flatten the idea down.
-// Consider Process to be a kind of 2, 1, or 0 outcome. Where 0 is a completed
-// process, 1 is a continuing one, and 2 is a splitting one. But it's possible
-// that in the split we'll actually have 2 completed processes. And what would
-// you call this new abstraction? Certainly not singular process.
-//
-//   #[derive(Clone)]
-//   pub enum Process<T: Clone> {
-//       Splitting(Process<T>, Process<T>),
-//       Running(Arc<dyn Stepable<T>>),
-//       Complete(T),
-//   }
-//
-// It's also bad because we don't want our list of running processes to include
-// splitting ones. Either seems appropriate but it isn't part of Rust's core
-// libraries so I'm slightly reluctant to pull it in.
-//
-// fn step(&self) -> Either<Process<T>, (Process<T>, Process<T>)>;
-//
-// Perhaps we treat stepping a bit like Mapcat / Flatmap. Step always returns a
-// collection of processes and they just get appended onto the list of running
-// ones.
-//
-//   fn step(&self) -> Vec<Process<T>>;
-//
-// Then spawning becomes quite natural. The existing:
-//
-//   active_processes.push_back(new_process);
-//
-// just becomes:
-//
-//   active_processes.append(new_processes);
-//
-// However it opens up the case of an empty array of processes. That shouldn't
-// happen unless they've completed. So it's elegant in one way but it introduces
-// an invalid state.
-//
-// Step should be returning "1 or more" new processes. We can represent that with
-//
-//   (Process<T>, Vector<Process<T>>)
-//
-// Then we don't risk returning 0 processes, because the left one must alwasy be
-// present. And we don't need to worry about at some point returning more than
-// one spawned process.
-//
-// ----------------------------------------------------------------------
-//
-// After a few failed attempts at implementing this I think I've learned a
-// couple of things:
-//
-//  1: Some of the eval code really expects there to be a concept of a main
-//  thread. Something that's updating definitions and maybe accumulating return
-//  values of each top level expression.
-//
-//  2: The type for process isn't always the same. Sometimes it's
-//  (Vector<RuntimeExpression>, Environment), and sometimes it's
-//  Vector<Process<(Vector<RuntimeExpression>, Environment)>>. Which really
-//  complicates things because the spawned threads don't nessisarily match.
-//
-// My best idea at the moment is that Running processes maybe add a set of child
-// processes as a second field. Though it'll be hard to track the state of which
-// children have been run as we're doing the round robin (which will now be a
-// tree traversal).
-//
-// It might also be worth thinking about how to represent blocked processes.
-//
-// ----------------------------------------------------------------------
-//
-// Here's the plan:
-// 1. [x] Remove step() from process. Replace any breakages with match.
-// 2. [x] Remove is_complete() and is_running(). Replace and breakages with match.
-// 3. [x] Remove result(). Replace break match.
-// 4. [x] Add a third Process type: Spawn(Arc<Process>), update all matches to
-//        handle it. Spawning will be a side effect, for now it evaluates to :ok
-// 5. [x] Add a spawn() function that returns a Spawn process.
-// 6. [x] Replace hard coded RuntimeExpression in Process with a type parameter
-// 6. [x] Remove it
-// 7. [ ] Use round robin for Nana#evaluate
-
-// I: Intermeidate (whatever form we need for this step in execution)
-// R: Root (The type right up top used for all round robin threads)
 pub trait Stepable<I: Clone> {
     fn step(&self) -> Process<I>;
 }
 
 #[derive(Clone)]
 pub enum Process<I: Clone> {
-    // 1. I'm not sure that Vector is strictly needed here. But I need some kind
-    // of indirection, Option isn't sufficient. And Option inside Arc feels a
-    // little inelegant.
-    // 2. I think RuntimeExpression could be a type parameter. T becomes
-    // IntermediateResultType and RuntimeExpression becomes TopResultType. But
-    // that would involve updating all references to Process. I'd prefer to make
-    // some progress and then come back to clean up.
     Spawn(Arc<Process<I>>, Vector<Process<I>>),
     Running(Arc<dyn Stepable<I>>),
     Complete(I),
@@ -127,10 +26,6 @@ impl<I: Clone + 'static, F: Fn() -> Process<I> + 'static> Stepable<I> for F {
 // ends. The result will be passed to the function passed as a second argument
 // to AndThen. That function should return a new process that will be returned
 // directly by AndThen, ending the cycle of wrapping.
-//
-// At any stage a wrapped step() spawning a new process should have that new
-// process exposed without wrapping. We only call step() at most once per cycle
-// so there's no need for Vec rather than Option for spawned processes.
 struct AndThen<A: Clone, B: Clone>(Process<A>, Arc<dyn Fn(A) -> Process<B>>);
 
 impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
@@ -152,9 +47,6 @@ impl<A: Clone + 'static, B: Clone + 'static> Stepable<B> for AndThen<A, B> {
 // wrapping a lambda. step on the process just proxies down to the contained
 // stepable (or panics).
 impl<I: Clone + 'static> Process<I> {
-    // This is used in tests, and for eval. round_robin hasn't been adopted yet.
-    // But this should probably be deprecated because it can't support spawning
-    // new processes.
     pub fn run_until_complete(self) -> Vector<I> {
         Process::round_robin(vector![self])
     }
@@ -163,9 +55,6 @@ impl<I: Clone + 'static> Process<I> {
         Process::round_robin(vector![self]).head().unwrap().clone()
     }
 
-    // Round robin only works with top level processes.
-    // TODO: These Is used to be RuntimeExpressions, so I think they should be
-    // Rs. If they aren't, then I don't think anything should be.
     pub fn round_robin(processes: Vector<Process<I>>) -> Vector<I> {
         let mut active_processes = processes;
         let mut complete_processes: Vector<I> = vector![];
@@ -175,11 +64,6 @@ impl<I: Clone + 'static> Process<I> {
                 Complete(result) => complete_processes.push_back(result),
                 Running(stepable) => active_processes.push_back(stepable.step()),
                 Spawn(continuation, spawned_processes) => {
-                    // The continuation might be a Vector<Process<T>> or
-                    // something with an Environment. Where the spawned
-                    // processes will always be a top level process... maybe it
-                    // is worth looking into process trees... traversing one
-                    // probably wouldn't be so different to a queue.
                     active_processes.append(spawned_processes);
                     active_processes.push_back((*continuation).clone());
                 }
