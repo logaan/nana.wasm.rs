@@ -1,0 +1,49 @@
+Defm count [start end]
+    [[same same] end
+     [start end] count(increment(start) end)]
+
+Def goal 1000000
+
+Def timer-start time()
+
+count(0 goal)
+
+Def timer-end time()
+
+log([:time-to-a-billion subtract(timer-end timer-start)])
+
+
+Def timer-start time()
+
+count(0 goal)
+
+Def timer-end time()
+
+log([:time-to-a-billion subtract(timer-end timer-start)])
+
+
+Def timer-start time()
+
+count(0 goal)
+
+Def timer-end time()
+
+log([:time-to-a-billion subtract(timer-end timer-start)])
+
+
+Def timer-start time()
+
+count(0 goal)
+
+Def timer-end time()
+
+log([:time-to-a-billion subtract(timer-end timer-start)])
+
+
+Def timer-start time()
+
+count(0 goal)
+
+Def timer-end time()
+
+log([:time-to-a-billion subtract(timer-end timer-start)])

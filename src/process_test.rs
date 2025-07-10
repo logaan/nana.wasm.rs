@@ -5,7 +5,7 @@ use crate::expressions::RuntimeExpression::{self, List, Number};
 use crate::process::Process::{Complete, Running, Spawn};
 use crate::process::*;
 
-fn make_process(a: i64, b: i64, c: i64) -> Process<RuntimeExpression> {
+fn make_process(a: u128, b: u128, c: u128) -> Process<RuntimeExpression> {
     Running(Arc::new(move || {
         Running(Arc::new(move || {
             Running(Arc::new(move || {

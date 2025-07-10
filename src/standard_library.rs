@@ -1,5 +1,6 @@
 use core::panic;
 use std::sync::Arc;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use im::{hashmap, vector, Vector};
 
@@ -252,6 +253,16 @@ pub fn builtins() -> Environment {
                 }
             }
         ),
+        s!("time") => BuiltinFunction(|args| {
+            if args.len() == 0 {
+                let start = SystemTime::now();
+                let since_epoch = start.duration_since(UNIX_EPOCH).expect("Time went backwards");
+
+                Complete(Number(since_epoch.as_millis()))
+            } else {
+                panic!("time takes no arguments")
+            }
+        }),
 
         // TODO: spawn needs to:
         // 1. Create a promise
