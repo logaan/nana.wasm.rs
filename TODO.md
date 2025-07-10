@@ -45,3 +45,6 @@
 - [ ] Chain function calls foo.bar().baz()
 - [ ] Call returned values foo()()()
 - [ ] Named arguments foo{:bar 1 :baz 2}
+
+- [ ] environment!() function that returns the current environment map
+- [ ] Procedures for side effects: Proc foo! [a b] [log(a) log(b)]
