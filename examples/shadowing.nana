@@ -1,0 +1,12 @@
+Def outer :foo
+
+Match 123 [num 
+    Match 456 [num
+        Match 789 [num
+            # TODO: Fix shadowing
+            # This logs [123 :foo]
+            # It should log [789 :foo]
+            log([num outer])
+        ]
+    ]
+]
