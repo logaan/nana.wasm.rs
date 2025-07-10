@@ -1,6 +1,5 @@
-- [ ] spawn() builtin that returns a promise
-   If the step fn returned a list of processes then running processes could kick
-   off new processes and they could be added into the round robin pool.
+- [x] spawn() builtin
+- [ ] spawn() returns a promise
 - [ ] Promises
 - [ ] Atoms
 - [x] Keyword tagged tupples
@@ -32,6 +31,7 @@
 - [x] Basic math functions
 - [ ] Literal syntax for negative numbers
 - [ ] Floats
+- [ ] Allow for commas or _ in numbers, to show thousandths
 
 - [ ] MacroName tagged tuples should evaluate as macros
 
@@ -39,3 +39,9 @@
 
 - [ ] Lexical function calls should maybe just be called TaggedTuples
 - [ ] MacroNames should maybe just be symbols
+
+- [ ] Count to a billion as fast as ruby (currently 51% as fast)
+
+- [ ] Chain function calls foo.bar().baz()
+- [ ] Call returned values foo()()()
+- [ ] Named arguments foo{:bar 1 :baz 2}
