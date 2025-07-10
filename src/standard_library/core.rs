@@ -192,7 +192,7 @@ pub fn builtins() -> Environment {
                                         None => {}
                                     }
                                 }
-                                panic!("No match found")
+                                Complete(TaggedTuple(Arc::new(Keyword(s!("error"))), vector![Keyword(s!("no-match-found")), value.clone()]))
                             },
                             _ => panic!("Match takes a value and a list of cases")
                         }
