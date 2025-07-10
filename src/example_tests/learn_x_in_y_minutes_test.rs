@@ -9,7 +9,7 @@ use crate::expressions::RuntimeExpression::{
 };
 use crate::helpers::strip_functions;
 use crate::s;
-use crate::standard_library::standard_library;
+use crate::standard_library::core::standard_library;
 
 #[test]
 fn test_learn_x_in_y_minutes() {

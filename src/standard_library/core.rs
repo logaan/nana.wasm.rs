@@ -295,4 +295,4 @@ pub fn standard_library() -> Environment {
     new_env
 }
 
-pub static PROGRAM_CODE: &str = include_str!("../examples/standard_library.nana");
+pub static PROGRAM_CODE: &str = include_str!("../../examples/standard_library.nana");

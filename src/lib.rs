@@ -20,14 +20,12 @@ mod eval_test;
 mod example_tests;
 #[cfg(test)]
 mod process_test;
-#[cfg(test)]
-mod standard_library_test;
 
 use bindings::exports::component::nana::nana::Guest as Nana;
 use bindings::exports::wasi::cli::run::Guest as Command;
 use eval::execute;
 use expressions::print;
-use standard_library::standard_library;
+use standard_library::core::standard_library;
 
 struct Component;
 

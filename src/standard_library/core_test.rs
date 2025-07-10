@@ -3,7 +3,7 @@ use im::{hashmap, vector};
 use crate::environment::Environment;
 use crate::expressions::RuntimeExpression::{Macro, Number, String as NString, Symbol};
 use crate::helpers::strip_functions;
-use crate::standard_library::standard_library;
+use crate::standard_library::core::standard_library;
 use crate::{eval::execute_once, s};
 
 #[test]
