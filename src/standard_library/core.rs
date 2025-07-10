@@ -174,6 +174,20 @@ pub fn builtins() -> Environment {
                                 let mut iter = cases.iter();
                                 while let (Some(pattern), Some(body)) = (iter.next(), iter.next()) {
                                     match does_match(pattern.clone(), value.clone()) {
+                                        // TODO: I think this is probably why
+                                        // shadowing isn't working correctly. WE
+                                        // shouldn't be evalling here. Instead
+                                        // we should be returning a blob of code
+                                        // that uses calls to llambdas to define
+                                        // local variables and then maybe makes
+                                        // use of a Builtin If statement or
+                                        // something. More should be happening
+                                        // at runtime rather than macro expand time.
+                                        // TODO: Split macro-expand out as a
+                                        // function so macros can be debugged
+                                        // better. Implement the existing macro
+                                        // running stuff in terms of
+                                        // macro-expand followed by eval.
                                         Some(bindings) => return eval(body.clone(), env.clone().union(bindings)),
                                         None => {}
                                     }
