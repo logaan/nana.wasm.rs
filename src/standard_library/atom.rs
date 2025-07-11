@@ -37,8 +37,8 @@ impl Atom {
     }
 }
 
-// TODO: Need to create a RuntimeExpression::Atom
 // TODO: Add support for a validator function
+// TODO: Merge these builtins into the standard library
 
 pub fn atom_builtins() -> Environment {
     Environment::from(hashmap! {
