@@ -107,7 +107,7 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
                             },
                         ))
                     }
-                    _ => not_found_error("No function of that name found"),
+                    _ => not_found_error(&format!("No function '{}' found", name)),
                 }
             }
             Keyword(_) => eval_expressions(&args, &environment).and_then(Arc::new(
