@@ -44,45 +44,45 @@ impl Atom {
 
 pub fn atom_builtins() -> Environment {
     Environment::from(hashmap! {
-      // Args:
-      //   - value: Any.
-      //   - watchers: List<Function | BuiltinFunction>
-      //
-      // Constructs an instance of Atom with those values and returns it.
-      //
-      // Returns:
-      //   - :error(:argument "Takes two arguments")
-      //   - :error(:argument "Second argument must be a list of functions")
-      //   - the newly created atom
-      s!("atom") => BuiltinFunction(|mut args| {
+        // Args:
+        //   - value: Any.
+        //   - watchers: List<Function | BuiltinFunction>
+        //
+        // Constructs an instance of Atom with those values and returns it.
+        //
+        // Returns:
+        //   - :error(:argument "Takes two arguments")
+        //   - :error(:argument "Second argument must be a list of functions")
+        //   - the newly created atom
+        s!("atom") => BuiltinFunction(|mut args| {
             if args.len() == 2 {
                 match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
                     // TODO: Should maybe check that all watchers are
                     // RuntimeExpression::Functions or
                     // RuntimeExpression::BuiltinFunctions
-                    [value, List(watchers)] => Complete(RuntimeExpression::Atom(Arc::new(Atom{
-                      value: RwLock::new(value),
-                       watchers: RwLock::new(watchers)
-                      }))),
-                    _ => argument_error("atom's second argument must be a list of watcher functions")
+                    [value, List(watchers)] => Complete(RuntimeExpression::Atom(Arc::new(Atom {
+                        value: RwLock::new(value),
+                        watchers: RwLock::new(watchers),
+                    }))),
+                    _ => argument_error("atom's second argument must be a list of watcher functions"),
                 }
             } else {
                 argument_error("atom takes exactly 2 arguments")
             }
-      }),
+        }),
 
-      // Args:
-      //   - value: Atom
-      //
-      // Returns:
-      //   - The current value of the atom
-      s!("get") => BuiltinFunction(|args| {
+        // Args:
+        //   - value: Atom
+        //
+        // Returns:
+        //   - The current value of the atom
+        s!("get") => BuiltinFunction(|args| {
             if args.len() == 0 {
-              todo!()
-                } else {
-                  argument_error("get takes exactly one atom as an argument")
-                }
-      }),
+                todo!()
+            } else {
+                argument_error("get takes exactly one atom as an argument")
+            }
+        }),
 
         // Args:
         //   - atom: Atom
@@ -95,9 +95,9 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "Takes two arguments")
         //   - :error(:argument "First argument must be an atom")
         //   - :ok(old-value)
-      s!("set!") => BuiltinFunction(|_args| {
-        todo!()
-      }),
+        s!("set!") => BuiltinFunction(|_args| {
+            todo!()
+        }),
 
         // Args:
         //   - transaction: (Function | BuiltinFunction)<new: Any, old: Any> -> Any
@@ -111,9 +111,9 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "Takes one argument")
         //   - :error(:argument "First argument must be function")
         //   - :ok(old-value new-value)
-      s!("transact!") => BuiltinFunction(|_args| {
-        todo!()
-      }),
+        s!("transact!") => BuiltinFunction(|_args| {
+            todo!()
+        }),
 
         // Args:
         //   - name: Keyword
@@ -127,9 +127,9 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "Second argument must be function")
         //   - :error(:key "Key already present")
         //   - :ok
-      s!("subscribe!") => BuiltinFunction(|_args| {
-        todo!()
-      }),
+        s!("subscribe!") => BuiltinFunction(|_args| {
+            todo!()
+        }),
 
         // Args:
         //   - name: Keyword
@@ -141,8 +141,8 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "First argument must be a keyword")
         //   - :error(:key "Key not found")
         //   - :ok
-      s!("unsubscribe!") => BuiltinFunction(|_args| {
-        todo!()
-      }),
+        s!("unsubscribe!") => BuiltinFunction(|_args| {
+            todo!()
+        }),
     })
 }
