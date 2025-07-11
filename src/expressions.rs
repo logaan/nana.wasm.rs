@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 pub use crate::environment::Environment;
-use crate::{process::Process, s};
+use crate::{process::Process, s, standard_library::atom::Atom};
 use im::Vector;
 use RuntimeExpression::{
     BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro, MacroCall,
@@ -47,6 +47,7 @@ pub enum RuntimeExpression {
     Symbol(String),
     Keyword(String),
     Definition(String, Arc<RuntimeExpression>),
+    Atom(Arc<Atom>),
 }
 
 pub fn print(expression: RuntimeExpression) -> String {

@@ -1,3 +1,4 @@
+use std::ptr::eq;
 use std::sync::RwLock;
 
 use im::{hashmap, Vector};
@@ -6,9 +7,19 @@ use crate::expressions::Environment;
 use crate::expressions::RuntimeExpression::{self, BuiltinFunction};
 use crate::s;
 
-struct Atom {
+// TODO: Split out the core Atom implementation from the nana methods that work
+// with it. Atom's contained type can be parametric and not coupled to
+// RuntimeExpression.
+#[derive(Debug)]
+pub struct Atom {
     value: RwLock<RuntimeExpression>,
     watchers: RwLock<Vector<RuntimeExpression>>,
+}
+
+impl PartialEq for Atom {
+    fn eq(&self, other: &Self) -> bool {
+        eq(self, other)
+    }
 }
 
 // TODO: Need to create a RuntimeExpression::Atom
