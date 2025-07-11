@@ -6,6 +6,7 @@ use std::sync::Arc;
 
 use im::{vector, HashMap, Vector};
 
+use crate::errors::{error_with_message, not_found_error};
 use crate::expressions::RuntimeExpression::{
     self, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro,
     MacroCall, Number, String as NString, Symbol, TaggedTuple,
@@ -50,7 +51,10 @@ pub fn apply(
 
             Process::run_in_sequence_tco(eval_body)
         }
-        _ => panic!("Not a function"),
+        _ => error_with_message(
+            "invalid-application",
+            "You've called an invalid value as a function",
+        ),
     }
 }
 
@@ -83,13 +87,14 @@ pub fn macro_expand(
                 |results: Vector<RuntimeExpression>| Complete(results.last().unwrap().clone()),
             ))
         }
-        _ => panic!("Not a macro"),
+        _ => error_with_message("invalid-macro-expand", "Not a macro"),
     }
 }
 
 pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<RuntimeExpression> {
     match expression {
         TaggedTuple(tag, args) => match (*tag).clone() {
+            // TODO: This should just eval the tag and then apply it to the tuple
             Symbol(name) => {
                 let maybe_function = environment.get(&name);
                 match maybe_function {
@@ -102,7 +107,7 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
                             },
                         ))
                     }
-                    _ => panic!("No function of that name found"),
+                    _ => not_found_error("No function of that name found"),
                 }
             }
             Keyword(_) => eval_expressions(&args, &environment).and_then(Arc::new(
@@ -124,10 +129,10 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
                             expanded.and_then(Arc::new(move |re| eval(re, environment.clone())))
                         }
                         BuiltinMacro(..) => expanded,
-                        _ => panic!("No macro of that name found"),
+                        _ => not_found_error("No macro of that name found"),
                     }
                 }
-                _ => panic!("No macro of that name found"),
+                _ => not_found_error("No macro of that name found"),
             }
         }
 
@@ -145,7 +150,7 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
 
         Symbol(name) => match environment.get(&name) {
             Some(value) => Complete(value.clone()),
-            None => panic!("{} not found", &name),
+            None => not_found_error(&format!("{} not found", &name)),
         },
 
         Keyword(_) => Complete(expression),

@@ -7,6 +7,7 @@ mod helpers;
 mod environment;
 #[cfg(test)]
 mod environment_test;
+mod errors;
 mod eval;
 #[cfg(test)]
 mod expression_test;

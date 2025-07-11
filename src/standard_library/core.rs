@@ -4,6 +4,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use im::{hashmap, vector, Vector};
 
+use crate::errors::{argument_error, error, error_with_message};
 use crate::eval::{apply, eval, execute, quote};
 use crate::expressions::RuntimeExpression::{
     BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro, MacroCall,
@@ -77,10 +78,10 @@ pub fn builtins() -> Environment {
             if args.len() == 2 {
                 match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
                     [Number(l), Number(r)] => Complete(Number(l + r)),
-                    _ => panic!("add takes exactly 2 numbers")
+                    _ => argument_error("add takes exactly 2 numbers")
                 }
             } else {
-                panic!("add takes exactly 2 numbers")
+                argument_error("add takes exactly 2 numbers")
             }
         }),
 
@@ -88,10 +89,10 @@ pub fn builtins() -> Environment {
             if args.len() == 2 {
                 match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
                     [Number(l), Number(r)] => Complete(Number(l - r)),
-                    _ => panic!("subtract takes exactly 2 numbers")
+                    _ => argument_error("subtract takes exactly 2 numbers")
                 }
             } else {
-                panic!("subtract takes exactly 2 numbers")
+                argument_error("subtract takes exactly 2 numbers")
             }
         }),
 
@@ -99,10 +100,10 @@ pub fn builtins() -> Environment {
             if args.len() == 2 {
                 match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
                     [Number(l), Number(r)] => Complete(Number(l * r)),
-                    _ => panic!("multiply takes exactly 2 numbers")
+                    _ => argument_error("multiply takes exactly 2 numbers")
                 }
             } else {
-                panic!("multiply takes exactly 2 numbers")
+                argument_error("multiply takes exactly 2 numbers")
             }
         }),
 
@@ -110,10 +111,10 @@ pub fn builtins() -> Environment {
             if args.len() == 2 {
                 match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
                     [Number(l), Number(r)] => Complete(Number(l / r)),
-                    _ => panic!("divide takes exactly 2 numbers")
+                    _ => argument_error("divide takes exactly 2 numbers")
                 }
             } else {
-                panic!("divide takes exactly 2 numbers")
+                argument_error("divide takes exactly 2 numbers")
             }
         }),
 
@@ -121,10 +122,10 @@ pub fn builtins() -> Environment {
             if args.len() == 2 {
                 match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
                     [Number(l), Number(r)] => Complete(Number(l % r)),
-                    _ => panic!("remainder takes exactly 2 numbers")
+                    _ => argument_error("remainder takes exactly 2 numbers")
                 }
             } else {
-                panic!("remainder takes exactly 2 numbers")
+                argument_error("remainder takes exactly 2 numbers")
             }
         }),
 
@@ -146,10 +147,10 @@ pub fn builtins() -> Environment {
                                 Complete(Definition(name.clone(), Arc::new(result.clone())))
                             }))
                         },
-                        _ => panic!("Def takes a symbol and a value")
+                        _ => argument_error("Def takes a symbol and a value")
                     }
                 } else {
-                    panic!("Def takes exactly 2 arguments")
+                    argument_error("Def takes exactly 2 arguments")
                 }
             }
         ),
@@ -168,37 +169,37 @@ pub fn builtins() -> Environment {
                         match cases.clone() {
                             List(cases) => {
                                 if cases.len() % 2 != 0 {
-                                    panic!("Cases must be a list with an even number of elements")
-                                }
-
-                                let mut iter = cases.iter();
-                                while let (Some(pattern), Some(body)) = (iter.next(), iter.next()) {
-                                    match does_match(pattern.clone(), value.clone()) {
-                                        // TODO: I think this is probably why
-                                        // shadowing isn't working correctly. WE
-                                        // shouldn't be evalling here. Instead
-                                        // we should be returning a blob of code
-                                        // that uses calls to llambdas to define
-                                        // local variables and then maybe makes
-                                        // use of a Builtin If statement or
-                                        // something. More should be happening
-                                        // at runtime rather than macro expand time.
-                                        // TODO: Split macro-expand out as a
-                                        // function so macros can be debugged
-                                        // better. Implement the existing macro
-                                        // running stuff in terms of
-                                        // macro-expand followed by eval.
-                                        Some(bindings) => return eval(body.clone(), env.clone().union(bindings)),
-                                        None => {}
+                                    argument_error("Match cases must be a list with an even number of elements")
+                                } else {
+                                    let mut iter = cases.iter();
+                                    while let (Some(pattern), Some(body)) = (iter.next(), iter.next()) {
+                                        match does_match(pattern.clone(), value.clone()) {
+                                            // TODO: I think this is probably why
+                                            // shadowing isn't working correctly. WE
+                                            // shouldn't be evalling here. Instead
+                                            // we should be returning a blob of code
+                                            // that uses calls to llambdas to define
+                                            // local variables and then maybe makes
+                                            // use of a Builtin If statement or
+                                            // something. More should be happening
+                                            // at runtime rather than macro expand time.
+                                            // TODO: Split macro-expand out as a
+                                            // function so macros can be debugged
+                                            // better. Implement the existing macro
+                                            // running stuff in terms of
+                                            // macro-expand followed by eval.
+                                            Some(bindings) => return eval(body.clone(), env.clone().union(bindings)),
+                                            None => {}
+                                        }
                                     }
+                                    error("no-match-found")
                                 }
-                                Complete(TaggedTuple(Arc::new(Keyword(s!("error"))), vector![Keyword(s!("no-match-found"))]))
                             },
-                            _ => panic!("Match takes a value and a list of cases")
+                            _ => error_with_message("argument", "Match takes a value and a list of cases")
                         }
                     ))
                 } else {
-                    panic!("Match takes exactly 2 arguments")
+                    error_with_message("argument", "Match takes exactly 2 arguments")
                 }
             }
         ),
@@ -217,14 +218,15 @@ pub fn builtins() -> Environment {
                         List(params) => {
                             let param_strings = params.iter().map(|p| match p {
                                 Symbol(s) => s,
+                                // TODO: Rewrite this as an argument_error
                                 _ => panic!("Func params must be ValueNames")
                             }).cloned().collect::<Vector<String>>();
                             Complete(Function(param_strings, env, vector![body]))
                         },
-                        _ => panic!("Fn takes a list of params and a single body expression")
+                        _ => argument_error("Fn takes a list of params and a single body expression")
                     }
                 } else {
-                    panic!("Fn takes exactly 2 arguments")
+                    argument_error("Fn takes exactly 2 arguments")
                 }
             }
         ),
@@ -237,7 +239,7 @@ pub fn builtins() -> Environment {
                 if args.len() == 1 {
                     quote(args.pop_front().unwrap(), env)
                 } else {
-                    panic!("Quote takes exactly 1 argument")
+                    argument_error("Quote takes exactly 1 argument")
                 }
             }
         ),
@@ -256,14 +258,15 @@ pub fn builtins() -> Environment {
                         List(params) => {
                             let param_strings = params.iter().map(|p| match p {
                                 Symbol(s) => s,
+                                // TODO: Rewrite this as an argument error
                                 _ => panic!("Macro params must be symbols")
                             }).cloned().collect::<Vector<String>>();
                             Complete(Macro(param_strings, env, vector![body]))
                         },
-                        _ => panic!("Macro takes a list of params and a single body expression")
+                        _ => argument_error("Macro takes a list of params and a single body expression")
                     }
                 } else {
-                    panic!("Macro takes exactly 2 arguments")
+                    argument_error("Macro takes exactly 2 arguments")
                 }
             }
         ),
@@ -274,7 +277,7 @@ pub fn builtins() -> Environment {
 
                 Complete(Number(since_epoch.as_millis()))
             } else {
-                panic!("time takes no arguments")
+                argument_error("time takes no arguments")
             }
         }),
 
@@ -292,10 +295,10 @@ pub fn builtins() -> Environment {
                     Function(..) => Spawn(Arc::new(Complete(Keyword(s!("process-spawned")))),
                                           vector![apply(first_arg, vector![])]),
                     // TODO: Should probably support BuiltinFunction too
-                    _ => panic!("spawn takes 1 function (with no arguments) as an argument")
+                    _ => argument_error("spawn takes 1 function (with no arguments) as an argument")
                 }
             } else {
-                panic!("spawn takes 1 function (with no arguments) as an argument")
+                argument_error("spawn takes 1 function (with no arguments) as an argument")
             }
         })
     })
