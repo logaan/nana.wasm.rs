@@ -76,9 +76,12 @@ pub fn atom_builtins() -> Environment {
         //
         // Returns:
         //   - The current value of the atom
-        s!("get") => BuiltinFunction(|args| {
-            if args.len() == 0 {
-                todo!()
+        s!("get") => BuiltinFunction(|mut args| {
+            if args.len() == 1 {
+                match args.pop_front().unwrap() {
+                    RuntimeExpression::Atom(atom) => Complete((*atom).clone().get()),
+                    _ => argument_error("get takes exactly one atom as an argument")
+                }
             } else {
                 argument_error("get takes exactly one atom as an argument")
             }
