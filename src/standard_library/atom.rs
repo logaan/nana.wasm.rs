@@ -1,10 +1,12 @@
 use std::ptr::eq;
-use std::sync::RwLock;
+use std::sync::{Arc, RwLock};
 
 use im::{hashmap, Vector};
 
+use crate::errors::argument_error;
 use crate::expressions::Environment;
-use crate::expressions::RuntimeExpression::{self, BuiltinFunction};
+use crate::expressions::RuntimeExpression::{self, BuiltinFunction, List};
+use crate::process::Process::Complete;
 use crate::s;
 
 // TODO: Split out the core Atom implementation from the nana methods that work
@@ -42,26 +44,39 @@ impl Atom {
 
 pub fn atom_builtins() -> Environment {
     Environment::from(hashmap! {
-      s!("atom") => BuiltinFunction(|_args| {
-        // Args:
-        //   - value: Any.
-        //   - watchers: List<Function | BuiltinFunction>
-        //
-        // Constructs an instance of Atom with those values and returns it.
-        //
-        // Returns:
-        //   - :error(:argument "Takes two arguments")
-        //   - :error(:argument "Second argument must be a list of functions")
-        //   - the newly created atom
-        todo!()
+      // Args:
+      //   - value: Any.
+      //   - watchers: List<Function | BuiltinFunction>
+      //
+      // Constructs an instance of Atom with those values and returns it.
+      //
+      // Returns:
+      //   - :error(:argument "Takes two arguments")
+      //   - :error(:argument "Second argument must be a list of functions")
+      //   - the newly created atom
+      s!("atom") => BuiltinFunction(|mut args| {
+            if args.len() == 2 {
+                match [args.pop_front().unwrap(), args.pop_front().unwrap()] {
+                    // TODO: Should maybe check that all watchers are
+                    // RuntimeExpression::Functions or
+                    // RuntimeExpression::BuiltinFunctions
+                    [value, List(watchers)] => Complete(RuntimeExpression::Atom(Arc::new(Atom{
+                      value: RwLock::new(value),
+                       watchers: RwLock::new(watchers)
+                      }))),
+                    _ => argument_error("atom's second argument must be a list of watcher functions")
+                }
+            } else {
+                argument_error("atom takes exactly 2 arguments")
+            }
       }),
 
+      // Args:
+      //   - value: Atom
+      //
+      // Returns:
+      //   - The current value of the atom
       s!("get") => BuiltinFunction(|_args| {
-        // Args:
-        //   - value: Atom
-        //
-        // Returns:
-        //   - The current value of the atom
         todo!()
       }),
 
