@@ -76,11 +76,14 @@ pub fn atom_builtins() -> Environment {
       //
       // Returns:
       //   - The current value of the atom
-      s!("get") => BuiltinFunction(|_args| {
-        todo!()
+      s!("get") => BuiltinFunction(|args| {
+            if args.len() == 0 {
+              todo!()
+                } else {
+                  argument_error("get takes exactly one atom as an argument")
+                }
       }),
 
-      s!("set!") => BuiltinFunction(|_args| {
         // Args:
         //   - atom: Atom
         //   - new-value: Any
@@ -92,10 +95,10 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "Takes two arguments")
         //   - :error(:argument "First argument must be an atom")
         //   - :ok(old-value)
+      s!("set!") => BuiltinFunction(|_args| {
         todo!()
       }),
 
-      s!("transact!") => BuiltinFunction(|_args| {
         // Args:
         //   - transaction: (Function | BuiltinFunction)<new: Any, old: Any> -> Any
         //
@@ -108,10 +111,10 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "Takes one argument")
         //   - :error(:argument "First argument must be function")
         //   - :ok(old-value new-value)
+      s!("transact!") => BuiltinFunction(|_args| {
         todo!()
       }),
 
-      s!("subscribe!") => BuiltinFunction(|_args| {
         // Args:
         //   - name: Keyword
         //   - watcher: Function<Any, Any> -> :ok
@@ -124,10 +127,10 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "Second argument must be function")
         //   - :error(:key "Key already present")
         //   - :ok
+      s!("subscribe!") => BuiltinFunction(|_args| {
         todo!()
       }),
 
-      s!("unsubscribe!") => BuiltinFunction(|_args| {
         // Args:
         //   - name: Keyword
         //
@@ -138,6 +141,7 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "First argument must be a keyword")
         //   - :error(:key "Key not found")
         //   - :ok
+      s!("unsubscribe!") => BuiltinFunction(|_args| {
         todo!()
       }),
     })
