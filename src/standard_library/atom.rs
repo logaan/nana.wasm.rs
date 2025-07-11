@@ -22,6 +22,21 @@ impl PartialEq for Atom {
     }
 }
 
+impl Clone for Atom {
+    fn clone(&self) -> Self {
+        Atom {
+            value: RwLock::new(self.value.read().unwrap().clone()),
+            watchers: RwLock::new(self.watchers.read().unwrap().clone()),
+        }
+    }
+}
+
+impl Atom {
+    pub fn get(self) -> RuntimeExpression {
+        self.value.read().unwrap().clone()
+    }
+}
+
 // TODO: Need to create a RuntimeExpression::Atom
 // TODO: Add support for a validator function
 

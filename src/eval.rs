@@ -8,7 +8,7 @@ use im::{vector, HashMap, Vector};
 
 use crate::errors::{error_with_message, not_found_error};
 use crate::expressions::RuntimeExpression::{
-    self, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro,
+    self, Atom, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro,
     MacroCall, Number, String as NString, Symbol, TaggedTuple,
 };
 use crate::expressions::{is_comment, Environment, LexicalExpression};
@@ -163,6 +163,7 @@ pub fn eval(expression: RuntimeExpression, environment: Environment) -> Process<
         Macro(..) => todo!("Do we eval macros?"),
         Hole => todo!("I can't imagine what holes evaluate to"),
         Definition(..) => todo!("Evalling a definition"),
+        Atom(..) => todo!("Evalling an atom"),
     }
 }
 
@@ -234,6 +235,7 @@ pub fn quote(value: RuntimeExpression, env: Environment) -> Process<RuntimeExpre
         NString(_) => Complete(value),
         Keyword(_) => Complete(value),
         Symbol(_) => Complete(value),
+        Atom(_) => Complete(value),
         Definition(name, value) => {
             let process = quote((*value).clone(), env);
             process.and_then(Arc::new(move |new_value| {

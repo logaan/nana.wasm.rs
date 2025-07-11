@@ -7,8 +7,8 @@ use im::{hashmap, vector, Vector};
 use crate::errors::{argument_error, error, error_with_message};
 use crate::eval::{apply, eval, execute, quote};
 use crate::expressions::RuntimeExpression::{
-    BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro, MacroCall,
-    Number, String as NString, Symbol, TaggedTuple,
+    Atom, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro,
+    MacroCall, Number, String as NString, Symbol, TaggedTuple,
 };
 use crate::expressions::{print_many, Environment, RuntimeExpression};
 use crate::process::Process::{Complete, Spawn};
@@ -57,6 +57,7 @@ fn does_match(pattern: RuntimeExpression, value: RuntimeExpression) -> Option<En
         BuiltinMacro(..) => None, // Builtins shouldn't be comparable
         Macro(..) => None,     // Macros shouldn't be comparable
         Definition(..) => None, // Definitions should just be at the top level.
+        Atom(..) => None,      // Macros shouldn't be comparable
     }
 }
 

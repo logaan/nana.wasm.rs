@@ -1,11 +1,11 @@
 use std::sync::Arc;
 
 pub use crate::environment::Environment;
-use crate::{process::Process, s, standard_library::atom::Atom};
+use crate::{process::Process, s, standard_library::atom};
 use im::Vector;
 use RuntimeExpression::{
-    BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro, MacroCall,
-    Number, String as NString, Symbol, TaggedTuple,
+    Atom, BuiltinFunction, BuiltinMacro, Definition, Function, Hole, Keyword, List, Macro,
+    MacroCall, Number, String as NString, Symbol, TaggedTuple,
 };
 
 pub fn is_comment(expression: &LexicalExpression) -> bool {
@@ -47,7 +47,7 @@ pub enum RuntimeExpression {
     Symbol(String),
     Keyword(String),
     Definition(String, Arc<RuntimeExpression>),
-    Atom(Arc<Atom>),
+    Atom(Arc<atom::Atom>),
 }
 
 pub fn print(expression: RuntimeExpression) -> String {
@@ -64,6 +64,7 @@ pub fn print(expression: RuntimeExpression) -> String {
         Number(value) => format!("{}", value),
         NString(value) => format!("\"{}\"", value),
         Symbol(name) => name,
+        Atom(atom) => format!("Atom({} [..])", print((*atom).clone().get())),
         TaggedTuple(tag, values) => {
             format!("{}({})", print((*tag).clone()), print_many(values, " "))
         }
