@@ -15,6 +15,7 @@ use crate::s;
 #[derive(Debug)]
 pub struct Atom {
     value: RwLock<RuntimeExpression>,
+    // Switch from Vector to OrdMap
     watchers: RwLock<Vector<RuntimeExpression>>,
 }
 
@@ -64,6 +65,7 @@ pub fn atom_builtins() -> Environment {
                         value: RwLock::new(value),
                         watchers: RwLock::new(watchers),
                     }))),
+                    // TODO: Update text when we switch watchers to a map
                     _ => argument_error("atom's second argument must be a list of watcher functions"),
                 }
             } else {
@@ -118,6 +120,7 @@ pub fn atom_builtins() -> Environment {
             todo!()
         }),
 
+        // TODO: Subscribe can wait until nana gets maps
         // Args:
         //   - name: Keyword
         //   - watcher: Function<Any, Any> -> :ok
@@ -130,10 +133,11 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "Second argument must be function")
         //   - :error(:key "Key already present")
         //   - :ok
-        s!("subscribe!") => BuiltinFunction(|_args| {
-            todo!()
-        }),
+        // s!("subscribe!") => BuiltinFunction(|_args| {
+        //     todo!()
+        // }),
 
+        // TODO: Unsubscribe will need to wait until nana gets maps
         // Args:
         //   - name: Keyword
         //
@@ -144,8 +148,8 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "First argument must be a keyword")
         //   - :error(:key "Key not found")
         //   - :ok
-        s!("unsubscribe!") => BuiltinFunction(|_args| {
-            todo!()
-        }),
+        // s!("unsubscribe!") => BuiltinFunction(|_args| {
+        //     todo!()
+        // }),
     })
 }
