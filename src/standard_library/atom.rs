@@ -87,6 +87,9 @@ pub fn atom_builtins() -> Environment {
             }
         }),
 
+        // TODO: The procedure `set!` can be implemented in a nana library file
+        // on top of `transact!`. No need to make it a builtin.
+        //
         // Args:
         //   - atom: Atom
         //   - new-value: Any
@@ -98,9 +101,6 @@ pub fn atom_builtins() -> Environment {
         //   - :error(:argument "Takes two arguments")
         //   - :error(:argument "First argument must be an atom")
         //   - :ok(old-value)
-        s!("set!") => BuiltinFunction(|_args| {
-            todo!()
-        }),
 
         // Args:
         //   - transaction: (Function | BuiltinFunction)<new: Any, old: Any> -> Any
